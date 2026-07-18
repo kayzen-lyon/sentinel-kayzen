@@ -1,0 +1,292 @@
+@import "tailwindcss";
+
+/* ============================================================
+   SENTINEL BY KAYZEN — Design tokens
+   Charte graphique reprise de Nexus (by Kayzen) :
+   police Outfit/Inter, bleu #2563EB, base zinc, échelle
+   nombre d'or, typographie fluide clamp(), easings spring.
+   Accent cyber : vert émeraude "safe" + rouge/ambre "risk".
+   ============================================================ */
+
+:root {
+  /* Fonts (fournies par next/font) */
+  --font-heading: var(--font-outfit), system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+
+  /* Surfaces — thème sombre (identique au rendu Nexus) */
+  --bg: 9 9 11; /* #09090B zinc-950 */
+  --bg-elev: 24 24 27; /* #18181B zinc-900 */
+  --bg-card: 24 24 27;
+  --bg-hover: 39 39 42; /* #27272A zinc-800 */
+  --fg: 244 244 245; /* #F4F4F5 */
+  --fg-muted: 161 161 170; /* #A1A1AA zinc-400 */
+  --fg-subtle: 113 113 122; /* #71717A zinc-500 */
+  --border: 39 39 42; /* #27272A */
+  --border-strong: 63 63 70; /* #3F3F46 */
+
+  /* Marque — bleu Kayzen (identique Nexus) */
+  --brand: 37 99 235; /* #2563EB blue-600 */
+  --brand-hover: 29 78 216; /* #1D4ED8 */
+  --brand-light: 96 165 250; /* #60A5FA blue-400 (liens sur sombre) */
+
+  /* Accents cyber */
+  --safe: 34 197 94; /* #22C55E émeraude — statut sécurisé / éco */
+  --safe-light: 134 239 172; /* #86EFAC */
+  --risk: 239 68 68; /* #EF4444 rouge — vulnérabilité critique */
+  --warn: 234 179 8; /* #EAB308 ambre — alerte moyenne */
+  --violet: 124 58 237; /* #7C3AED */
+
+  /* Typographie fluide (échelle Nexus) */
+  --text-sm: clamp(0.8rem, 0.75rem + 0.2vw, 0.875rem);
+  --text-base: clamp(0.9rem, 0.85rem + 0.3vw, 1rem);
+  --text-lg: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+  --text-xl: clamp(1.1rem, 1rem + 0.6vw, 1.25rem);
+  --text-2xl: clamp(1.25rem, 1.1rem + 0.8vw, 1.5rem);
+  --text-3xl: clamp(1.5rem, 1.2rem + 1.5vw, 1.875rem);
+  --text-4xl: clamp(1.75rem, 1.4rem + 2vw, 2.25rem);
+  --text-5xl: clamp(2rem, 1.5rem + 3vw, 3rem);
+  --text-hero: clamp(2.5rem, 2rem + 4.5vw, 5rem);
+
+  /* Espacements — nombre d'or (échelle Nexus) */
+  --space-xs: 0.236rem;
+  --space-sm: 0.382rem;
+  --space-md: 0.618rem;
+  --space-lg: 1rem;
+  --space-xl: 1.618rem;
+  --space-2xl: 2.618rem;
+  --space-3xl: 4.236rem;
+  --space-4xl: 6.854rem;
+
+  /* Easings & durées (identiques Nexus) */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  --dur-fast: 150ms;
+  --dur-normal: 300ms;
+  --dur-slow: 600ms;
+
+  /* Ombres */
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.25);
+  --shadow-brand: 0 8px 32px rgba(37, 99, 235, 0.25);
+  --shadow-glow: 0 0 40px rgba(37, 99, 235, 0.2);
+
+  --scroll-margin: 88px;
+}
+
+/* Expose les tokens comme utilitaires Tailwind v4 */
+@theme inline {
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+
+  --color-bg: rgb(var(--bg));
+  --color-bg-elev: rgb(var(--bg-elev));
+  --color-card: rgb(var(--bg-card));
+  --color-hover: rgb(var(--bg-hover));
+  --color-fg: rgb(var(--fg));
+  --color-muted: rgb(var(--fg-muted));
+  --color-subtle: rgb(var(--fg-subtle));
+  --color-border: rgb(var(--border));
+  --color-border-strong: rgb(var(--border-strong));
+  --color-brand: rgb(var(--brand));
+  --color-brand-hover: rgb(var(--brand-hover));
+  --color-brand-light: rgb(var(--brand-light));
+  --color-safe: rgb(var(--safe));
+  --color-safe-light: rgb(var(--safe-light));
+  --color-risk: rgb(var(--risk));
+  --color-warn: rgb(var(--warn));
+  --color-violet: rgb(var(--violet));
+
+  --font-size-hero: var(--text-hero);
+  --font-size-fluid-5xl: var(--text-5xl);
+  --font-size-fluid-4xl: var(--text-4xl);
+  --font-size-fluid-3xl: var(--text-3xl);
+  --font-size-fluid-2xl: var(--text-2xl);
+  --font-size-fluid-xl: var(--text-xl);
+  --font-size-fluid-lg: var(--text-lg);
+
+  --ease-spring: var(--ease-spring);
+  --ease-out: var(--ease-out);
+}
+
+* {
+  border-color: rgb(var(--border));
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: rgb(var(--bg));
+  color: rgb(var(--fg));
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background-color: rgba(37, 99, 235, 0.35);
+  color: rgb(var(--fg));
+}
+
+[id] {
+  scroll-margin-top: var(--scroll-margin);
+}
+
+/* ---- Utilitaires composites ---- */
+.container-x {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+.gradient-text {
+  background: linear-gradient(120deg, rgb(var(--brand-light)), rgb(var(--violet)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.grid-glow {
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.15), transparent 55%),
+    linear-gradient(to right, rgba(63, 63, 70, 0.25) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(63, 63, 70, 0.25) 1px, transparent 1px);
+  background-size: 100% 100%, 56px 56px, 56px 56px;
+}
+
+.card {
+  background-color: rgb(var(--bg-card));
+  border: 1px solid rgb(var(--border));
+  border-radius: 16px;
+  transition: border-color var(--dur-normal) var(--ease-out),
+    transform var(--dur-normal) var(--ease-out),
+    box-shadow var(--dur-normal) var(--ease-out);
+}
+
+.card:hover {
+  border-color: rgb(var(--border-strong));
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--text-base);
+  line-height: 1;
+  padding: 0.85rem 1.4rem;
+  border-radius: 12px;
+  transition: all var(--dur-normal) var(--ease-out);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background-color: rgb(var(--brand));
+  color: #fff;
+  box-shadow: var(--shadow-brand);
+}
+
+.btn-primary:hover {
+  background-color: rgb(var(--brand-hover));
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow), var(--shadow-brand);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: rgb(var(--fg));
+  border: 1px solid rgb(var(--border-strong));
+}
+
+.btn-ghost:hover {
+  background-color: rgb(var(--bg-hover));
+  border-color: rgb(var(--fg-subtle));
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgb(var(--brand-light));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---- Prose (pages légales) ---- */
+.prose {
+  color: rgb(var(--fg-muted));
+  font-size: var(--text-base);
+  line-height: 1.75;
+}
+.prose h2 {
+  color: rgb(var(--fg));
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+.prose h3 {
+  color: rgb(var(--fg));
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+.prose p {
+  margin-bottom: 1rem;
+}
+.prose ul {
+  list-style: disc;
+  padding-left: 1.4rem;
+  margin-bottom: 1rem;
+}
+.prose li {
+  margin-bottom: 0.4rem;
+}
+.prose a {
+  color: rgb(var(--brand-light));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose strong {
+  color: rgb(var(--fg));
+  font-weight: 600;
+}
+.prose .todo {
+  color: rgb(var(--warn));
+  font-weight: 600;
+}
+
+@keyframes float-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  animation: float-up var(--dur-slow) var(--ease-out) both;
+}
