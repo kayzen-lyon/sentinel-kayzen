@@ -61,13 +61,13 @@ export default function Header() {
 
         <div className="hidden items-center gap-2 md:flex">
           <a
-            href="#plateforme"
+            href="/login"
             className="rounded-xl px-3 py-2 text-sm font-medium text-muted transition-colors hover:text-fg"
           >
             Connexion
           </a>
-          <a href="#contact" className="btn btn-primary !px-4 !py-2.5 text-sm">
-            Demander un audit
+          <a href="/signup" className="btn btn-primary !px-4 !py-2.5 text-sm">
+            Scanner mon site
           </a>
         </div>
 
@@ -98,18 +98,18 @@ export default function Header() {
           </nav>
           <div className="mt-4 flex flex-col gap-2">
             <a
-              href="#contact"
+              href="/signup"
               onClick={() => setOpen(false)}
               className="btn btn-primary w-full"
             >
-              Demander un audit
+              Scanner mon site
             </a>
             <a
-              href="#plateforme"
+              href="/login"
               onClick={() => setOpen(false)}
               className="btn btn-ghost w-full"
             >
-              Accéder à la plateforme
+              Connexion
             </a>
           </div>
         </div>

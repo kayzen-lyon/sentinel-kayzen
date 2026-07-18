@@ -16,11 +16,11 @@ const PLANS = [
   },
   {
     name: "Plateforme",
-    tagline: "Pentest IA continu en self-service",
+    tagline: "Scan de sécurité continu en self-service",
     price: "à partir de 290 €",
     unit: "/ mois",
     cta: "Démarrer un essai",
-    href: "#contact",
+    href: "/signup",
     highlight: true,
     features: [
       "Cibles et dépôts illimités*",

@@ -68,8 +68,8 @@ export default function Offers() {
                 <Item key={i} accent="brand">{i}</Item>
               ))}
             </ul>
-            <a href="#tarifs" className="btn btn-ghost mt-8 w-full sm:w-auto">
-              Voir les offres plateforme
+            <a href="/signup" className="btn btn-ghost mt-8 w-full sm:w-auto">
+              Scanner mon site maintenant
             </a>
           </article>
         </div>

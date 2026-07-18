@@ -13,23 +13,42 @@ import Footer from "@/components/Footer";
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "Service",
-  name: "Sentinel by Kayzen",
-  serviceType: "Pentest IA autonome & cybersécurité offensive",
-  provider: {
-    "@type": "Organization",
-    name: "Kayzen Web",
-    url: "https://kayzen-lyon.fr",
-    areaServed: "FR",
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Lyon",
-      addressCountry: "FR",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://sentinel.kayzen-lyon.fr/#org",
+      name: "Sentinel by Kayzen",
+      url: "https://sentinel.kayzen-lyon.fr",
+      logo: "https://sentinel.kayzen-lyon.fr/logo-mark.png",
+      parentOrganization: { "@type": "Organization", name: "Kayzen Web", url: "https://kayzen-lyon.fr" },
+      areaServed: "FR",
+      address: { "@type": "PostalAddress", addressLocality: "Lyon", addressCountry: "FR" },
+      email: "contact@kayzen-lyon.fr",
     },
-  },
-  description:
-    "Des agents IA autonomes qui trouvent, exploitent et prouvent vos vulnérabilités par des PoC réels. Audit managé et plateforme self-service intégrée à la CI/CD.",
-  url: "https://sentinel.kayzen-lyon.fr",
+    {
+      "@type": "WebSite",
+      "@id": "https://sentinel.kayzen-lyon.fr/#website",
+      url: "https://sentinel.kayzen-lyon.fr",
+      name: "Sentinel by Kayzen",
+      inLanguage: "fr-FR",
+      publisher: { "@id": "https://sentinel.kayzen-lyon.fr/#org" },
+    },
+    {
+      "@type": "Service",
+      name: "Sentinel by Kayzen",
+      serviceType: "Scan de sécurité IA & pentest",
+      provider: { "@id": "https://sentinel.kayzen-lyon.fr/#org" },
+      description:
+        "Scanner de posture de sécurité en self-service (en-têtes, TLS, CSP, expositions) et audit managé par les experts Kayzen.",
+      url: "https://sentinel.kayzen-lyon.fr",
+      offers: {
+        "@type": "Offer",
+        priceCurrency: "EUR",
+        price: "0",
+        description: "Scan de sécurité initial gratuit.",
+      },
+    },
+  ],
 };
 
 export default function Page() {

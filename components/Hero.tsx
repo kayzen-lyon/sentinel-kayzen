@@ -36,12 +36,12 @@ export default function Hero() {
             className="reveal mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
             style={{ animationDelay: "180ms" }}
           >
-            <a href="#contact" className="btn btn-primary w-full sm:w-auto">
-              Demander un audit gratuit
+            <a href="/signup" className="btn btn-primary w-full sm:w-auto">
+              Scanner mon site gratuitement
               <IconArrow />
             </a>
-            <a href="#plateforme" className="btn btn-ghost w-full sm:w-auto">
-              Explorer la plateforme
+            <a href="#contact" className="btn btn-ghost w-full sm:w-auto">
+              Demander un audit managé
             </a>
           </div>
 

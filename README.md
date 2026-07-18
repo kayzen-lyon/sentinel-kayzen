@@ -9,6 +9,32 @@ Sentinel propose du **pentest IA autonome** basé sur le moteur open-source
 vulnérabilités par des PoC réels. Offre **hybride** : audit managé par l'agence
 Kayzen **+** plateforme self-service intégrée à la CI/CD.
 
+## Application self-service (opérationnelle)
+
+Au-delà de la vitrine, le projet embarque un **outil fonctionnel** :
+
+- **Authentification** e-mail + mot de passe (sessions JWT httpOnly, `bcrypt`).
+- **Scanner de sécurité passif réel** (`lib/scanner.ts`) : le client saisit son URL et
+  Sentinel analyse en direct HTTPS/HSTS, en-têtes de sécurité, CSP, cookies, CORS,
+  fuites serveur, `security.txt` et expositions (`.env`, `.git`…). Note **A→F** + score.
+- **Garde anti-SSRF** (`lib/ssrf.ts`) : refuse localhost, IP privées et métadonnées cloud.
+- **Dashboard** `/dashboard` protégé, avec historique des scans par utilisateur.
+
+> Le scan est **passif et non-intrusif** (requêtes GET). Le pentest offensif complet
+> (moteur Strix, exploitation, PoC) reste l'offre **audit managé**, exécutée sur infra Docker.
+
+### Variables d'environnement
+
+| Variable | Rôle | Requis |
+|---|---|---|
+| `AUTH_SECRET` | Clé de signature des sessions JWT | **Oui en prod** (défini sur Vercel) |
+| `DATABASE_URL` | Postgres (Neon, Vercel Postgres ou Supabase) — comptes + historique | Oui pour l'auth |
+
+**Brancher la base (Neon, gratuit) :** dans Vercel → projet → **Storage → Create Database
+→ Neon**. La variable `DATABASE_URL` (ou `POSTGRES_URL`) est injectée automatiquement ;
+au premier appel, le schéma (`users`, `scans`) est créé tout seul. Sans base, le scan
+fonctionne quand même (mode démo, sans historique persistant).
+
 ## Stack
 
 - **Next.js 15** (App Router) + **React 19** + **TypeScript**
