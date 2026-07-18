@@ -70,7 +70,10 @@ function grade(score: number): string {
 }
 
 /** Exécute un scan passif de posture de sécurité sur une URL déjà validée (anti-SSRF). */
-export async function runScan(target: URL): Promise<ScanResult> {
+export async function runScan(
+  target: URL,
+  opts: { deep?: boolean } = {}
+): Promise<ScanResult> {
   const findings: Finding[] = [];
   const add = (f: Finding) => findings.push(f);
 
@@ -374,6 +377,17 @@ export async function runScan(target: URL): Promise<ScanResult> {
           recommendation: `Bloquez l'accès public à ${s.path} au niveau du serveur web.`,
         });
       }
+    }
+  }
+
+  // --- Contrôles approfondis (domaine vérifié) ---
+  if (opts.deep) {
+    try {
+      const { deepChecks } = await import("./deepchecks");
+      const extra = await deepChecks(new URL(finalUrl));
+      for (const f of extra) add(f);
+    } catch {
+      /* les contrôles approfondis sont best-effort */
     }
   }
 

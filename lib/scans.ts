@@ -8,6 +8,7 @@ export type ScanRow = {
   status: string;
   grade: string | null;
   score: number | null;
+  deep: boolean | null;
   summary: ScanResult["summary"] | null;
   findings: ScanResult["findings"] | null;
   error: string | null;
@@ -17,12 +18,13 @@ export type ScanRow = {
 
 export async function createScanRecord(
   userId: string,
-  targetUrl: string
+  targetUrl: string,
+  deep = false
 ): Promise<string> {
   await ensureSchema();
   const rows = await query<{ id: string }>(
-    `INSERT INTO scans (user_id, target_url, status) VALUES ($1, $2, 'running') RETURNING id`,
-    [userId, targetUrl]
+    `INSERT INTO scans (user_id, target_url, status, deep) VALUES ($1, $2, 'running', $3) RETURNING id`,
+    [userId, targetUrl, deep]
   );
   return rows[0].id;
 }
@@ -55,7 +57,7 @@ export async function failScan(id: string, message: string): Promise<void> {
 export async function listScans(userId: string): Promise<ScanRow[]> {
   await ensureSchema();
   return query<ScanRow>(
-    `SELECT id, target_url, final_url, status, grade, score, summary, error, created_at, completed_at
+    `SELECT id, target_url, final_url, status, grade, score, deep, summary, error, created_at, completed_at
        FROM scans WHERE user_id=$1 ORDER BY created_at DESC LIMIT 50`,
     [userId]
   );

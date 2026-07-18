@@ -11,6 +11,7 @@ import {
   SESSION_COOKIE,
   sessionCookieOptions,
 } from "@/lib/auth";
+import { checkRateLimit, clientIp } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
@@ -21,6 +22,13 @@ export async function POST(req: Request) {
       { status: 503 }
     );
   }
+
+  const rl = await checkRateLimit(`signup:${clientIp(req)}`, 6, 3600);
+  if (!rl.allowed)
+    return NextResponse.json(
+      { error: "Trop de créations de compte. Réessayez plus tard." },
+      { status: 429 }
+    );
   let body: { email?: string; password?: string; name?: string };
   try {
     body = await req.json();

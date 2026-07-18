@@ -4,6 +4,8 @@ import { dbConfigured } from "@/lib/db";
 import { validateTargetUrl } from "@/lib/ssrf";
 import { runScan } from "@/lib/scanner";
 import { createScanRecord, completeScan, failScan, listScans } from "@/lib/scans";
+import { isHostVerified } from "@/lib/domains";
+import { checkRateLimit } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -29,24 +31,39 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Requête invalide." }, { status: 400 });
   }
 
+  // Rate-limiting : 8 scans / 10 min par utilisateur
+  const rl = await checkRateLimit(`scan:${session.id}`, 8, 600);
+  if (!rl.allowed)
+    return NextResponse.json(
+      {
+        error: `Limite de scans atteinte. Réessayez dans ${rl.retryAfter ?? 60}s.`,
+      },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfter ?? 60) } }
+    );
+
   const check = await validateTargetUrl(body.url || "");
   if (!check.ok)
     return NextResponse.json({ error: check.reason }, { status: 400 });
+
+  // Scan approfondi uniquement si le domaine est vérifié par l'utilisateur
+  const deep = dbConfigured
+    ? await isHostVerified(session.id, check.url.hostname).catch(() => false)
+    : false;
 
   const persist = dbConfigured;
   let scanId: string | null = null;
   if (persist) {
     try {
-      scanId = await createScanRecord(session.id, check.url.toString());
+      scanId = await createScanRecord(session.id, check.url.toString(), deep);
     } catch {
       // on continue même si la persistance échoue
     }
   }
 
   try {
-    const result = await runScan(check.url);
+    const result = await runScan(check.url, { deep });
     if (scanId) await completeScan(scanId, result).catch(() => {});
-    return NextResponse.json({ id: scanId, result });
+    return NextResponse.json({ id: scanId, result, deep });
   } catch (e) {
     const message =
       e instanceof Error ? e.message : "Échec du scan de la cible.";

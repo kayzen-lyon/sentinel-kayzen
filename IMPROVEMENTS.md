@@ -26,14 +26,14 @@ en production ; les ◻ constituent une feuille de route claire et exécutable.
 15. ✅ État vide (aucun scan) soigné
 16. ✅ Mode démo si base non connectée (scan quand même fonctionnel)
 17. ✅ CTA du site reliés au vrai produit (`/signup`, `/login`)
-18. ◻ Ré-exécuter un scan en un clic depuis l'historique
+18. ✅ Ré-exécuter un scan en un clic depuis l'historique
 19. ◻ Comparaison entre deux scans (évolution du score)
-20. ◻ Export PDF du rapport de scan
-21. ◻ Export JSON / CSV des findings
+20. ✅ Export PDF du rapport de scan (impression / PDF)
+21. 🔄 Export JSON des findings (JSON ✅, CSV ◻)
 22. ◻ Envoi du rapport par e-mail
 23. ◻ Scans planifiés (quotidien / hebdomadaire)
 24. ◻ Alertes en cas de régression du score
-25. ◻ Vérification de propriété du domaine (DNS TXT / fichier) avant scans approfondis
+25. ✅ Vérification de propriété du domaine (DNS TXT / fichier) avant scans approfondis
 26. ◻ Multi-cibles / projets par compte
 27. ◻ Rôles & équipes (plusieurs utilisateurs par organisation)
 28. ◻ Quotas selon l'offre (gratuit vs plateforme)
@@ -60,8 +60,8 @@ en production ; les ◻ constituent une feuille de route claire et exécutable.
 47. ✅ `/.well-known/security.txt` publié (RFC 9116)
 48. ✅ Timeouts sur toutes les requêtes sortantes du scanner
 49. ✅ User-Agent identifiable et transparent pour le scanner
-50. ◻ Rate-limiting des endpoints d'auth et de scan
-51. ◻ Protection anti-bruteforce (backoff / captcha après N échecs)
+50. ✅ Rate-limiting des endpoints d'auth, de scan et de domaines (Postgres, fenêtre glissante)
+51. 🔄 Protection anti-bruteforce (rate-limit par IP ✅ ; captcha ◻)
 52. ◻ CSP par nonce (retirer `unsafe-inline` sur les scripts)
 53. ◻ Vérification e-mail à l'inscription (double opt-in)
 54. ◻ Journalisation des connexions et audit trail
@@ -85,15 +85,15 @@ en production ; les ◻ constituent une feuille de route claire et exécutable.
 70. ✅ Exposition de `server-status`
 71. ✅ Temps de réponse mesuré
 72. ✅ Scoring pondéré par gravité + note A→F
-73. ◻ Analyse du certificat TLS (émetteur, expiration, chaîne)
+73. ✅ Analyse du certificat TLS (émetteur, expiration, validité) — scan approfondi
 74. ◻ Détection des versions TLS/ciphers faibles
-75. ◻ Vérification `robots.txt` / `sitemap.xml`
+75. ✅ Vérification `robots.txt` / `sitemap.xml` — scan approfondi
 76. ◻ Détection de la techno (CMS, framework, librairies JS)
 77. ◻ Correspondance versions ↔ CVE connues
-78. ◻ Détection de contenu mixte (mixed content)
+78. ✅ Détection de contenu mixte (mixed content) — scan approfondi
 79. ◻ Contrôle `Cache-Control` sur pages sensibles
 80. ◻ Détection de sous-domaines (énumération passive)
-81. ◻ Vérification des enregistrements SPF / DKIM / DMARC
+81. 🔄 Enregistrements SPF / DMARC ✅ (scan approfondi) — DKIM ◻
 82. ◻ Détection de pages d'admin/login exposées
 83. ◻ Analyse des formulaires (CSRF token, autocomplete)
 84. ◻ Vérification des en-têtes de cache CDN / Vary

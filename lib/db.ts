@@ -70,6 +70,28 @@ export async function ensureSchema(): Promise<void> {
 
     CREATE INDEX IF NOT EXISTS scans_user_created_idx
       ON scans (user_id, created_at DESC);
+
+    ALTER TABLE scans ADD COLUMN IF NOT EXISTS deep boolean NOT NULL DEFAULT false;
+
+    CREATE TABLE IF NOT EXISTS verified_domains (
+      id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id     uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      domain      text NOT NULL,
+      token       text NOT NULL,
+      method      text,
+      verified_at timestamptz,
+      created_at  timestamptz NOT NULL DEFAULT now(),
+      UNIQUE (user_id, domain)
+    );
+
+    CREATE TABLE IF NOT EXISTS rate_events (
+      id         bigserial PRIMARY KEY,
+      bucket     text NOT NULL,
+      created_at timestamptz NOT NULL DEFAULT now()
+    );
+
+    CREATE INDEX IF NOT EXISTS rate_events_bucket_idx
+      ON rate_events (bucket, created_at DESC);
   `);
   schemaReady = true;
 }

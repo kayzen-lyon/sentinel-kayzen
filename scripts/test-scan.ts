@@ -9,8 +9,9 @@ async function main() {
     console.error("REFUSÉ:", check.reason);
     process.exit(1);
   }
-  console.log("OK, scan en cours…\n");
-  const result = await runScan(check.url);
+  const deep = process.argv.includes("--deep");
+  console.log(`OK, scan ${deep ? "APPROFONDI" : "standard"} en cours…\n`);
+  const result = await runScan(check.url, { deep });
   console.log("Note:", result.grade, "| Score:", result.score + "/100");
   console.log("Résumé:", JSON.stringify(result.summary.counts));
   console.log("\nFindings:");
