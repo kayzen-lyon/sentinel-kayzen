@@ -1,0 +1,8 @@
+﻿User-agent: *
+Allow: /
+Disallow: /mentions-legales
+Disallow: /confidentialite
+Disallow: /cgu
+Disallow: /accessibilite
+
+Sitemap: https://sentinel.kayzen-lyon.fr/sitemap.xml
