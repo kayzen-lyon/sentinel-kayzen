@@ -10,6 +10,7 @@ import Group from "@/components/Group";
 import Faq from "@/components/Faq";
 import CtaFinal from "@/components/CtaFinal";
 import Footer from "@/components/Footer";
+import { FAQ } from "@/lib/faq";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -47,6 +48,14 @@ const jsonLd = {
         price: "0",
         description: "Scan de sécurité initial gratuit.",
       },
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: FAQ.map((item) => ({
+        "@type": "Question",
+        name: item.q,
+        acceptedAnswer: { "@type": "Answer", text: item.a },
+      })),
     },
   ],
 };

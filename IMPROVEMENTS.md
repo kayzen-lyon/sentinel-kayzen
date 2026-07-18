@@ -27,9 +27,9 @@ en production ; les ◻ constituent une feuille de route claire et exécutable.
 16. ✅ Mode démo si base non connectée (scan quand même fonctionnel)
 17. ✅ CTA du site reliés au vrai produit (`/signup`, `/login`)
 18. ✅ Ré-exécuter un scan en un clic depuis l'historique
-19. ◻ Comparaison entre deux scans (évolution du score)
+19. 🔄 Comparaison de scans (sparkline d'évolution ✅ ; diff détaillé ◻)
 20. ✅ Export PDF du rapport de scan (impression / PDF)
-21. 🔄 Export JSON des findings (JSON ✅, CSV ◻)
+21. ✅ Export JSON + CSV des findings
 22. ◻ Envoi du rapport par e-mail
 23. ◻ Scans planifiés (quotidien / hebdomadaire)
 24. ◻ Alertes en cas de régression du score
@@ -37,7 +37,7 @@ en production ; les ◻ constituent une feuille de route claire et exécutable.
 26. ◻ Multi-cibles / projets par compte
 27. ◻ Rôles & équipes (plusieurs utilisateurs par organisation)
 28. ◻ Quotas selon l'offre (gratuit vs plateforme)
-29. ◻ Réinitialisation de mot de passe par e-mail
+29. 🔄 Gestion du compte + changement de mot de passe ✅ ; réinitialisation par e-mail ◻
 30. ◻ Connexion via Google / GitHub (OAuth)
 
 ## B. Sécurité applicative (notre propre site)
@@ -88,10 +88,10 @@ en production ; les ◻ constituent une feuille de route claire et exécutable.
 73. ✅ Analyse du certificat TLS (émetteur, expiration, validité) — scan approfondi
 74. ◻ Détection des versions TLS/ciphers faibles
 75. ✅ Vérification `robots.txt` / `sitemap.xml` — scan approfondi
-76. ◻ Détection de la techno (CMS, framework, librairies JS)
+76. ✅ Détection de la techno (Server, X-Powered-By, Vercel, Next.js, WordPress…)
 77. ◻ Correspondance versions ↔ CVE connues
 78. ✅ Détection de contenu mixte (mixed content) — scan approfondi
-79. ◻ Contrôle `Cache-Control` sur pages sensibles
+79. ✅ Contrôle `Cache-Control` sur la réponse principale
 80. ◻ Détection de sous-domaines (énumération passive)
 81. 🔄 Enregistrements SPF / DMARC ✅ (scan approfondi) — DKIM ◻
 82. ◻ Détection de pages d'admin/login exposées
@@ -115,7 +115,7 @@ en production ; les ◻ constituent une feuille de route claire et exécutable.
 98. ◻ Balise canonical explicite par page
 99. ◻ Sitemap enrichi (lastmod dynamique par contenu)
 100. ◻ Page blog + articles (contenu SEO cybersécurité)
-101. ◻ FAQ structurée en JSON-LD (`FAQPage`)
+101. ✅ FAQ structurée en JSON-LD (`FAQPage`)
 102. ◻ Fil d'Ariane + `BreadcrumbList`
 103. ◻ Balises hreflang (si version EN)
 104. ◻ Optimisation Core Web Vitals (mesure Lighthouse)
@@ -183,12 +183,12 @@ en production ; les ◻ constituent une feuille de route claire et exécutable.
 160. ◻ Notifications toast (succès / erreur)
 161. ◻ Mode clair optionnel (toggle thème)
 162. ◻ Micro-interactions au survol des findings
-163. ◻ Graphique d'évolution du score dans le temps
-164. ◻ Tri / filtre des findings par gravité
-165. ◻ Copie en un clic d'une recommandation
+163. ✅ Sparkline d'évolution du score par domaine
+164. ✅ Filtre des findings (tous / problèmes uniquement)
+165. ✅ Copie en un clic d'une recommandation
 166. ◻ Onboarding (première visite du dashboard)
 167. ◻ Illustrations / pictos personnalisés par catégorie
-168. ◻ Animation de la note qui « compte » jusqu'au score
+168. ✅ Animation de la note qui « compte » jusqu'au score
 169. ◻ Barre de progression réelle (SSE) plutôt qu'estimée
 170. ◻ Aperçu OG dynamique par scan partagé
 
@@ -220,7 +220,7 @@ en production ; les ◻ constituent une feuille de route claire et exécutable.
 193. ✅ Convention `proxy` de Next 16 (plus de warning middleware)
 194. ✅ Auto-déploiement GitHub → Vercel actif
 195. ✅ 4 pages légales FR (structure prête)
-196. ◻ Tests automatisés (scanner, SSRF, auth)
+196. ✅ Tests automatisés (SSRF, validation, domaines) — `npm test` (node:test)
 197. ◻ CI GitHub Actions (lint + build + tests)
 198. ◻ Surveillance d'erreurs (Sentry ou équivalent)
 199. ◻ Analytics respectueux de la vie privée (Plausible)

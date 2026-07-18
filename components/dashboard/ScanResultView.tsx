@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import type { Finding, ScanResult, Severity } from "@/lib/scanner";
 
 const SEV: Record<Severity, { label: string; color: string }> = {
@@ -14,9 +17,35 @@ function gradeColor(grade: string): string {
   return "risk";
 }
 
+function useCountUp(target: number, duration = 700): number {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setVal(Math.round(target * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return val;
+}
+
 export default function ScanResultView({ result }: { result: ScanResult }) {
   const gc = gradeColor(result.grade);
   const s = result.summary;
+  const score = useCountUp(result.score);
+  const [onlyProblems, setOnlyProblems] = useState(false);
+
+  const problems = result.findings.filter(
+    (f) => f.state === "fail" || f.state === "warn"
+  ).length;
+  const shown = onlyProblems
+    ? result.findings.filter((f) => f.state === "fail" || f.state === "warn")
+    : result.findings;
 
   return (
     <div className="space-y-6">
@@ -37,9 +66,8 @@ export default function ScanResultView({ result }: { result: ScanResult }) {
               {s.finalUrl}
             </p>
             <p className="mt-1 text-sm text-muted">
-              Score de posture : <strong className="text-fg">{result.score}/100</strong>{" "}
-              · HTTP {s.httpStatus} · {s.responseTimeMs} ms
-              {s.server ? ` · ${s.server}` : ""}
+              Score de posture : <strong className="text-fg">{score}/100</strong> · HTTP{" "}
+              {s.httpStatus} · {s.responseTimeMs} ms{s.server ? ` · ${s.server}` : ""}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {(Object.keys(SEV) as Severity[]).map((sev) =>
@@ -64,8 +92,32 @@ export default function ScanResultView({ result }: { result: ScanResult }) {
         </div>
       </div>
 
+      <div className="no-print flex items-center justify-between">
+        <span className="text-sm text-muted">
+          {shown.length} contrôle{shown.length > 1 ? "s" : ""} affiché{shown.length > 1 ? "s" : ""}
+        </span>
+        <div className="flex gap-1 rounded-lg border border-border p-1">
+          <button
+            onClick={() => setOnlyProblems(false)}
+            className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+              !onlyProblems ? "bg-hover text-fg" : "text-muted hover:text-fg"
+            }`}
+          >
+            Tous ({result.findings.length})
+          </button>
+          <button
+            onClick={() => setOnlyProblems(true)}
+            className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+              onlyProblems ? "bg-hover text-fg" : "text-muted hover:text-fg"
+            }`}
+          >
+            Problèmes ({problems})
+          </button>
+        </div>
+      </div>
+
       <ul className="space-y-3">
-        {result.findings.map((f) => (
+        {shown.map((f) => (
           <FindingRow key={f.id} f={f} />
         ))}
       </ul>
@@ -74,10 +126,22 @@ export default function ScanResultView({ result }: { result: ScanResult }) {
 }
 
 function FindingRow({ f }: { f: Finding }) {
-  const color =
-    f.state === "pass" ? "safe" : SEV[f.severity].color;
+  const [copied, setCopied] = useState(false);
+  const color = f.state === "pass" ? "safe" : SEV[f.severity].color;
   const icon =
     f.state === "pass" ? "✓" : f.state === "fail" ? "✗" : f.state === "warn" ? "!" : "i";
+
+  async function copy() {
+    if (!f.recommendation) return;
+    try {
+      await navigator.clipboard.writeText(f.recommendation);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* ignore */
+    }
+  }
+
   return (
     <li className="card p-5">
       <div className="flex items-start gap-3">
@@ -107,9 +171,18 @@ function FindingRow({ f }: { f: Finding }) {
           </div>
           <p className="mt-1.5 break-words text-sm text-muted">{f.detail}</p>
           {f.recommendation && (
-            <p className="mt-2 rounded-lg border border-border bg-bg-elev/60 px-3 py-2 text-sm text-muted">
-              <strong className="text-fg">Recommandation :</strong> {f.recommendation}
-            </p>
+            <div className="mt-2 flex items-start gap-2 rounded-lg border border-border bg-bg-elev/60 px-3 py-2">
+              <p className="flex-1 text-sm text-muted">
+                <strong className="text-fg">Recommandation :</strong> {f.recommendation}
+              </p>
+              <button
+                onClick={copy}
+                className="no-print flex-none rounded-md px-2 py-1 text-xs text-brand-light transition-colors hover:bg-hover"
+                title="Copier la recommandation"
+              >
+                {copied ? "Copié ✓" : "Copier"}
+              </button>
+            </div>
           )}
         </div>
       </div>

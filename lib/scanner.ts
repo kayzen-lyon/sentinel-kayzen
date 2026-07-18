@@ -323,6 +323,69 @@ export async function runScan(
     });
   }
 
+  // 8b. Cookies SameSite
+  if (cookies.length) {
+    const noSameSite = cookies.filter((c) => !/;\s*samesite/i.test(c));
+    if (noSameSite.length) {
+      add({
+        id: "cookies-samesite",
+        category: "Cookies",
+        title: "Cookies sans attribut SameSite",
+        severity: "low",
+        state: "warn",
+        detail: `${noSameSite.length}/${cookies.length} cookie(s) sans SameSite (risque CSRF).`,
+        recommendation: "Ajoutez SameSite=Lax ou Strict à vos cookies.",
+      });
+    }
+  }
+
+  // 8c. Cache-Control
+  const cacheControl = get("cache-control");
+  add(
+    cacheControl
+      ? {
+          id: "cache-control",
+          category: "En-têtes",
+          title: "Cache-Control défini",
+          severity: "info",
+          state: "pass",
+          detail: `Cache-Control: ${cacheControl}`,
+        }
+      : {
+          id: "cache-control",
+          category: "En-têtes",
+          title: "Cache-Control absent",
+          severity: "low",
+          state: "warn",
+          detail: "Aucune directive Cache-Control sur la réponse principale.",
+          recommendation:
+            "Définissez Cache-Control explicitement, surtout sur les pages authentifiées (no-store).",
+        }
+  );
+
+  // 8d. Détection de technologie (informatif)
+  const generator = get("x-generator");
+  const techBits: string[] = [];
+  if (server) techBits.push(server);
+  if (powered) techBits.push(powered);
+  if (generator) techBits.push(generator);
+  if (/wp-|wordpress/i.test(get("link")) || /wordpress/i.test(generator))
+    techBits.push("WordPress");
+  if (get("x-vercel-id")) techBits.push("Vercel");
+  if (get("x-nextjs-cache") || /next\.js/i.test(powered)) techBits.push("Next.js");
+  if (techBits.length) {
+    add({
+      id: "tech",
+      category: "Reconnaissance",
+      title: "Technologies détectées",
+      severity: "info",
+      state: "info",
+      detail: `Empreinte : ${[...new Set(techBits)].join(", ")}.`,
+      recommendation:
+        "Vérifiez que ces composants sont à jour et que leurs versions ne sont pas exposées.",
+    });
+  }
+
   // 9. security.txt
   const origin = new URL(finalUrl).origin;
   const sec = await fetchSafe(`${origin}/.well-known/security.txt`, {

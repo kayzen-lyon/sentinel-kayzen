@@ -16,6 +16,23 @@ export async function findUserByEmail(email: string): Promise<UserRow | null> {
   return rows[0] ?? null;
 }
 
+export async function getUserById(id: string): Promise<UserRow | null> {
+  await ensureSchema();
+  const rows = await query<UserRow>(
+    `SELECT id, email, password_hash, name FROM users WHERE id=$1`,
+    [id]
+  );
+  return rows[0] ?? null;
+}
+
+export async function updatePassword(
+  userId: string,
+  passwordHash: string
+): Promise<void> {
+  await ensureSchema();
+  await query(`UPDATE users SET password_hash=$2 WHERE id=$1`, [userId, passwordHash]);
+}
+
 export async function createUser(
   email: string,
   passwordHash: string,

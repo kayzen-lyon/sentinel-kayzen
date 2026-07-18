@@ -125,17 +125,39 @@ export default function DashboardClient({
     }
   }
 
-  function exportJson() {
+  function download(content: string, type: string, ext: string) {
     if (!result) return;
-    const blob = new Blob([JSON.stringify(result, null, 2)], {
-      type: "application/json",
-    });
+    const blob = new Blob([content], { type });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `sentinel-scan-${prettyHost(result.targetUrl)}.json`;
+    a.download = `sentinel-scan-${prettyHost(result.targetUrl)}.${ext}`;
     a.click();
     URL.revokeObjectURL(a.href);
   }
+
+  function exportJson() {
+    if (result) download(JSON.stringify(result, null, 2), "application/json", "json");
+  }
+
+  function exportCsv() {
+    if (!result) return;
+    const esc = (v: string) => `"${(v || "").replace(/"/g, '""')}"`;
+    const header = "titre,gravite,etat,categorie,detail,recommandation";
+    const rows = result.findings.map((f) =>
+      [f.title, f.severity, f.state, f.category, f.detail, f.recommendation || ""]
+        .map(esc)
+        .join(",")
+    );
+    download([header, ...rows].join("\r\n"), "text/csv;charset=utf-8", "csv");
+  }
+
+  // Historique des scores pour le domaine courant (sparkline)
+  const history = result
+    ? scans
+        .filter((x) => prettyHost(x.target_url) === prettyHost(result.targetUrl) && x.score != null)
+        .map((x) => x.score as number)
+        .reverse()
+    : [];
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -174,7 +196,12 @@ export default function DashboardClient({
             </nav>
           </div>
           <div className="flex items-center gap-3">
-            <span className="hidden text-sm text-muted sm:inline">{user.name || user.email}</span>
+            <Link
+              href="/dashboard/account"
+              className="hidden text-sm text-muted transition-colors hover:text-fg sm:inline"
+            >
+              {user.name || user.email}
+            </Link>
             <button onClick={logout} className="btn btn-ghost !px-3.5 !py-2 text-sm">
               Déconnexion
             </button>
@@ -271,13 +298,25 @@ export default function DashboardClient({
                           ↻ Re-scanner
                         </button>
                         <button onClick={exportJson} className="btn btn-ghost !px-3 !py-1.5 text-xs">
-                          Export JSON
+                          JSON
+                        </button>
+                        <button onClick={exportCsv} className="btn btn-ghost !px-3 !py-1.5 text-xs">
+                          CSV
                         </button>
                         <button onClick={() => window.print()} className="btn btn-ghost !px-3 !py-1.5 text-xs">
                           Imprimer / PDF
                         </button>
                       </div>
                     </div>
+                    {history.length >= 2 && (
+                      <div className="no-print mb-4 flex items-center gap-3 rounded-lg border border-border bg-bg-elev/40 px-4 py-3">
+                        <span className="text-xs font-medium text-muted">Évolution du score</span>
+                        <Sparkline values={history} />
+                        <span className="text-xs text-subtle">
+                          {history.length} scan{history.length > 1 ? "s" : ""}
+                        </span>
+                      </div>
+                    )}
                     {!resultDeep && (
                       <p className="no-print mb-4 rounded-lg border border-border bg-bg-elev/60 px-4 py-2.5 text-sm text-muted">
                         Astuce : vérifiez la propriété de ce domaine dans l'onglet{" "}
@@ -372,6 +411,33 @@ function GradeChip({ grade }: { grade: string | null }) {
 function Spinner() {
   return (
     <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-brand/30 border-t-brand" />
+  );
+}
+
+function Sparkline({ values }: { values: number[] }) {
+  const w = 120;
+  const h = 28;
+  const max = 100;
+  const min = Math.min(...values, 0);
+  const range = max - min || 1;
+  const pts = values.map((v, i) => {
+    const x = values.length === 1 ? w : (i / (values.length - 1)) * w;
+    const y = h - ((v - min) / range) * h;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+  const last = values[values.length - 1];
+  const color = last >= 80 ? "safe" : last >= 50 ? "warn" : "risk";
+  return (
+    <svg width={w} height={h} className="flex-1" aria-hidden="true">
+      <polyline
+        points={pts.join(" ")}
+        fill="none"
+        stroke={`rgb(var(--${color}))`}
+        strokeWidth="2"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 
