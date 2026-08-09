@@ -169,6 +169,13 @@ export async function ensureSchema(): Promise<void> {
       webhook_url text,
       updated_at  timestamptz NOT NULL DEFAULT now()
     );
+    -- Gestionnaires de tickets (Jira / Linear)
+    ALTER TABLE org_integrations ADD COLUMN IF NOT EXISTS jira_base_url text;
+    ALTER TABLE org_integrations ADD COLUMN IF NOT EXISTS jira_email text;
+    ALTER TABLE org_integrations ADD COLUMN IF NOT EXISTS jira_token text;
+    ALTER TABLE org_integrations ADD COLUMN IF NOT EXISTS jira_project text;
+    ALTER TABLE org_integrations ADD COLUMN IF NOT EXISTS linear_key text;
+    ALTER TABLE org_integrations ADD COLUMN IF NOT EXISTS linear_team text;
 
     -- Surveillance planifiée (scans passifs récurrents + alertes de régression)
     CREATE TABLE IF NOT EXISTS scheduled_scans (
@@ -183,6 +190,20 @@ export async function ensureSchema(): Promise<void> {
       created_at  timestamptz NOT NULL DEFAULT now()
     );
     CREATE INDEX IF NOT EXISTS scheduled_scans_user_idx ON scheduled_scans (user_id);
+
+    -- GitHub App managée : installations + contexte PR sur les jobs
+    CREATE TABLE IF NOT EXISTS gh_installations (
+      installation_id bigint PRIMARY KEY,
+      account_login   text,
+      org_id          uuid REFERENCES organizations(id) ON DELETE SET NULL,
+      user_id         uuid REFERENCES users(id) ON DELETE SET NULL,
+      created_at      timestamptz NOT NULL DEFAULT now()
+    );
+    ALTER TABLE jobs ADD COLUMN IF NOT EXISTS gh_installation_id bigint;
+    ALTER TABLE jobs ADD COLUMN IF NOT EXISTS gh_owner text;
+    ALTER TABLE jobs ADD COLUMN IF NOT EXISTS gh_repo text;
+    ALTER TABLE jobs ADD COLUMN IF NOT EXISTS gh_sha text;
+    ALTER TABLE jobs ADD COLUMN IF NOT EXISTS gh_pr integer;
 
     -- Clés API (accès programmatique / serveur MCP)
     CREATE TABLE IF NOT EXISTS api_keys (

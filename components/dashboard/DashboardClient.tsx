@@ -212,6 +212,12 @@ export default function DashboardClient({
                 CI/CD
               </Link>
               <Link
+                href="/dashboard/integrations"
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg"
+              >
+                Intégrations
+              </Link>
+              <Link
                 href="/dashboard/team"
                 className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg"
               >

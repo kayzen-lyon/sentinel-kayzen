@@ -163,11 +163,16 @@ La Vague 2 ci-dessous **ne dépend pas** de cette décision et démarre immédia
 
 ## VAGUE 4 — Écosystème & intégrations ✅ LIVRÉE (sauf GitHub App / Jira / Linear)
 
-- **T4.1 ✅** Notifications **Slack + webhook générique** sur fin de pentest (`lib/notify.ts`,
-  URLs validées anti-SSRF) + **scan sur PR** (page `/dashboard/cicd` générant le workflow GitHub
-  Actions Strix, échec du check si vulnérabilités) + **rapport par e-mail** (`lib/email.ts`, Resend,
-  auto en fin de pentest + envoi manuel) + **export PDF** (page rapport imprimable
-  `/dashboard/pentest/[id]/report`). *(GitHub App managée + Jira/Linear : backlog.)*
+- **T4.1 ✅** Notifications Slack + webhook (`lib/notify.ts`), scan sur PR CI (`/dashboard/cicd`),
+  rapport e-mail (`lib/email.ts`), export PDF (`/dashboard/pentest/[id]/report`).
+- **T4.1b ✅ GitHub App managée** : webhook signé (`lib/githubApp.ts` — HMAC + JWT RS256 + jeton
+  d'installation), déclenchement d'un scan Strix à chaque PR, **statut de check + commentaire**
+  publiés sur la PR ; installations reliées au compte (`lib/ghinstall.ts`,
+  `/api/integrations/github/{webhook,setup}`, page `/dashboard/integrations`).
+- **T4.1c ✅ Jira / Linear** : création de ticket depuis un finding (`lib/tickets.ts`, bouton dans
+  la console), config par organisation (`/api/integrations/tickets`, URL Jira validée anti-SSRF).
+- **UX ✅** En-tête console partagé et **responsive** (`ConsoleHeader`, menu mobile) — corrige la
+  navigation mobile absente sur les pages pentest/surveillance/CI-CD/intégrations/équipe.
 - **T4.2 ✅** **Serveur MCP** : `app/api/mcp` (JSON-RPC 2.0, auth par clé API `sntl_…`), outils
   `passive_scan` / `list_scans` / `launch_pentest` / `get_pentest`. Clés gérées dans `/dashboard/account`
   (`lib/apikeys.ts`, table `api_keys`, secret montré une seule fois) + snippet de config Claude Desktop.

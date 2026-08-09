@@ -12,6 +12,7 @@ import {
 import { notifyOrg } from "@/lib/notify";
 import { getUserById } from "@/lib/users";
 import { pentestReportEmail, sendEmail } from "@/lib/email";
+import { postCommitStatus, postPrComment } from "@/lib/githubApp";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -97,6 +98,40 @@ export async function POST(req: Request) {
         findings: findings.length,
       },
     });
+
+    // Publication du résultat sur la pull request GitHub (si le job vient de la GitHub App)
+    if (job.gh_installation_id && job.gh_owner && job.gh_repo && job.gh_sha) {
+      const crit = findings.filter((f) =>
+        ["critical", "high"].includes((f.severity || "").toLowerCase())
+      ).length;
+      const state =
+        body.status !== "done" ? "error" : findings.length > 0 ? "failure" : "success";
+      const desc =
+        body.status !== "done"
+          ? "Scan interrompu."
+          : `${findings.length} vulnérabilité(s), dont ${crit} critique(s)/élevée(s).`;
+      await postCommitStatus(
+        Number(job.gh_installation_id),
+        job.gh_owner,
+        job.gh_repo,
+        job.gh_sha,
+        state,
+        desc
+      ).catch(() => {});
+      if (job.gh_pr) {
+        const lines = findings
+          .slice(0, 20)
+          .map((f) => `- **${f.severity}** ${f.title}${f.cvss ? ` (CVSS ${f.cvss})` : ""}`)
+          .join("\n");
+        await postPrComment(
+          Number(job.gh_installation_id),
+          job.gh_owner,
+          job.gh_repo,
+          job.gh_pr,
+          `### 🛡️ Sentinel by Kayzen — ${findings.length} vulnérabilité(s)\n\n${lines || "Aucune vulnérabilité détectée."}`
+        ).catch(() => {});
+      }
+    }
 
     // Rapport par e-mail au demandeur (best-effort, seulement si Resend configuré)
     const user = await getUserById(job.user_id).catch(() => null);

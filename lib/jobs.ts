@@ -23,6 +23,11 @@ export type JobRow = {
   agents_graph: unknown;
   playbook: string | null;
   instruction: string | null;
+  gh_installation_id: string | null;
+  gh_owner: string | null;
+  gh_repo: string | null;
+  gh_sha: string | null;
+  gh_pr: number | null;
   created_at: string;
   started_at: string | null;
   completed_at: string | null;
@@ -64,6 +69,25 @@ export async function createJob(
     `INSERT INTO jobs (user_id, target_url, mode, status, org_id, playbook, instruction)
      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
     [userId, targetUrl, mode, status, orgId, playbook, instruction]
+  );
+  return rows[0].id;
+}
+
+/** Crée un job déclenché par une pull request GitHub (avec contexte de check). */
+export async function createGithubJob(
+  userId: string,
+  orgId: string | null,
+  targetUrl: string,
+  gh: { installationId: number; owner: string; repo: string; sha: string; pr: number }
+): Promise<string> {
+  await ensureSchema();
+  const rows = await query<{ id: string }>(
+    `INSERT INTO jobs
+       (user_id, org_id, target_url, mode, status,
+        gh_installation_id, gh_owner, gh_repo, gh_sha, gh_pr)
+     VALUES ($1, $2, $3, 'standard', 'queued', $4, $5, $6, $7, $8)
+     RETURNING id`,
+    [userId, orgId, targetUrl, gh.installationId, gh.owner, gh.repo, gh.sha, gh.pr]
   );
   return rows[0].id;
 }

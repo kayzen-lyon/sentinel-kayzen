@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import ConsoleHeader from "@/components/dashboard/ConsoleHeader";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 // Assemblé ligne par ligne pour garder les `${{ ... }}` littéraux (pas d'interpolation JS).
 const WORKFLOW_YAML = [
@@ -42,7 +41,6 @@ const WORKFLOW_YAML = [
 ].join("\n");
 
 export default function CicdPanel() {
-  const router = useRouter();
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -55,43 +53,9 @@ export default function CicdPanel() {
     }
   }
 
-  async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
-    router.refresh();
-  }
-
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-40 border-b border-border bg-bg/85 backdrop-blur-xl">
-        <div className="container-x flex h-[64px] items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2.5">
-              <Image src="/logo-mark.png" alt="Sentinel by Kayzen" width={32} height={32} className="h-8 w-auto" />
-              <span className="font-heading text-base font-semibold text-fg">
-                Sentinel <span className="text-subtle">Console</span>
-              </span>
-            </Link>
-            <nav className="hidden gap-1 sm:flex">
-              <Link href="/dashboard" className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg">
-                Scanner
-              </Link>
-              <Link href="/dashboard/pentest" className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg">
-                Pentest autonome
-              </Link>
-              <span className="rounded-lg bg-hover px-3 py-1.5 text-sm font-medium text-fg">
-                CI/CD
-              </span>
-              <Link href="/dashboard/team" className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg">
-                Équipe
-              </Link>
-            </nav>
-          </div>
-          <button onClick={logout} className="btn btn-ghost !px-3.5 !py-2 text-sm">
-            Déconnexion
-          </button>
-        </div>
-      </header>
+      <ConsoleHeader active="cicd" />
 
       <main className="container-x py-10">
         <h1 className="font-heading text-3xl font-bold text-fg">

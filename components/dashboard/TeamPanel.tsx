@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import ConsoleHeader from "@/components/dashboard/ConsoleHeader";
 
 type Role = "owner" | "admin" | "member" | "viewer";
 type Member = {
@@ -46,7 +44,6 @@ const ACTION_LABEL: Record<string, string> = {
 };
 
 export default function TeamPanel() {
-  const router = useRouter();
   const [members, setMembers] = useState<Member[]>([]);
   const [audit, setAudit] = useState<Audit[]>([]);
   const [role, setRole] = useState<Role | null>(null);
@@ -150,43 +147,9 @@ export default function TeamPanel() {
     else setError(d.error || "Échec.");
   }
 
-  async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
-    router.refresh();
-  }
-
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-40 border-b border-border bg-bg/85 backdrop-blur-xl">
-        <div className="container-x flex h-[64px] items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2.5">
-              <Image src="/logo-mark.png" alt="Sentinel by Kayzen" width={32} height={32} className="h-8 w-auto" />
-              <span className="font-heading text-base font-semibold text-fg">
-                Sentinel <span className="text-subtle">Console</span>
-              </span>
-            </Link>
-            <nav className="hidden gap-1 sm:flex">
-              <Link href="/dashboard" className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg">
-                Scanner
-              </Link>
-              <Link href="/dashboard/pentest" className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg">
-                Pentest autonome
-              </Link>
-              <Link href="/dashboard/monitoring" className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg">
-                Surveillance
-              </Link>
-              <span className="rounded-lg bg-hover px-3 py-1.5 text-sm font-medium text-fg">
-                Équipe & audit
-              </span>
-            </nav>
-          </div>
-          <button onClick={logout} className="btn btn-ghost !px-3.5 !py-2 text-sm">
-            Déconnexion
-          </button>
-        </div>
-      </header>
+      <ConsoleHeader active="team" />
 
       <main className="container-x py-10">
         <h1 className="font-heading text-3xl font-bold text-fg">Équipe & audit</h1>
