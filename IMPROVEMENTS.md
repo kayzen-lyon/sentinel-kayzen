@@ -31,11 +31,11 @@ en production ; les ◻ constituent une feuille de route claire et exécutable.
 20. ✅ Export PDF du rapport de scan (impression / PDF)
 21. ✅ Export JSON + CSV des findings
 22. ◻ Envoi du rapport par e-mail
-23. ◻ Scans planifiés (quotidien / hebdomadaire)
-24. ◻ Alertes en cas de régression du score
+23. ✅ Scans planifiés (quotidien / hebdomadaire) — `lib/scheduled.ts` + Vercel Cron
+24. ✅ Alertes en cas de régression du score — notification Slack/webhook (`/dashboard/monitoring`)
 25. ✅ Vérification de propriété du domaine (DNS TXT / fichier) avant scans approfondis
 26. ◻ Multi-cibles / projets par compte
-27. ◻ Rôles & équipes (plusieurs utilisateurs par organisation)
+27. ✅ Rôles & équipes (organisations + RBAC owner/admin/member/viewer, `lib/orgs.ts`, `/dashboard/team`)
 28. ◻ Quotas selon l'offre (gratuit vs plateforme)
 29. 🔄 Gestion du compte + changement de mot de passe ✅ ; réinitialisation par e-mail ◻
 30. ◻ Connexion via Google / GitHub (OAuth)
@@ -64,7 +64,7 @@ en production ; les ◻ constituent une feuille de route claire et exécutable.
 51. 🔄 Protection anti-bruteforce (rate-limit par IP ✅ ; captcha ◻)
 52. ◻ CSP par nonce (retirer `unsafe-inline` sur les scripts)
 53. ◻ Vérification e-mail à l'inscription (double opt-in)
-54. ◻ Journalisation des connexions et audit trail
+54. ✅ Journalisation des connexions et audit trail (`lib/audit.ts`, table `audit_log`, vue `/dashboard/team`)
 55. ◻ Rotation programmée du secret de session
 
 ## C. Scanner — couverture des contrôles
@@ -89,13 +89,13 @@ en production ; les ◻ constituent une feuille de route claire et exécutable.
 74. ◻ Détection des versions TLS/ciphers faibles
 75. ✅ Vérification `robots.txt` / `sitemap.xml` — scan approfondi
 76. ✅ Détection de la techno (Server, X-Powered-By, Vercel, Next.js, WordPress…)
-77. ◻ Correspondance versions ↔ CVE connues
+77. ✅ Correspondance versions ↔ CVE connues (NVD, `lib/cve.ts`, cache Postgres, clé `NVD_API_KEY` optionnelle)
 78. ✅ Détection de contenu mixte (mixed content) — scan approfondi
 79. ✅ Contrôle `Cache-Control` sur la réponse principale
-80. ◻ Détection de sous-domaines (énumération passive)
+80. ✅ Détection de sous-domaines (énumération passive via Certificate Transparency / crt.sh, `lib/recon.ts`)
 81. 🔄 Enregistrements SPF / DMARC ✅ (scan approfondi) — DKIM ◻
-82. ◻ Détection de pages d'admin/login exposées
-83. ◻ Analyse des formulaires (CSRF token, autocomplete)
+82. ✅ Détection de pages d'admin/login exposées (balayage GET borné, `lib/recon.ts`)
+83. ✅ Analyse des formulaires (CSRF token, autocomplete) via `node-html-parser`
 84. ◻ Vérification des en-têtes de cache CDN / Vary
 85. ◻ Score de confidentialité (trackers tiers chargés)
 

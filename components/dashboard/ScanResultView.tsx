@@ -170,6 +170,23 @@ function FindingRow({ f }: { f: Finding }) {
             <span className="text-xs text-subtle">· {f.category}</span>
           </div>
           <p className="mt-1.5 break-words text-sm text-muted">{f.detail}</p>
+          {f.cves && f.cves.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {f.cves.map((c) => (
+                <a
+                  key={c.id}
+                  href={c.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-md border border-border bg-bg-elev/60 px-2 py-0.5 font-mono text-[0.7rem] text-brand-light transition-colors hover:bg-hover"
+                  title={`${c.source}${c.cvss ? ` · CVSS ${c.cvss}` : ""}`}
+                >
+                  {c.id}
+                  {c.cvss ? ` · ${c.cvss}` : ""}
+                </a>
+              ))}
+            </div>
+          )}
           {f.recommendation && (
             <div className="mt-2 flex items-start gap-2 rounded-lg border border-border bg-bg-elev/60 px-3 py-2">
               <p className="flex-1 text-sm text-muted">

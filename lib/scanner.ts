@@ -1,6 +1,14 @@
 export type Severity = "critical" | "high" | "medium" | "low" | "info";
 export type CheckState = "pass" | "fail" | "warn" | "info";
 
+/** Référence CVE potentielle rattachée à un composant détecté (advisory, non authentifié). */
+export type CveRef = {
+  id: string;
+  cvss?: number;
+  source: "NVD" | "OSV";
+  url: string;
+};
+
 export type Finding = {
   id: string;
   category: string;
@@ -9,6 +17,10 @@ export type Finding = {
   state: CheckState;
   detail: string;
   recommendation?: string;
+  /** CVE potentiellement applicables au composant/version détecté (jamais confirmées activement). */
+  cves?: CveRef[];
+  /** Liens de référence (sources externes, preuves). */
+  refs?: { label: string; url: string }[];
 };
 
 export type ScanSummary = {
@@ -386,6 +398,37 @@ export async function runScan(
     });
   }
 
+  // 8e. Corrélation CVE (advisory) sur les bannières versionnées détectées
+  try {
+    const { parseBanners, correlateCves } = await import("./cve");
+    const components = parseBanners(server, powered, generator);
+    if (components.length) {
+      const correlated = await correlateCves(components);
+      for (const { component, cves } of correlated) {
+        const maxCvss = Math.max(...cves.map((c) => c.cvss ?? 0));
+        const sev: Severity =
+          maxCvss >= 9 ? "critical" : maxCvss >= 7 ? "high" : maxCvss >= 4 ? "medium" : "low";
+        add({
+          id: `cve-${component.product}-${component.version}`,
+          category: "CVE",
+          title: `${cves.length} CVE potentielle(s) — ${component.product} ${component.version}`,
+          severity: sev,
+          state: "warn",
+          detail:
+            `La version détectée (${component.product} ${component.version}) correspond à des ` +
+            `CVE publiées (corrélation par bannière, à confirmer) : ` +
+            cves.map((c) => c.id + (c.cvss ? ` [${c.cvss}]` : "")).join(", ") +
+            ".",
+          recommendation:
+            "Mettez à jour le composant vers une version corrigée et masquez le numéro de version.",
+          cves,
+        });
+      }
+    }
+  } catch {
+    /* la corrélation CVE est best-effort (réseau/limite de débit) */
+  }
+
   // 9. security.txt
   const origin = new URL(finalUrl).origin;
   const sec = await fetchSafe(`${origin}/.well-known/security.txt`, {
@@ -451,6 +494,15 @@ export async function runScan(
       for (const f of extra) add(f);
     } catch {
       /* les contrôles approfondis sont best-effort */
+    }
+    // Reconnaissance étendue : sous-domaines (CT), pages admin, formulaires
+    try {
+      const { reconChecks } = await import("./recon");
+      const apex = new URL(finalUrl).hostname.split(".").slice(-2).join(".");
+      const extra = await reconChecks(new URL(finalUrl), apex);
+      for (const f of extra) add(f);
+    } catch {
+      /* la reconnaissance étendue est best-effort */
     }
   }
 

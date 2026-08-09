@@ -8,6 +8,8 @@ import {
   sessionCookieOptions,
 } from "@/lib/auth";
 import { checkRateLimit, clientIp } from "@/lib/ratelimit";
+import { ensurePersonalOrg } from "@/lib/orgs";
+import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
 
@@ -58,6 +60,13 @@ export async function POST(req: Request) {
       user: { id: user.id, email: user.email, name: user.name },
     });
     res.cookies.set(SESSION_COOKIE, token, sessionCookieOptions());
+    const orgId = await ensurePersonalOrg(user.id, user.name || user.email).catch(() => null);
+    await logAudit({
+      orgId,
+      actorId: user.id,
+      actorEmail: user.email,
+      action: "auth.login",
+    });
     return res;
   } catch {
     return NextResponse.json({ error: "Erreur serveur." }, { status: 500 });

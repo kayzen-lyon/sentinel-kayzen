@@ -3,6 +3,8 @@ import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
 import { verifyDomain } from "@/lib/domains";
 import { checkRateLimit } from "@/lib/ratelimit";
+import { ensurePersonalOrg } from "@/lib/orgs";
+import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
 
@@ -26,5 +28,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Requête invalide." }, { status: 400 });
   }
   const result = await verifyDomain(session.id, body.domain || "");
+  if (result.verified) {
+    const orgId = await ensurePersonalOrg(session.id, session.name || session.email).catch(
+      () => null
+    );
+    await logAudit({
+      orgId,
+      actorId: session.id,
+      actorEmail: session.email,
+      action: "domain.verified",
+      target: body.domain || null,
+    });
+  }
   return NextResponse.json(result, { status: result.verified ? 200 : 400 });
 }

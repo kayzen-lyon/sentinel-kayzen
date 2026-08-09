@@ -193,6 +193,24 @@ export default function DashboardClient({
               >
                 Domaines
               </button>
+              <Link
+                href="/dashboard/pentest"
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg"
+              >
+                Pentest autonome
+              </Link>
+              <Link
+                href="/dashboard/monitoring"
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg"
+              >
+                Surveillance
+              </Link>
+              <Link
+                href="/dashboard/team"
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg"
+              >
+                Équipe
+              </Link>
             </nav>
           </div>
           <div className="flex items-center gap-3">

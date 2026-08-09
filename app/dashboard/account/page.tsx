@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import AccountForm from "@/components/dashboard/AccountForm";
+import ApiKeysPanel from "@/components/dashboard/ApiKeysPanel";
 
 export const metadata: Metadata = {
   title: "Compte",
@@ -29,6 +30,9 @@ export default async function AccountPage() {
         <h1 className="font-heading text-3xl font-bold text-fg">Mon compte</h1>
         <div className="mt-6">
           <AccountForm email={session.email} />
+        </div>
+        <div className="mt-10">
+          <ApiKeysPanel />
         </div>
       </main>
     </div>
