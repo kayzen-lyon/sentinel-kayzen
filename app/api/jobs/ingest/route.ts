@@ -10,6 +10,8 @@ import {
   type JobStatus,
 } from "@/lib/jobs";
 import { notifyOrg } from "@/lib/notify";
+import { getUserById } from "@/lib/users";
+import { pentestReportEmail, sendEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -95,6 +97,25 @@ export async function POST(req: Request) {
         findings: findings.length,
       },
     });
+
+    // Rapport par e-mail au demandeur (best-effort, seulement si Resend configuré)
+    const user = await getUserById(job.user_id).catch(() => null);
+    if (user?.email) {
+      await sendEmail(
+        user.email,
+        `Sentinel — pentest ${host} : ${findings.length} vulnérabilité(s)`,
+        pentestReportEmail({
+          host,
+          status: String(body.status),
+          findings: findings.map((f) => ({
+            title: f.title,
+            severity: f.severity,
+            cvss: f.cvss,
+          })),
+          reportMd: body.reportMd ?? null,
+        })
+      );
+    }
   }
 
   return NextResponse.json({ ok: true, inserted });

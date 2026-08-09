@@ -206,6 +206,12 @@ export default function DashboardClient({
                 Surveillance
               </Link>
               <Link
+                href="/dashboard/cicd"
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg"
+              >
+                CI/CD
+              </Link>
+              <Link
                 href="/dashboard/team"
                 className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg"
               >

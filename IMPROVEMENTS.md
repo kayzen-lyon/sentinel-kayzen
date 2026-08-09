@@ -30,7 +30,7 @@ en production ; les ◻ constituent une feuille de route claire et exécutable.
 19. 🔄 Comparaison de scans (sparkline d'évolution ✅ ; diff détaillé ◻)
 20. ✅ Export PDF du rapport de scan (impression / PDF)
 21. ✅ Export JSON + CSV des findings
-22. ◻ Envoi du rapport par e-mail
+22. ✅ Envoi du rapport par e-mail (Resend, `lib/email.ts` — auto en fin de pentest + envoi manuel)
 23. ✅ Scans planifiés (quotidien / hebdomadaire) — `lib/scheduled.ts` + Vercel Cron
 24. ✅ Alertes en cas de régression du score — notification Slack/webhook (`/dashboard/monitoring`)
 25. ✅ Vérification de propriété du domaine (DNS TXT / fichier) avant scans approfondis
