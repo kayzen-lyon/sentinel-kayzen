@@ -14,6 +14,9 @@ export default function IntegrationsPanel() {
   const [installUrl, setInstallUrl] = useState<string | null>(null);
   const [installations, setInstallations] = useState<Installation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [callbackMsg, setCallbackMsg] = useState<
+    { kind: "ok" | "warn"; text: string } | null
+  >(null);
 
   // Tickets (Jira / Linear)
   const [canManage, setCanManage] = useState(false);
@@ -24,6 +27,19 @@ export default function IntegrationsPanel() {
   const [linearKey, setLinearKey] = useState("");
   const [linearTeam, setLinearTeam] = useState("");
   const [ticketMsg, setTicketMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    if (q.get("installed") === "1")
+      setCallbackMsg({ kind: "ok", text: "GitHub App reliée à votre compte." });
+    else if (q.get("install_conflict") === "1")
+      setCallbackMsg({
+        kind: "warn",
+        text:
+          "Cette installation GitHub est déjà reliée à un autre compte Sentinel. " +
+          "Elle n'a pas été rattachée au vôtre.",
+      });
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -77,6 +93,18 @@ export default function IntegrationsPanel() {
         <p className="mt-2 max-w-2xl text-muted">
           Connectez Sentinel à vos outils de développement.
         </p>
+
+        {callbackMsg && (
+          <p
+            className={`mt-6 rounded-lg px-4 py-2.5 text-sm ${
+              callbackMsg.kind === "ok"
+                ? "border border-brand/30 bg-brand/10 text-brand-light"
+                : "border border-warn/30 bg-warn/10 text-warn"
+            }`}
+          >
+            {callbackMsg.text}
+          </p>
+        )}
 
         <section className="mt-8">
           <h2 className="font-heading text-lg font-semibold text-fg">GitHub App</h2>

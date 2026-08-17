@@ -80,3 +80,58 @@ export async function validateTargetUrl(input: string): Promise<UrlCheck> {
 
   return { ok: true, url };
 }
+
+export type SafeFetchOptions = RequestInit & { timeoutMs?: number };
+
+/**
+ * `fetch` durci anti-SSRF : chaque saut (URL initiale ET chaque redirection) est re-validé via
+ * {@link validateTargetUrl}. Une redirection vers une adresse interne/privée (ex. métadonnées
+ * cloud `169.254.169.254`) ou un schéma non http(s) interrompt la requête au lieu d'être suivie.
+ *
+ * Passer `redirect: "manual"` désactive le suivi : la première réponse (y compris 3xx) est
+ * renvoyée telle quelle, après validation de l'URL demandée.
+ *
+ * Renvoie `null` en cas d'échec réseau, de timeout, ou de cible refusée par la validation.
+ */
+export async function safeFetch(
+  input: string,
+  opts: SafeFetchOptions = {}
+): Promise<Response | null> {
+  const manual = opts.redirect === "manual";
+  const maxHops = 5;
+  let current = input;
+
+  for (let hop = 0; hop <= maxHops; hop++) {
+    const check = await validateTargetUrl(current);
+    if (!check.ok) return null;
+
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), opts.timeoutMs ?? 12000);
+    let res: Response;
+    try {
+      res = await fetch(check.url.toString(), {
+        ...opts,
+        redirect: "manual",
+        signal: ctrl.signal,
+      });
+    } catch {
+      return null;
+    } finally {
+      clearTimeout(t);
+    }
+
+    if (manual) return res;
+
+    const location = res.headers.get("location");
+    const isRedirect = res.status >= 300 && res.status < 400 && Boolean(location);
+    if (!isRedirect) return res;
+    if (hop === maxHops) return null; // trop de redirections → on abandonne
+
+    try {
+      current = new URL(location as string, check.url).toString();
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}

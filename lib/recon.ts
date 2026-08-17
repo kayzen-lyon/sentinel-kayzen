@@ -1,5 +1,6 @@
 import { parse } from "node-html-parser";
 import type { Finding } from "./scanner";
+import { safeFetch } from "./ssrf";
 
 /**
  * Reconnaissance légère et non destructive, réservée aux domaines vérifiés (`deep`) :
@@ -19,19 +20,13 @@ async function fetchWithTimeout(
   url: string,
   opts: RequestInit & { timeoutMs?: number } = {}
 ): Promise<Response | null> {
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), opts.timeoutMs ?? 8000);
-  try {
-    return await fetch(url, {
-      ...opts,
-      signal: ctrl.signal,
-      headers: { "user-agent": UA, ...(opts.headers || {}) },
-    });
-  } catch {
-    return null;
-  } finally {
-    clearTimeout(t);
-  }
+  // Suivi de redirections durci anti-SSRF (cf. lib/ssrf.ts) : un propriétaire de domaine vérifié
+  // ne peut pas faire rebondir le scan vers une adresse interne via une redirection.
+  return safeFetch(url, {
+    timeoutMs: 8000,
+    ...opts,
+    headers: { "user-agent": UA, ...(opts.headers || {}) },
+  });
 }
 
 /** Exécute `fn` sur `items` avec une concurrence bornée. */

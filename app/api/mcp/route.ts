@@ -7,9 +7,10 @@ import { runScan } from "@/lib/scanner";
 import { createScanRecord, completeScan, listScans } from "@/lib/scans";
 import { isHostVerified } from "@/lib/domains";
 import { createJob, getJob, listFindings } from "@/lib/jobs";
-import { ensurePersonalOrg } from "@/lib/orgs";
+import { canManage, ensurePersonalOrg, getOrg, getRole } from "@/lib/orgs";
 import { getPlaybook, PLAYBOOKS } from "@/lib/playbooks";
 import { appBaseUrl, dispatchStrixRun, githubConfigured } from "@/lib/github";
+import { checkRateLimit } from "@/lib/ratelimit";
 import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
@@ -129,16 +130,33 @@ async function callTool(
           ),
           isError: true,
         };
+      // Même quota que la voie web (2 lancements offensifs / heure).
+      const rl = await checkRateLimit(`job:${userId}`, 2, 3600);
+      if (!rl.allowed)
+        return {
+          ...text(
+            `Limite de lancements atteinte. Réessayez dans ${rl.retryAfter ?? 60}s.`
+          ),
+          isError: true,
+        };
+
       const playbook = getPlaybook(args.playbook ? String(args.playbook) : null);
       const mode = playbook ? playbook.mode : "standard";
       const instruction = playbook?.instruction ?? null;
       const orgId = await ensurePersonalOrg(userId, userEmail).catch(() => null);
+
+      // Même verrou de gouvernance que la voie web : si l'organisation exige une approbation et
+      // que le demandeur n'est pas gestionnaire, le run attend une validation (pas de dispatch).
+      const org = orgId ? await getOrg(orgId).catch(() => null) : null;
+      const role = orgId ? await getRole(orgId, userId).catch(() => null) : null;
+      const needsApproval = Boolean(org?.require_approval) && !canManage(role);
+
       const jobId = await createJob(
         userId,
         check.url.toString(),
         mode,
         orgId,
-        "queued",
+        needsApproval ? "pending_approval" : "queued",
         playbook?.id ?? null,
         instruction
       );
@@ -146,10 +164,17 @@ async function callTool(
         orgId,
         actorId: userId,
         actorEmail: userEmail,
-        action: "pentest.launch",
+        action: needsApproval ? "pentest.pending" : "pentest.launch",
         target: check.url.hostname,
         meta: { mode, jobId, via: "mcp" },
       });
+      if (needsApproval)
+        return text({
+          jobId,
+          status: "pending_approval",
+          message:
+            "Pentest en attente d'approbation par un administrateur de l'organisation avant exécution.",
+        });
       if (githubConfigured) {
         await dispatchStrixRun({
           jobId,

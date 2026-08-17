@@ -1,3 +1,5 @@
+import { safeFetch } from "./ssrf";
+
 export type Severity = "critical" | "high" | "medium" | "low" | "info";
 export type CheckState = "pass" | "fail" | "warn" | "info";
 
@@ -57,19 +59,12 @@ async function fetchSafe(
   url: string,
   opts: RequestInit & { timeoutMs?: number } = {}
 ): Promise<Response | null> {
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), opts.timeoutMs ?? 12000);
-  try {
-    return await fetch(url, {
-      ...opts,
-      signal: ctrl.signal,
-      headers: { "user-agent": UA, ...(opts.headers || {}) },
-    });
-  } catch {
-    return null;
-  } finally {
-    clearTimeout(t);
-  }
+  // Suivi de redirections durci anti-SSRF : chaque saut est re-validé (bloque une redirection
+  // vers une IP interne / les métadonnées cloud, y compris après résolution DNS).
+  return safeFetch(url, {
+    ...opts,
+    headers: { "user-agent": UA, ...(opts.headers || {}) },
+  });
 }
 
 function grade(score: number): string {
@@ -271,6 +266,36 @@ export async function runScan(
     });
   }
 
+  // 5b. Isolation cross-origine (COOP / CORP) — durcissement contre les XS-Leaks / Spectre.
+  //     Dérivé de la méthodologie « en-têtes de sécurité » (reverse-skill / web-attack-cheatsheet).
+  for (const c of [
+    {
+      id: "coop",
+      header: "cross-origin-opener-policy",
+      title: "Cross-Origin-Opener-Policy",
+    },
+    {
+      id: "corp",
+      header: "cross-origin-resource-policy",
+      title: "Cross-Origin-Resource-Policy",
+    },
+  ]) {
+    const present = Boolean(get(c.header));
+    add({
+      id: c.id,
+      category: "En-têtes",
+      title: present ? `${c.title} présent` : `${c.title} absent`,
+      severity: present ? "info" : "low",
+      state: present ? "pass" : "warn",
+      detail: present
+        ? `${c.title}: ${get(c.header)}`
+        : "En-tête d'isolation cross-origine non défini.",
+      recommendation: present
+        ? undefined
+        : `Ajoutez ${c.title} pour limiter les fuites d'information cross-origine (XS-Leaks).`,
+    });
+  }
+
   // 6. Cookies
   const cookies = (h as unknown as { getSetCookie?: () => string[] }).getSetCookie?.() ?? [];
   if (cookies.length) {
@@ -333,6 +358,39 @@ export async function runScan(
       recommendation:
         "Restreignez Access-Control-Allow-Origin à une liste d'origines de confiance.",
     });
+  }
+
+  // 8f. Réflexion d'origine CORS (test passif : une requête GET avec un en-tête Origin forgé).
+  //     Dérivé de la méthodologie api-security (reverse-skill). Non intrusif : même URL déjà scannée.
+  try {
+    const probeOrigin = "https://sentinel-cors-probe.example";
+    const r = await fetchSafe(finalUrl, {
+      redirect: "manual",
+      timeoutMs: 8000,
+      headers: { origin: probeOrigin },
+    });
+    const reflected = r?.headers.get("access-control-allow-origin") || "";
+    const creds = /true/i.test(r?.headers.get("access-control-allow-credentials") || "");
+    if (reflected === probeOrigin) {
+      add({
+        id: "cors-reflection",
+        category: "En-têtes",
+        title: creds
+          ? "CORS reflète toute origine avec Allow-Credentials"
+          : "CORS reflète l'origine de la requête",
+        severity: creds ? "high" : "medium",
+        state: creds ? "fail" : "warn",
+        detail: creds
+          ? `L'origine arbitraire ${probeOrigin} est reflétée dans Access-Control-Allow-Origin avec ` +
+            "Access-Control-Allow-Credentials: true — une page malveillante peut lire les réponses authentifiées."
+          : `L'origine arbitraire ${probeOrigin} est reflétée dans Access-Control-Allow-Origin.`,
+        recommendation:
+          "Validez l'en-tête Origin contre une liste blanche stricte ; ne reflétez jamais Origin " +
+          "dynamiquement, en particulier avec Allow-Credentials.",
+      });
+    }
+  } catch {
+    /* la sonde CORS est best-effort */
   }
 
   // 8b. Cookies SameSite
@@ -503,6 +561,14 @@ export async function runScan(
       for (const f of extra) add(f);
     } catch {
       /* la reconnaissance étendue est best-effort */
+    }
+    // Surface d'exposition : VCS, sauvegardes, Actuator, specs d'API, source maps
+    try {
+      const { exposureChecks } = await import("./exposure");
+      const extra = await exposureChecks(new URL(finalUrl));
+      for (const f of extra) add(f);
+    } catch {
+      /* l'analyse d'exposition est best-effort */
     }
   }
 

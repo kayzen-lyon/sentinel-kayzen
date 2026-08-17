@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { validateEmail, validatePassword } from "../lib/password";
-import { validateTargetUrl } from "../lib/ssrf";
+import { validateTargetUrl, safeFetch } from "../lib/ssrf";
 import { normalizeDomain, registrableDomain } from "../lib/domains";
 import { parseBanners } from "../lib/cve";
 import { analyzeForms } from "../lib/recon";
@@ -42,6 +42,35 @@ test("validateTargetUrl bloque les cibles internes", async () => {
 test("validateTargetUrl accepte une IP publique littérale", async () => {
   const r = await validateTargetUrl("http://8.8.8.8");
   assert.equal(r.ok, true);
+});
+
+test("safeFetch refuse les cibles internes / non http(s) sans réseau", async () => {
+  // La validation anti-SSRF s'applique dès le premier saut : aucune connexion n'est tentée.
+  assert.equal(await safeFetch("http://127.0.0.1/"), null);
+  assert.equal(await safeFetch("http://169.254.169.254/latest/meta-data/"), null);
+  assert.equal(await safeFetch("http://localhost:8080/"), null);
+  assert.equal(await safeFetch("file:///etc/passwd"), null);
+});
+
+test("getSecret échoue fermé en production sans AUTH_SECRET", async () => {
+  const env = process.env as Record<string, string | undefined>;
+  const prevEnv = env.NODE_ENV;
+  const prevSecret = env.AUTH_SECRET;
+  try {
+    env.NODE_ENV = "production";
+    delete env.AUTH_SECRET;
+    const { createSessionToken } = await import("../lib/jwt");
+    await assert.rejects(() => createSessionToken({ id: "u1", email: "a@b.fr" }));
+
+    env.AUTH_SECRET = "un-secret-suffisamment-long-123";
+    const token = await createSessionToken({ id: "u1", email: "a@b.fr" });
+    assert.ok(typeof token === "string" && token.length > 0);
+  } finally {
+    if (prevEnv === undefined) delete env.NODE_ENV;
+    else env.NODE_ENV = prevEnv;
+    if (prevSecret === undefined) delete env.AUTH_SECRET;
+    else env.AUTH_SECRET = prevSecret;
+  }
 });
 
 test("parseBanners extrait produit/version", () => {

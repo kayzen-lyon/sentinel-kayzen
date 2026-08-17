@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
 import { ensurePersonalOrg } from "@/lib/orgs";
-import { upsertInstallation } from "@/lib/ghinstall";
+import { linkInstallationToUser } from "@/lib/ghinstall";
 import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
@@ -26,14 +26,22 @@ export async function GET(req: Request) {
   const orgId = await ensurePersonalOrg(session.id, session.name || session.email).catch(
     () => null
   );
-  await upsertInstallation(installationId, null, orgId, session.id);
+  // Liaison non usurpable : une installation déjà rattachée à un autre compte n'est pas volée.
+  const linked = await linkInstallationToUser(installationId, orgId, session.id).catch(
+    () => false
+  );
   await logAudit({
     orgId,
     actorId: session.id,
     actorEmail: session.email,
-    action: "github.installed",
+    action: linked ? "github.installed" : "github.install_conflict",
     target: String(installationId),
   });
 
-  return NextResponse.redirect(new URL(`/dashboard/integrations?installed=1`, url.origin));
+  return NextResponse.redirect(
+    new URL(
+      `/dashboard/integrations?${linked ? "installed=1" : "install_conflict=1"}`,
+      url.origin
+    )
+  );
 }

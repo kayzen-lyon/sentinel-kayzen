@@ -3,9 +3,23 @@ import { SignJWT, jwtVerify } from "jose";
 export const SESSION_COOKIE = "sentinel_session";
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 jours
 
+const DEV_FALLBACK_SECRET = "dev-insecure-secret-change-me-in-prod";
+
 function getSecret(): Uint8Array {
-  const s = process.env.AUTH_SECRET || "dev-insecure-secret-change-me-in-prod";
-  return new TextEncoder().encode(s);
+  const s = process.env.AUTH_SECRET || "";
+  // En production, refuser de signer/vérifier avec le secret de repli : un secret par défaut
+  // public rendrait les sessions falsifiables (usurpation de n'importe quel compte). On échoue
+  // volontairement fermé — mieux vaut une auth indisponible qu'une auth contournable.
+  if (process.env.NODE_ENV === "production") {
+    if (s.length < 16) {
+      throw new Error(
+        "AUTH_SECRET manquant ou trop court en production (≥ 16 caractères requis). " +
+          "Définissez une valeur secrète aléatoire pour sécuriser les sessions."
+      );
+    }
+    return new TextEncoder().encode(s);
+  }
+  return new TextEncoder().encode(s || DEV_FALLBACK_SECRET);
 }
 
 export type SessionUser = {

@@ -1,6 +1,7 @@
 import tls from "node:tls";
 import { resolveTxt } from "node:dns/promises";
 import type { Finding } from "./scanner";
+import { safeFetch } from "./ssrf";
 
 const UA =
   "SentinelByKayzen/1.0 (+https://sentinel.kayzen-lyon.fr; passive security posture scan)";
@@ -56,17 +57,10 @@ function getCertificate(host: string, port = 443): Promise<CertInfo> {
 }
 
 async function fetchText(url: string, timeoutMs = 8000): Promise<string | null> {
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), timeoutMs);
-  try {
-    const r = await fetch(url, { headers: { "user-agent": UA }, signal: ctrl.signal });
-    if (!r.ok) return null;
-    return await r.text();
-  } catch {
-    return null;
-  } finally {
-    clearTimeout(t);
-  }
+  // Suivi de redirections durci anti-SSRF (cf. lib/ssrf.ts).
+  const r = await safeFetch(url, { headers: { "user-agent": UA }, timeoutMs });
+  if (!r || !r.ok) return null;
+  return r.text().catch(() => null);
 }
 
 /** Contrôles approfondis, réservés aux domaines dont la propriété est vérifiée. */
