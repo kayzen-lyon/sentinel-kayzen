@@ -16,18 +16,25 @@ export const githubConfigured = Boolean(
   process.env.GITHUB_DISPATCH_TOKEN && process.env.GITHUB_RUNNER_REPO
 );
 
+/** Moteur d'exécution : Strix (agents IA) ou la suite OSS déterministe (Nuclei + testssl.sh). */
+export type ScanEngine = "strix" | "oss";
+
 export type DispatchPayload = {
   jobId: string;
   target: string;
   mode: string;
   ingestUrl: string;
   instruction?: string;
+  engine?: ScanEngine;
 };
 
-export async function dispatchStrixRun(payload: DispatchPayload): Promise<void> {
+export async function dispatchWorkerRun(payload: DispatchPayload): Promise<void> {
   const token = process.env.GITHUB_DISPATCH_TOKEN;
   const repo = process.env.GITHUB_RUNNER_REPO;
   if (!token || !repo) throw new Error("Runner GitHub non configuré.");
+
+  // Chaque moteur écoute son propre event_type de repository_dispatch.
+  const eventType = payload.engine === "oss" ? "oss-scan" : "strix-scan";
 
   const res = await fetch(`https://api.github.com/repos/${repo}/dispatches`, {
     method: "POST",
@@ -39,7 +46,7 @@ export async function dispatchStrixRun(payload: DispatchPayload): Promise<void> 
       "user-agent": "SentinelByKayzen",
     },
     body: JSON.stringify({
-      event_type: "strix-scan",
+      event_type: eventType,
       client_payload: payload,
     }),
   });

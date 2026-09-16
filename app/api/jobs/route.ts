@@ -5,7 +5,7 @@ import { validateTargetUrl } from "@/lib/ssrf";
 import { isHostVerified } from "@/lib/domains";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { createJob, listJobs, updateJobSystem, type JobMode } from "@/lib/jobs";
-import { appBaseUrl, dispatchStrixRun, githubConfigured } from "@/lib/github";
+import { appBaseUrl, dispatchWorkerRun, githubConfigured, type ScanEngine } from "@/lib/github";
 import { canManage, ensurePersonalOrg, getOrg, getRole } from "@/lib/orgs";
 import { logAudit } from "@/lib/audit";
 import { getPlaybook } from "@/lib/playbooks";
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       { status: 503 }
     );
 
-  let body: { url?: string; mode?: string; playbook?: string };
+  let body: { url?: string; mode?: string; playbook?: string; engine?: string };
   try {
     body = await req.json();
   } catch {
@@ -68,6 +68,7 @@ export async function POST(req: Request) {
       ? "deep"
       : "standard";
   const instruction = playbook?.instruction ?? null;
+  const engine: ScanEngine = body.engine === "oss" ? "oss" : "strix";
   const orgId = await ensurePersonalOrg(session.id, session.name || session.email).catch(
     () => null
   );
@@ -117,12 +118,13 @@ export async function POST(req: Request) {
   }
 
   try {
-    await dispatchStrixRun({
+    await dispatchWorkerRun({
       jobId,
       target: check.url.toString(),
       mode,
       ingestUrl: `${appBaseUrl(req)}/api/jobs/ingest`,
       instruction: instruction ?? undefined,
+      engine,
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Échec du déclenchement du runner.";

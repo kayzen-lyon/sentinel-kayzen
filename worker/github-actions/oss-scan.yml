@@ -1,0 +1,83 @@
+# Runner de scan OSS — à copier dans `.github/workflows/oss-scan.yml` du DÉPÔT RUNNER.
+#
+# Moteur de scan 100 % open source, déterministe (aucun LLM, aucun coût) :
+#   - Nuclei (ProjectDiscovery) — scanner de vulnérabilités par templates
+#   - testssl.sh — audit TLS/SSL
+#
+# Déclenché à la demande par Sentinel (repository_dispatch "oss-scan"). Les findings
+# sont repoussés vers l'API d'ingestion via le même contrat que Strix.
+#
+# Secret requis (Settings → Secrets and variables → Actions) :
+#   WORKER_INGEST_SECRET  — même valeur que côté Vercel (auth de l'ingestion)
+# Variable optionnelle :
+#   NUCLEI_VERSION        — défaut épinglé ci-dessous
+
+name: oss-scan
+
+on:
+  repository_dispatch:
+    types: [oss-scan]
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      JOB_ID: ${{ github.event.client_payload.jobId }}
+      TARGET: ${{ github.event.client_payload.target }}
+      INGEST_URL: ${{ github.event.client_payload.ingestUrl }}
+      WORKER_INGEST_SECRET: ${{ secrets.WORKER_INGEST_SECRET }}
+      NUCLEI_VERSION: ${{ vars.NUCLEI_VERSION || '3.3.7' }}
+    steps:
+      - name: Checkout runner repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Mark job running
+        run: |
+          curl -s -X POST "$INGEST_URL" \
+            -H "content-type: application/json" \
+            -H "x-worker-secret: $WORKER_INGEST_SECRET" \
+            -d "{\"jobId\":\"$JOB_ID\",\"status\":\"running\"}" || true
+
+      - name: Install Nuclei (binaire épinglé)
+        run: |
+          curl -sSfL "https://github.com/projectdiscovery/nuclei/releases/download/v${NUCLEI_VERSION}/nuclei_${NUCLEI_VERSION}_linux_amd64.zip" -o nuclei.zip
+          unzip -o nuclei.zip nuclei
+          chmod +x nuclei
+          ./nuclei -version
+
+      - name: Install testssl.sh
+        run: |
+          git clone --depth 1 https://github.com/drwetter/testssl.sh.git
+
+      - name: Nuclei scan (non destructif, limité en débit)
+        run: |
+          set +e
+          ./nuclei -u "$TARGET" \
+            -jsonl -o nuclei.jsonl \
+            -severity low,medium,high,critical \
+            -exclude-tags dos,intrusive,fuzz \
+            -rate-limit 50 -timeout 10 -retries 1 \
+            -no-interactsh -disable-update-check
+          echo "NUCLEI_EXIT=$?" >> "$GITHUB_ENV"
+          set -e
+
+      - name: testssl.sh scan
+        run: |
+          set +e
+          HOST=$(echo "$TARGET" | sed -E 's#^https?://##; s#/.*$##')
+          ./testssl.sh/testssl.sh --jsonfile testssl.json --quiet --sneaky --warnings off "$HOST" || true
+          echo "OSS_EXIT=${NUCLEI_EXIT:-0}" >> "$GITHUB_ENV"
+          set -e
+
+      - name: Push findings + statut
+        if: always()
+        run: python push_oss_findings.py

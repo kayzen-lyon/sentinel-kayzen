@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
 import { approveJob, getJob, updateJobSystem } from "@/lib/jobs";
 import { canManage, getRole } from "@/lib/orgs";
-import { appBaseUrl, dispatchStrixRun, githubConfigured } from "@/lib/github";
+import { appBaseUrl, dispatchWorkerRun, githubConfigured } from "@/lib/github";
 import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
@@ -53,7 +53,7 @@ export async function POST(
 
   if (githubConfigured) {
     try {
-      await dispatchStrixRun({
+      await dispatchWorkerRun({
         jobId: id,
         target: job.target_url,
         mode: job.mode,

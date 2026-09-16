@@ -7,7 +7,7 @@ import {
   upsertInstallation,
 } from "@/lib/ghinstall";
 import { createGithubJob } from "@/lib/jobs";
-import { appBaseUrl, dispatchStrixRun, githubConfigured } from "@/lib/github";
+import { appBaseUrl, dispatchWorkerRun, githubConfigured } from "@/lib/github";
 import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
@@ -96,7 +96,7 @@ export async function POST(req: Request) {
     });
 
     if (githubConfigured) {
-      await dispatchStrixRun({
+      await dispatchWorkerRun({
         jobId,
         target: repo.html_url,
         mode: "standard",

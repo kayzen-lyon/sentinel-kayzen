@@ -9,7 +9,7 @@ import { isHostVerified } from "@/lib/domains";
 import { createJob, getJob, listFindings } from "@/lib/jobs";
 import { canManage, ensurePersonalOrg, getOrg, getRole } from "@/lib/orgs";
 import { getPlaybook, PLAYBOOKS } from "@/lib/playbooks";
-import { appBaseUrl, dispatchStrixRun, githubConfigured } from "@/lib/github";
+import { appBaseUrl, dispatchWorkerRun, githubConfigured } from "@/lib/github";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { logAudit } from "@/lib/audit";
 
@@ -176,7 +176,7 @@ async function callTool(
             "Pentest en attente d'approbation par un administrateur de l'organisation avant exécution.",
         });
       if (githubConfigured) {
-        await dispatchStrixRun({
+        await dispatchWorkerRun({
           jobId,
           target: check.url.toString(),
           mode,

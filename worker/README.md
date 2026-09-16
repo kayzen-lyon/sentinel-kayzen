@@ -1,4 +1,4 @@
-# Worker Strix — pentest autonome via GitHub Actions (100 % gratuit)
+# Worker — pentest autonome via GitHub Actions (100 % gratuit)
 
 Le moteur Strix ne tourne **ni sur votre PC ni sur un serveur payant** : il s'exécute dans un
 **runner GitHub Actions éphémère** (Docker déjà disponible, gratuit), déclenché à la demande par
@@ -18,6 +18,10 @@ Sentinel (Vercel)  ──repository_dispatch──▶  GitHub Actions (Strix + D
 2. Copiez-y **deux fichiers** depuis ce dossier :
    - `github-actions/strix-pentest.yml` → `.github/workflows/strix-pentest.yml`
    - `github-actions/push_findings.py` → `push_findings.py` (racine du dépôt)
+
+   Pour le **moteur OSS** (Nuclei + testssl.sh, déterministe, sans LLM ni clé), copiez aussi :
+   - `github-actions/oss-scan.yml` → `.github/workflows/oss-scan.yml`
+   - `github-actions/push_oss_findings.py` → `push_oss_findings.py` (racine du dépôt)
 
 ## 2. Secrets du dépôt runner
 
@@ -48,6 +52,20 @@ Un **Personal Access Token** (classic, scope `repo`, ou fine-grained avec permis
 
 Sans `GITHUB_DISPATCH_TOKEN` + `GITHUB_RUNNER_REPO`, un lancement de pentest est simplement
 **mis en file** (mode audit managé) : aucune erreur, mais pas d'exécution automatique.
+
+## 4 bis. Deux moteurs de scan
+
+Sentinel propose deux moteurs, sélectionnables dans la console (« Moteur de scan ») :
+
+| Moteur | Outils | LLM / clé | Coût | event_type |
+|---|---|---|---|---|
+| **Strix** | agents IA (exploitation, PoC) | Gemini (gratuit) requis | borné | `strix-scan` |
+| **OSS** | Nuclei + testssl.sh | aucun | **0 $** | `oss-scan` |
+
+Le moteur OSS est **100 % open source et déterministe** : idéal pour un scan rapide,
+reproductible, sans dépendance à un fournisseur LLM. Nuclei tourne en mode non destructif
+(`-exclude-tags dos,intrusive,fuzz`, débit limité). Les deux moteurs remontent leurs findings
+par le **même** contrat d'ingestion (`/api/jobs/ingest`).
 
 ## 5. Garde-fous
 
