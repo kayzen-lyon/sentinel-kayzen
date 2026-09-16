@@ -65,7 +65,7 @@ export default function AccountForm({ email }: { email: string }) {
             {msg.text}
           </p>
         )}
-        <button type="submit" disabled={busy} className="btn btn-primary disabled:opacity-60">
+        <button type="submit" disabled={busy} aria-busy={busy} className="btn btn-primary disabled:opacity-60">
           {busy ? "Mise à jour…" : "Mettre à jour"}
         </button>
       </form>

@@ -116,13 +116,18 @@ export default function MonitoringPanel() {
             <option value="daily">Quotidien</option>
             <option value="weekly">Hebdomadaire</option>
           </select>
-          <button type="submit" disabled={busy} className="btn btn-primary disabled:opacity-60">
+          <button type="submit" disabled={busy} aria-busy={busy} className="btn btn-primary disabled:opacity-60">
             Surveiller
           </button>
         </form>
 
         <ul className="mt-8 space-y-2">
-          {loading && <li className="text-sm text-muted">Chargement…</li>}
+          {loading &&
+          Array.from({ length: 3 }).map((_, i) => (
+            <li key={`sk-${i}`} className="card p-3">
+              <div className="skeleton h-4 w-2/3" />
+            </li>
+          ))}
           {!loading && schedules.length === 0 && (
             <li className="text-sm text-muted">Aucune cible surveillée.</li>
           )}

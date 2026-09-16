@@ -97,7 +97,7 @@ export default function ApiKeysPanel() {
           className="input flex-1"
           aria-label="Nom de la clé"
         />
-        <button type="submit" disabled={busy} className="btn btn-primary disabled:opacity-60">
+        <button type="submit" disabled={busy} aria-busy={busy} className="btn btn-primary disabled:opacity-60">
           Générer une clé
         </button>
       </form>
@@ -114,7 +114,12 @@ export default function ApiKeysPanel() {
       )}
 
       <ul className="mt-4 space-y-2">
-        {loading && <li className="text-sm text-muted">Chargement…</li>}
+        {loading &&
+          Array.from({ length: 3 }).map((_, i) => (
+            <li key={`sk-${i}`} className="card p-3">
+              <div className="skeleton h-4 w-2/3" />
+            </li>
+          ))}
         {!loading && keys.length === 0 && (
           <li className="text-sm text-muted">Aucune clé API.</li>
         )}

@@ -115,6 +115,7 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
           <button
             type="submit"
             disabled={loading}
+            aria-busy={loading}
             className="btn btn-primary w-full disabled:opacity-60"
           >
             {loading

@@ -282,7 +282,7 @@ export default function DashboardClient({
                   className="w-full rounded-xl border border-border-strong bg-bg px-4 py-3 text-fg outline-none transition-colors placeholder:text-subtle focus:border-brand focus:ring-2 focus:ring-brand/30 disabled:opacity-60"
                 />
               </label>
-              <button type="submit" disabled={scanning} className="btn btn-primary disabled:opacity-60">
+              <button type="submit" disabled={scanning} aria-busy={scanning} className="btn btn-primary disabled:opacity-60">
                 {scanning ? "Scan en cours…" : "Lancer le scan"}
               </button>
             </form>

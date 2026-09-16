@@ -212,7 +212,7 @@ export default function IntegrationsPanel() {
                 </label>
               </div>
               <div className="flex items-center gap-3 lg:col-span-2">
-                <button type="submit" disabled={saving} className="btn btn-primary disabled:opacity-60">Enregistrer</button>
+                <button type="submit" disabled={saving} aria-busy={saving} className="btn btn-primary disabled:opacity-60">Enregistrer</button>
                 {ticketMsg && <span className="text-sm text-brand-light">{ticketMsg}</span>}
               </div>
             </form>

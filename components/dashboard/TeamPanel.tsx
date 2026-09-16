@@ -271,7 +271,12 @@ export default function TeamPanel() {
               </form>
             )}
             <ul className="mt-4 space-y-2">
-              {loading && <li className="text-sm text-muted">Chargement…</li>}
+              {loading &&
+          Array.from({ length: 3 }).map((_, i) => (
+            <li key={`sk-${i}`} className="card p-3">
+              <div className="skeleton h-4 w-2/3" />
+            </li>
+          ))}
               {members.map((m) => (
                 <li key={m.user_id} className="card flex items-center justify-between gap-3 p-3">
                   <div className="min-w-0">
