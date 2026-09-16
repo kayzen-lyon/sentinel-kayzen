@@ -34,7 +34,7 @@ export default function Page() {
       <h2>Hébergeur</h2>
       <p>
         Le site est hébergé par <strong>Vercel Inc.</strong>, 340 S Lemon Avenue #4133,
-        Walnut, CA 91789, États-Unis (<a href="https://vercel.com">vercel.com</a>). La
+        Walnut, CA 91789, États-Unis (<a href="https://vercel.com" target="_blank" rel="noopener noreferrer">vercel.com</a>). La
         base de données est opérée par notre prestataire d'hébergement PostgreSQL (Neon
         ou Supabase selon la configuration), au sein de l'Union européenne lorsque cette
         région est sélectionnée.
