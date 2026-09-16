@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ConsoleHeader from "@/components/dashboard/ConsoleHeader";
+import { formatDate } from "@/lib/format";
 
 type Schedule = {
   id: string;
@@ -26,41 +27,56 @@ export default function MonitoringPanel() {
   const [frequency, setFrequency] = useState<"daily" | "weekly">("daily");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
 
-  async function load() {
-    const res = await fetch("/api/scheduled");
+  async function load(signal?: AbortSignal) {
+    const res = await fetch("/api/scheduled", { signal });
     if (res.ok) setSchedules((await res.json()).schedules || []);
     setLoading(false);
   }
   useEffect(() => {
-    load();
+    const ac = new AbortController();
+    load(ac.signal).catch(() => {});
+    return () => ac.abort();
   }, []);
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
+    if (busy) return;
+    setBusy(true);
     setError(null);
-    const res = await fetch("/api/scheduled", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ url, frequency }),
-    });
-    const d = await res.json();
-    if (!res.ok) {
-      setError(d.error || "Échec.");
-      return;
+    try {
+      const res = await fetch("/api/scheduled", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ url, frequency }),
+      });
+      const d = await res.json();
+      if (!res.ok) {
+        setError(d.error || "Échec.");
+        return;
+      }
+      setSchedules(d.schedules || []);
+      setUrl("");
+    } finally {
+      setBusy(false);
     }
-    setSchedules(d.schedules || []);
-    setUrl("");
   }
 
   async function remove(id: string) {
-    const res = await fetch("/api/scheduled", {
-      method: "DELETE",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    const d = await res.json();
-    if (res.ok) setSchedules(d.schedules || []);
+    if (busy) return;
+    setBusy(true);
+    try {
+      const res = await fetch("/api/scheduled", {
+        method: "DELETE",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const d = await res.json();
+      if (res.ok) setSchedules(d.schedules || []);
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -100,7 +116,7 @@ export default function MonitoringPanel() {
             <option value="daily">Quotidien</option>
             <option value="weekly">Hebdomadaire</option>
           </select>
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" disabled={busy} className="btn btn-primary disabled:opacity-60">
             Surveiller
           </button>
         </form>
@@ -118,12 +134,13 @@ export default function MonitoringPanel() {
                   {s.frequency === "daily" ? "Quotidien" : "Hebdomadaire"}
                   {s.last_score != null && ` · dernier score ${s.last_score}/100`}
                   {s.last_run_at &&
-                    ` · ${new Date(s.last_run_at).toLocaleDateString("fr-FR")}`}
+                    ` · ${formatDate(s.last_run_at)}`}
                 </p>
               </div>
               <button
                 onClick={() => remove(s.id)}
-                className="flex-none rounded-md px-2.5 py-1 text-xs text-risk transition-colors hover:bg-hover"
+                disabled={busy}
+                className="flex-none rounded-md px-2.5 py-1 text-xs text-risk transition-colors hover:bg-hover disabled:opacity-60"
               >
                 Retirer
               </button>

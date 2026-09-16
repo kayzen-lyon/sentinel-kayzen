@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ConsoleHeader from "@/components/dashboard/ConsoleHeader";
+import { formatDateTime } from "@/lib/format";
 
 type Role = "owner" | "admin" | "member" | "viewer";
 type Member = {
@@ -55,11 +56,12 @@ export default function TeamPanel() {
   const [integSaved, setIntegSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
 
   const canManage = role === "owner" || role === "admin";
 
-  async function load() {
-    const res = await fetch("/api/team");
+  async function load(signal?: AbortSignal) {
+    const res = await fetch("/api/team", { signal });
     if (res.ok) {
       const d = await res.json();
       setMembers(d.members || []);
@@ -74,19 +76,25 @@ export default function TeamPanel() {
 
   async function saveIntegrations(e: React.FormEvent) {
     e.preventDefault();
+    if (busy) return;
+    setBusy(true);
     setError(null);
     setIntegSaved(false);
-    const res = await fetch("/api/team/settings", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ slackUrl, webhookUrl }),
-    });
-    if (res.ok) {
-      setIntegSaved(true);
-      setTimeout(() => setIntegSaved(false), 2000);
-    } else {
-      const d = await res.json();
-      setError(d.error || "Échec.");
+    try {
+      const res = await fetch("/api/team/settings", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ slackUrl, webhookUrl }),
+      });
+      if (res.ok) {
+        setIntegSaved(true);
+        setTimeout(() => setIntegSaved(false), 2000);
+      } else {
+        const d = await res.json();
+        setError(d.error || "Échec.");
+      }
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -104,47 +112,67 @@ export default function TeamPanel() {
     }
   }
   useEffect(() => {
-    load();
+    const ac = new AbortController();
+    load(ac.signal).catch(() => {});
+    return () => ac.abort();
   }, []);
 
   async function addMember(e: React.FormEvent) {
     e.preventDefault();
+    if (busy) return;
+    setBusy(true);
     setError(null);
-    const res = await fetch("/api/team", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email, role: newRole }),
-    });
-    const d = await res.json();
-    if (!res.ok) {
-      setError(d.error || "Échec.");
-      return;
+    try {
+      const res = await fetch("/api/team", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, role: newRole }),
+      });
+      const d = await res.json();
+      if (!res.ok) {
+        setError(d.error || "Échec.");
+        return;
+      }
+      setMembers(d.members || []);
+      setEmail("");
+      await load();
+    } finally {
+      setBusy(false);
     }
-    setMembers(d.members || []);
-    setEmail("");
-    load();
   }
 
   async function changeRole(userId: string, r: Role) {
-    const res = await fetch("/api/team", {
-      method: "PATCH",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ userId, role: r }),
-    });
-    const d = await res.json();
-    if (res.ok) setMembers(d.members || []);
-    else setError(d.error || "Échec.");
+    if (busy) return;
+    setBusy(true);
+    try {
+      const res = await fetch("/api/team", {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ userId, role: r }),
+      });
+      const d = await res.json();
+      if (res.ok) setMembers(d.members || []);
+      else setError(d.error || "Échec.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function remove(userId: string) {
-    const res = await fetch("/api/team", {
-      method: "DELETE",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ userId }),
-    });
-    const d = await res.json();
-    if (res.ok) setMembers(d.members || []);
-    else setError(d.error || "Échec.");
+    if (busy) return;
+    setBusy(true);
+    try {
+      const res = await fetch("/api/team", {
+        method: "DELETE",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+      const d = await res.json();
+      if (res.ok) setMembers(d.members || []);
+      else setError(d.error || "Échec.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -183,8 +211,8 @@ export default function TeamPanel() {
             <h2 className="font-heading text-sm font-semibold text-subtle">
               Notifications sortantes
             </h2>
-            <div>
-              <label className="text-xs text-muted">Webhook Slack (Incoming Webhook)</label>
+            <label className="block">
+              <span className="block text-xs text-muted">Webhook Slack (Incoming Webhook)</span>
               <input
                 type="url"
                 value={slackUrl}
@@ -192,9 +220,9 @@ export default function TeamPanel() {
                 placeholder="https://hooks.slack.com/services/…"
                 className="input mt-1 w-full"
               />
-            </div>
-            <div>
-              <label className="text-xs text-muted">Webhook générique (JSON)</label>
+            </label>
+            <label className="block">
+              <span className="block text-xs text-muted">Webhook générique (JSON)</span>
               <input
                 type="url"
                 value={webhookUrl}
@@ -202,9 +230,9 @@ export default function TeamPanel() {
                 placeholder="https://exemple.fr/webhook"
                 className="input mt-1 w-full"
               />
-            </div>
+            </label>
             <div className="flex items-center gap-3">
-              <button type="submit" className="btn btn-primary !py-2 text-sm">
+              <button type="submit" disabled={busy} className="btn btn-primary !py-2 text-sm disabled:opacity-60">
                 Enregistrer
               </button>
               {integSaved && <span className="text-sm text-safe">Enregistré ✓</span>}
@@ -237,7 +265,7 @@ export default function TeamPanel() {
                   <option value="member">Membre</option>
                   <option value="viewer">Lecteur</option>
                 </select>
-                <button type="submit" className="btn btn-primary">
+                <button type="submit" disabled={busy} className="btn btn-primary disabled:opacity-60">
                   Inviter
                 </button>
               </form>
@@ -295,7 +323,7 @@ export default function TeamPanel() {
                     {a.target && <span className="text-muted"> · {a.target}</span>}
                   </span>
                   <span className="flex-none text-xs text-subtle">
-                    {new Date(a.created_at).toLocaleString("fr-FR")}
+                    {formatDateTime(a.created_at)}
                   </span>
                 </li>
               ))}

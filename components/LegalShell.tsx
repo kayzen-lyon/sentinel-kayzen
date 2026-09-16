@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import Link from "next/link";
 import Footer from "@/components/Footer";
 
 export default function LegalShell({
@@ -15,7 +16,7 @@ export default function LegalShell({
       <Header />
       <main id="contenu" className="pt-[72px]">
         <div className="container-x max-w-3xl py-16">
-          <a
+          <Link
             href="/"
             className="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-fg"
           >
@@ -23,7 +24,7 @@ export default function LegalShell({
               <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             Retour à l'accueil
-          </a>
+          </Link>
           <h1 className="mt-6 font-heading text-4xl font-bold text-fg">{title}</h1>
           {updated && (
             <p className="mt-2 text-sm text-subtle">Dernière mise à jour : {updated}</p>

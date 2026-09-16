@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const MANAGED = [
   "Audit mené et interprété par les experts Kayzen",
   "Périmètre, règles d'engagement et priorités définis avec vous",
@@ -68,9 +70,9 @@ export default function Offers() {
                 <Item key={i} accent="brand">{i}</Item>
               ))}
             </ul>
-            <a href="/signup" className="btn btn-ghost mt-8 w-full sm:w-auto">
+            <Link href="/signup" className="btn btn-ghost mt-8 w-full sm:w-auto">
               Scanner mon site maintenant
-            </a>
+            </Link>
           </article>
         </div>
       </div>

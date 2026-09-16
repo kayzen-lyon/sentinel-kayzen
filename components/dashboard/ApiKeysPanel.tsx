@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { formatDate } from "@/lib/format";
 
 type ApiKey = {
   id: string;
@@ -17,44 +18,59 @@ export default function ApiKeysPanel() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [mcpUrl, setMcpUrl] = useState("/api/mcp");
+  const [busy, setBusy] = useState(false);
 
-  async function load() {
-    const res = await fetch("/api/keys");
+  async function load(signal?: AbortSignal) {
+    const res = await fetch("/api/keys", { signal });
     if (res.ok) setKeys((await res.json()).keys || []);
     setLoading(false);
   }
   useEffect(() => {
-    load();
-    if (typeof window !== "undefined") setMcpUrl(`${window.location.origin}/api/mcp`);
+    const ac = new AbortController();
+    load(ac.signal).catch(() => {});
+    setMcpUrl(`${window.location.origin}/api/mcp`);
+    return () => ac.abort();
   }, []);
 
   async function create(e: React.FormEvent) {
     e.preventDefault();
+    if (busy) return;
+    setBusy(true);
     setError(null);
     setFreshToken(null);
-    const res = await fetch("/api/keys", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ name }),
-    });
-    const d = await res.json();
-    if (!res.ok) {
-      setError(d.error || "Échec.");
-      return;
+    try {
+      const res = await fetch("/api/keys", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      const d = await res.json();
+      if (!res.ok) {
+        setError(d.error || "Échec.");
+        return;
+      }
+      setFreshToken(d.token);
+      setKeys(d.keys || []);
+      setName("");
+    } finally {
+      setBusy(false);
     }
-    setFreshToken(d.token);
-    setKeys(d.keys || []);
-    setName("");
   }
 
   async function revoke(id: string) {
-    const res = await fetch("/api/keys", {
-      method: "DELETE",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    const d = await res.json();
-    if (res.ok) setKeys(d.keys || []);
+    if (busy) return;
+    setBusy(true);
+    try {
+      const res = await fetch("/api/keys", {
+        method: "DELETE",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const d = await res.json();
+      if (res.ok) setKeys(d.keys || []);
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -81,7 +97,7 @@ export default function ApiKeysPanel() {
           className="input flex-1"
           aria-label="Nom de la clé"
         />
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" disabled={busy} className="btn btn-primary disabled:opacity-60">
           Générer une clé
         </button>
       </form>
@@ -111,13 +127,14 @@ export default function ApiKeysPanel() {
               </p>
               <p className="text-xs text-subtle">
                 {k.last_used_at
-                  ? `Dernière utilisation ${new Date(k.last_used_at).toLocaleDateString("fr-FR")}`
+                  ? `Dernière utilisation ${formatDate(k.last_used_at)}`
                   : "Jamais utilisée"}
               </p>
             </div>
             <button
               onClick={() => revoke(k.id)}
-              className="flex-none rounded-md px-2.5 py-1 text-xs text-risk transition-colors hover:bg-hover"
+              disabled={busy}
+              className="flex-none rounded-md px-2.5 py-1 text-xs text-risk transition-colors hover:bg-hover disabled:opacity-60"
             >
               Révoquer
             </button>

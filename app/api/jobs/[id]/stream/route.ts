@@ -58,8 +58,10 @@ export async function GET(
       };
 
       // Snapshot initial (statut + findings déjà présents)
-      const initial = await getJob(id, session.id);
-      const findings = await listFindings(id);
+      const [initial, findings] = await Promise.all([
+        getJob(id, session.id),
+        listFindings(id),
+      ]);
       if (findings.length) lastIso = findings[findings.length - 1].created_at;
       send("status", { status: initial?.status, costUsd: initial?.cost_usd });
       maybeSendGraph(initial?.agents_graph);
@@ -73,12 +75,14 @@ export async function GET(
       const deadline = Date.now() + 55_000;
       const timer = setInterval(async () => {
         try {
-          const fresh = await listFindings(id, lastIso);
+          const [fresh, j] = await Promise.all([
+            listFindings(id, lastIso),
+            getJob(id, session.id),
+          ]);
           for (const f of fresh) {
             send("finding", f);
             lastIso = f.created_at;
           }
-          const j = await getJob(id, session.id);
           send("status", { status: j?.status, costUsd: j?.cost_usd });
           maybeSendGraph(j?.agents_graph);
           if (j && TERMINAL.has(j.status)) {

@@ -67,10 +67,11 @@ export default function DashboardClient({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ url: target }),
       });
-      const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Le scan a échoué.");
+        const err = await res.json().catch(() => ({}));
+        setError(err.error || "Le scan a échoué.");
       } else {
+        const data = await res.json();
         const r: ScanResult = data.result;
         setResult(r);
         setResultDeep(Boolean(data.deep));
@@ -107,8 +108,9 @@ export default function DashboardClient({
     if (!item.id) return;
     try {
       const res = await fetch(`/api/scan/${item.id}`);
+      if (!res.ok) return;
       const data = await res.json();
-      if (res.ok && data.scan?.findings) {
+      if (data.scan?.findings) {
         setResult({
           targetUrl: data.scan.target_url,
           grade: data.scan.grade,
@@ -128,11 +130,13 @@ export default function DashboardClient({
   function download(content: string, type: string, ext: string) {
     if (!result) return;
     const blob = new Blob([content], { type });
+    const objectUrl = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
+    a.href = objectUrl;
     a.download = `sentinel-scan-${prettyHost(result.targetUrl)}.${ext}`;
     a.click();
-    URL.revokeObjectURL(a.href);
+    // Le telechargement demarre de maniere asynchrone : liberer le Blob au tick suivant.
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
   }
 
   function exportJson() {
@@ -262,17 +266,22 @@ export default function DashboardClient({
                 e.preventDefault();
                 performScan(url);
               }}
-              className="no-print mt-6 flex flex-col gap-3 sm:flex-row"
+              className="no-print mt-6 flex flex-col gap-3 sm:flex-row sm:items-end"
             >
-              <input
-                type="text"
-                inputMode="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://mon-site.fr"
-                disabled={scanning}
-                className="flex-1 rounded-xl border border-border-strong bg-bg px-4 py-3 text-fg outline-none transition-colors placeholder:text-subtle focus:border-brand focus:ring-2 focus:ring-brand/30 disabled:opacity-60"
-              />
+              <label className="flex-1">
+                <span className="mb-1 block text-xs font-medium text-subtle">
+                  URL à scanner
+                </span>
+                <input
+                  type="text"
+                  inputMode="url"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="https://mon-site.fr"
+                  disabled={scanning}
+                  className="w-full rounded-xl border border-border-strong bg-bg px-4 py-3 text-fg outline-none transition-colors placeholder:text-subtle focus:border-brand focus:ring-2 focus:ring-brand/30 disabled:opacity-60"
+                />
+              </label>
               <button type="submit" disabled={scanning} className="btn btn-primary disabled:opacity-60">
                 {scanning ? "Scan en cours…" : "Lancer le scan"}
               </button>
@@ -295,7 +304,7 @@ export default function DashboardClient({
                     <ul className="mt-4 space-y-2">
                       {PROGRESS.map((p, i) => (
                         <li
-                          key={i}
+                          key={p}
                           className={`flex items-center gap-2 text-sm transition-colors ${
                             i < step ? "text-safe" : i === step ? "text-fg" : "text-subtle"
                           }`}
@@ -382,8 +391,11 @@ export default function DashboardClient({
                   <p className="mt-3 text-sm text-subtle">Vos scans apparaîtront ici.</p>
                 ) : (
                   <ul className="mt-3 space-y-2">
-                    {scans.map((item, i) => (
-                      <li key={item.id ?? i} className="group relative">
+                    {scans.map((item) => (
+                      <li
+                        key={item.id ?? `${item.created_at}-${item.target_url}`}
+                        className="group relative"
+                      >
                         <button
                           onClick={() => openHistory(item)}
                           className="card flex w-full items-center gap-3 p-3 text-left"
@@ -482,6 +494,7 @@ function prettyHost(u: string): string {
 function formatDate(iso: string): string {
   try {
     return new Date(iso).toLocaleString("fr-FR", {
+      timeZone: "Europe/Paris",
       day: "2-digit",
       month: "2-digit",
       hour: "2-digit",

@@ -17,9 +17,9 @@ export default function DomainsPanel() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  async function load() {
+  async function load(signal?: AbortSignal) {
     try {
-      const r = await fetch("/api/domains");
+      const r = await fetch("/api/domains", { signal });
       const d = await r.json();
       if (r.ok) setDomains(d.domains || []);
     } catch {
@@ -27,7 +27,9 @@ export default function DomainsPanel() {
     }
   }
   useEffect(() => {
-    load();
+    const ac = new AbortController();
+    load(ac.signal);
+    return () => ac.abort();
   }, []);
 
   async function addDomain(e: React.FormEvent) {
@@ -64,6 +66,12 @@ export default function DomainsPanel() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ domain }),
       });
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}));
+        setError(err.error || "Vérification indisponible.");
+        await load();
+        return;
+      }
       const d = await r.json();
       if (d.verified) setNotice(`${domain} vérifié via ${d.method === "dns" ? "DNS" : "fichier"} ✓`);
       else setError(d.reason || "Vérification échouée.");
@@ -82,14 +90,19 @@ export default function DomainsPanel() {
         contenu mixte, robots.txt…).
       </p>
 
-      <form onSubmit={addDomain} className="mt-5 flex flex-col gap-3 sm:flex-row">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="mon-site.fr"
-          disabled={busy}
-          className="flex-1 rounded-xl border border-border-strong bg-bg px-4 py-3 text-fg outline-none placeholder:text-subtle focus:border-brand focus:ring-2 focus:ring-brand/30 disabled:opacity-60"
-        />
+      <form onSubmit={addDomain} className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-end">
+        <label className="flex-1">
+          <span className="mb-1 block text-xs font-medium text-subtle">
+            Domaine à vérifier
+          </span>
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="mon-site.fr"
+            disabled={busy}
+            className="w-full rounded-xl border border-border-strong bg-bg px-4 py-3 text-fg outline-none placeholder:text-subtle focus:border-brand focus:ring-2 focus:ring-brand/30 disabled:opacity-60"
+          />
+        </label>
         <button type="submit" disabled={busy} className="btn btn-primary disabled:opacity-60">
           Générer un jeton
         </button>

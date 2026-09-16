@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ConsoleHeader from "@/components/dashboard/ConsoleHeader";
+import { formatDate } from "@/lib/format";
 
 type Installation = {
   installation_id: string;
@@ -27,6 +28,7 @@ export default function IntegrationsPanel() {
   const [linearKey, setLinearKey] = useState("");
   const [linearTeam, setLinearTeam] = useState("");
   const [ticketMsg, setTicketMsg] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
@@ -42,10 +44,11 @@ export default function IntegrationsPanel() {
   }, []);
 
   useEffect(() => {
+    const ac = new AbortController();
     (async () => {
       const [gh, tk] = await Promise.all([
-        fetch("/api/integrations/github"),
-        fetch("/api/integrations/tickets"),
+        fetch("/api/integrations/github", { signal: ac.signal }),
+        fetch("/api/integrations/tickets", { signal: ac.signal }),
       ]);
       if (gh.ok) {
         const d = await gh.json();
@@ -62,26 +65,33 @@ export default function IntegrationsPanel() {
         setLinearTeam(d.linear?.team || "");
       }
       setLoading(false);
-    })();
+    })().catch(() => {});
+    return () => ac.abort();
   }, []);
 
   async function saveTickets(e: React.FormEvent) {
     e.preventDefault();
+    if (saving) return;
+    setSaving(true);
     setTicketMsg(null);
-    const res = await fetch("/api/integrations/tickets", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        jiraBaseUrl,
-        jiraEmail,
-        jiraToken,
-        jiraProject,
-        linearKey,
-        linearTeam,
-      }),
-    });
-    const d = await res.json();
-    setTicketMsg(res.ok ? "Configuration enregistrée." : d.error || "Échec.");
+    try {
+      const res = await fetch("/api/integrations/tickets", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          jiraBaseUrl,
+          jiraEmail,
+          jiraToken,
+          jiraProject,
+          linearKey,
+          linearTeam,
+        }),
+      });
+      const d = await res.json();
+      setTicketMsg(res.ok ? "Configuration enregistrée." : d.error || "Échec.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -139,7 +149,7 @@ export default function IntegrationsPanel() {
                       {i.account_login || `Installation ${i.installation_id}`}
                     </span>
                     <span className="text-xs text-subtle">
-                      reliée le {new Date(i.created_at).toLocaleDateString("fr-FR")}
+                      reliée le {formatDate(i.created_at)}
                     </span>
                   </li>
                 ))}
@@ -167,24 +177,42 @@ export default function IntegrationsPanel() {
             <form onSubmit={saveTickets} className="mt-4 grid gap-6 lg:grid-cols-2">
               <div className="card space-y-3 p-4">
                 <h3 className="font-heading text-sm font-semibold text-subtle">Jira</h3>
-                <input className="input w-full" placeholder="https://votre-espace.atlassian.net"
-                  value={jiraBaseUrl} onChange={(e) => setJiraBaseUrl(e.target.value)} />
-                <input className="input w-full" placeholder="E-mail Jira"
-                  value={jiraEmail} onChange={(e) => setJiraEmail(e.target.value)} />
-                <input className="input w-full" placeholder="Token API (laisser vide = inchangé)"
-                  type="password" value={jiraToken} onChange={(e) => setJiraToken(e.target.value)} />
-                <input className="input w-full" placeholder="Clé de projet (ex. SEC)"
-                  value={jiraProject} onChange={(e) => setJiraProject(e.target.value)} />
+                <label className="block">
+                  <span className="mb-1 block text-xs font-medium text-subtle">URL de l'espace Jira</span>
+                  <input className="input w-full" placeholder="https://votre-espace.atlassian.net"
+                    value={jiraBaseUrl} onChange={(e) => setJiraBaseUrl(e.target.value)} />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-xs font-medium text-subtle">E-mail Jira</span>
+                  <input className="input w-full" placeholder="vous@entreprise.fr"
+                    value={jiraEmail} onChange={(e) => setJiraEmail(e.target.value)} />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-xs font-medium text-subtle">Token API</span>
+                  <input className="input w-full" placeholder="Laisser vide = inchangé"
+                    type="password" value={jiraToken} onChange={(e) => setJiraToken(e.target.value)} />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-xs font-medium text-subtle">Clé de projet</span>
+                  <input className="input w-full" placeholder="ex. SEC"
+                    value={jiraProject} onChange={(e) => setJiraProject(e.target.value)} />
+                </label>
               </div>
               <div className="card space-y-3 p-4">
                 <h3 className="font-heading text-sm font-semibold text-subtle">Linear</h3>
-                <input className="input w-full" placeholder="Clé API (laisser vide = inchangé)"
-                  type="password" value={linearKey} onChange={(e) => setLinearKey(e.target.value)} />
-                <input className="input w-full" placeholder="Team ID Linear"
-                  value={linearTeam} onChange={(e) => setLinearTeam(e.target.value)} />
+                <label className="block">
+                  <span className="mb-1 block text-xs font-medium text-subtle">Clé API Linear</span>
+                  <input className="input w-full" placeholder="Laisser vide = inchangé"
+                    type="password" value={linearKey} onChange={(e) => setLinearKey(e.target.value)} />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-xs font-medium text-subtle">Team ID Linear</span>
+                  <input className="input w-full" placeholder="ex. TEAM-123"
+                    value={linearTeam} onChange={(e) => setLinearTeam(e.target.value)} />
+                </label>
               </div>
               <div className="flex items-center gap-3 lg:col-span-2">
-                <button type="submit" className="btn btn-primary">Enregistrer</button>
+                <button type="submit" disabled={saving} className="btn btn-primary disabled:opacity-60">Enregistrer</button>
                 {ticketMsg && <span className="text-sm text-brand-light">{ticketMsg}</span>}
               </div>
             </form>

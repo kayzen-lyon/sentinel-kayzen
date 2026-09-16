@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Hero() {
   return (
     <section id="contenu" className="relative overflow-hidden pt-[72px]">
@@ -36,10 +38,10 @@ export default function Hero() {
             className="reveal mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
             style={{ animationDelay: "180ms" }}
           >
-            <a href="/signup" className="btn btn-primary w-full sm:w-auto">
+            <Link href="/signup" className="btn btn-primary w-full sm:w-auto">
               Scanner mon site gratuitement
               <IconArrow />
-            </a>
+            </Link>
             <a href="#contact" className="btn btn-ghost w-full sm:w-auto">
               Demander un audit managé
             </a>

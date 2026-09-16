@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const NAV = [
@@ -60,15 +61,15 @@ export default function Header() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <a
+          <Link
             href="/login"
             className="rounded-xl px-3 py-2 text-sm font-medium text-muted transition-colors hover:text-fg"
           >
             Connexion
-          </a>
-          <a href="/signup" className="btn btn-primary !px-4 !py-2.5 text-sm">
+          </Link>
+          <Link href="/signup" className="btn btn-primary !px-4 !py-2.5 text-sm">
             Scanner mon site
-          </a>
+          </Link>
         </div>
 
         <button
@@ -97,20 +98,20 @@ export default function Header() {
             ))}
           </nav>
           <div className="mt-4 flex flex-col gap-2">
-            <a
+            <Link
               href="/signup"
               onClick={() => setOpen(false)}
               className="btn btn-primary w-full"
             >
               Scanner mon site
-            </a>
-            <a
+            </Link>
+            <Link
               href="/login"
               onClick={() => setOpen(false)}
               className="btn btn-ghost w-full"
             >
               Connexion
-            </a>
+            </Link>
           </div>
         </div>
       )}

@@ -53,7 +53,7 @@ const SEVERITY_WEIGHT: Record<Severity, number> = {
 };
 
 const UA =
-  "SentinelByKayzen/1.0 (+https://sentinel.kayzen-lyon.fr; passive security posture scan)";
+  "SentinelByKayzen/1.0 (+https://sentinel.kayzen-lyon.com; passive security posture scan)";
 
 async function fetchSafe(
   url: string,
@@ -520,10 +520,16 @@ export async function runScan(
     { path: "/.git/config", label: "Dépôt .git" },
     { path: "/server-status", label: "Apache server-status" },
   ];
-  for (const s of sensitive) {
-    const r = await fetchSafe(`${origin}${s.path}`, { timeoutMs: 6000 });
-    if (r && r.status === 200) {
-      const body = (await r.text().catch(() => "")).slice(0, 200);
+  const probes = await Promise.all(
+    sensitive.map(async (s) => {
+      const r = await fetchSafe(`${origin}${s.path}`, { timeoutMs: 6000 });
+      const body =
+        r && r.status === 200 ? (await r.text().catch(() => "")).slice(0, 200) : null;
+      return { s, body };
+    })
+  );
+  for (const { s, body } of probes) {
+    if (body !== null) {
       const looksReal =
         s.path === "/.env"
           ? /=/.test(body) && !/<html/i.test(body)

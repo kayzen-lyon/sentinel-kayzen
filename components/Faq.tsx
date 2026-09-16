@@ -23,7 +23,7 @@ export default function Faq() {
           {QA.map((item, i) => {
             const isOpen = open === i;
             return (
-              <div key={i}>
+              <div key={item.q}>
                 <button
                   className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
                   onClick={() => setOpen(isOpen ? null : i)}
@@ -43,7 +43,7 @@ export default function Faq() {
                   </span>
                 </button>
                 <div
-                  className="grid transition-all duration-300 ease-out"
+                  className="grid transition-[grid-template-rows] duration-300 ease-out"
                   style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
                 >
                   <div className="overflow-hidden">
