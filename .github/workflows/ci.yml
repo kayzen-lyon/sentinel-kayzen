@@ -32,9 +32,6 @@ jobs:
   sast:
     name: SAST (Semgrep)
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -51,12 +48,15 @@ jobs:
             --config p/secrets \
             --config p/owasp-top-ten \
             --sarif --output semgrep.sarif
-      - name: Upload SARIF
+      # SARIF archivé en artefact (gratuit, dépôt privé OK). Pour l'onglet Security,
+      # activez le code scanning (dépôt public ou GitHub Advanced Security) puis
+      # remplacez cette étape par github/codeql-action/upload-sarif@v3.
+      - name: Archiver le SARIF Semgrep
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: actions/upload-artifact@v4
         with:
-          sarif_file: semgrep.sarif
-          category: semgrep
+          name: semgrep-sarif
+          path: semgrep.sarif
 
   secrets:
     name: Secrets (gitleaks)
@@ -72,18 +72,17 @@ jobs:
   deps:
     name: Dépendances (osv-scanner + npm audit)
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
     steps:
       - uses: actions/checkout@v4
       - name: npm audit (prod, échoue sur high+)
         run: |
           npm ci --ignore-scripts
           npm audit --omit=dev --audit-level=high
-      - name: OSV-Scanner (binaire épinglé)
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: OSV-Scanner (informatif)
+        continue-on-error: true
         run: |
-          VER=1.9.2
-          curl -sSfL "https://github.com/google/osv-scanner/releases/download/v${VER}/osv-scanner_${VER}_linux_amd64" -o osv-scanner
-          chmod +x osv-scanner
-          ./osv-scanner --lockfile=package-lock.json
+          go install github.com/google/osv-scanner/v2/cmd/osv-scanner@latest
+          "$(go env GOPATH)/bin/osv-scanner" --lockfile=package-lock.json
