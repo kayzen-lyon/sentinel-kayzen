@@ -5,22 +5,22 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { safeInternalPath } from "@/lib/redirect";
+import { useToast } from "@/components/ui/Toast";
 
 export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
   const params = useSearchParams();
+  const toast = useToast();
   const next = safeInternalPath(params.get("next"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const isSignup = mode === "signup";
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
     setLoading(true);
     try {
       const res = await fetch(`/api/auth/${isSignup ? "signup" : "login"}`, {
@@ -30,16 +30,17 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
           isSignup ? { email, password, name } : { email, password }
         ),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error || "Une erreur est survenue.");
+        toast.error(data.error || "Une erreur est survenue.");
         setLoading(false);
         return;
       }
+      toast.success(isSignup ? "Compte créé." : "Connexion réussie.");
       router.push(next);
       router.refresh();
     } catch {
-      setError("Impossible de contacter le serveur.");
+      toast.error("Impossible de contacter le serveur.");
       setLoading(false);
     }
   }
@@ -102,15 +103,6 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
             placeholder="••••••••"
             hint={isSignup ? "8+ caractères, majuscule, minuscule et chiffre." : undefined}
           />
-
-          {error && (
-            <p
-              role="alert"
-              className="rounded-lg border border-risk/30 bg-risk/10 px-3 py-2 text-sm text-risk"
-            >
-              {error}
-            </p>
-          )}
 
           <button
             type="submit"

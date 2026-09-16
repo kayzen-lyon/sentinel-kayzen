@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ConsoleHeader from "@/components/dashboard/ConsoleHeader";
+import { useToast } from "@/components/ui/Toast";
 import { formatDate } from "@/lib/format";
 
 type Installation = {
@@ -27,8 +28,8 @@ export default function IntegrationsPanel() {
   const [jiraProject, setJiraProject] = useState("");
   const [linearKey, setLinearKey] = useState("");
   const [linearTeam, setLinearTeam] = useState("");
-  const [ticketMsg, setTicketMsg] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
@@ -73,7 +74,6 @@ export default function IntegrationsPanel() {
     e.preventDefault();
     if (saving) return;
     setSaving(true);
-    setTicketMsg(null);
     try {
       const res = await fetch("/api/integrations/tickets", {
         method: "POST",
@@ -88,7 +88,8 @@ export default function IntegrationsPanel() {
         }),
       });
       const d = await res.json();
-      setTicketMsg(res.ok ? "Configuration enregistrée." : d.error || "Échec.");
+      if (res.ok) toast.success("Configuration enregistrée.");
+      else toast.error(d.error || "Échec.");
     } finally {
       setSaving(false);
     }
@@ -213,7 +214,6 @@ export default function IntegrationsPanel() {
               </div>
               <div className="flex items-center gap-3 lg:col-span-2">
                 <button type="submit" disabled={saving} aria-busy={saving} className="btn btn-primary disabled:opacity-60">Enregistrer</button>
-                {ticketMsg && <span className="text-sm text-brand-light">{ticketMsg}</span>}
               </div>
             </form>
           )}

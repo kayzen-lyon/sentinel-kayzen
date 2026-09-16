@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { inter, outfit } from "./fonts";
+import { ToastProvider } from "@/components/ui/Toast";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -69,7 +70,7 @@ export default function RootLayout({
         >
           Aller au contenu principal
         </a>
-        {children}
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );

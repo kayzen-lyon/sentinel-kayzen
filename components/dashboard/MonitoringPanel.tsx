@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ConsoleHeader from "@/components/dashboard/ConsoleHeader";
+import { useToast } from "@/components/ui/Toast";
 import { formatDate } from "@/lib/format";
 
 type Schedule = {
@@ -25,9 +26,9 @@ export default function MonitoringPanel() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [url, setUrl] = useState("");
   const [frequency, setFrequency] = useState<"daily" | "weekly">("daily");
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const toast = useToast();
 
   async function load(signal?: AbortSignal) {
     const res = await fetch("/api/scheduled", { signal });
@@ -44,7 +45,6 @@ export default function MonitoringPanel() {
     e.preventDefault();
     if (busy) return;
     setBusy(true);
-    setError(null);
     try {
       const res = await fetch("/api/scheduled", {
         method: "POST",
@@ -53,7 +53,7 @@ export default function MonitoringPanel() {
       });
       const d = await res.json();
       if (!res.ok) {
-        setError(d.error || "Échec.");
+        toast.error(d.error || "Échec.");
         return;
       }
       setSchedules(d.schedules || []);
@@ -91,11 +91,6 @@ export default function MonitoringPanel() {
           approfondi si le domaine est vérifié.
         </p>
 
-        {error && (
-          <p role="alert" className="mt-4 rounded-lg border border-risk/30 bg-risk/10 px-4 py-2.5 text-sm text-risk">
-            {error}
-          </p>
-        )}
 
         <form onSubmit={add} className="mt-6 flex flex-col gap-3 sm:flex-row">
           <input

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useToast } from "@/components/ui/Toast";
 
 type Domain = {
   id: string;
@@ -14,8 +15,7 @@ export default function DomainsPanel() {
   const [domains, setDomains] = useState<Domain[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const toast = useToast();
 
   async function load(signal?: AbortSignal) {
     try {
@@ -36,8 +36,6 @@ export default function DomainsPanel() {
     e.preventDefault();
     if (!input.trim()) return;
     setBusy(true);
-    setError(null);
-    setNotice(null);
     try {
       const r = await fetch("/api/domains", {
         method: "POST",
@@ -45,10 +43,10 @@ export default function DomainsPanel() {
         body: JSON.stringify({ domain: input }),
       });
       const d = await r.json();
-      if (!r.ok) setError(d.error || "Erreur.");
+      if (!r.ok) toast.error(d.error || "Erreur.");
       else {
         setInput("");
-        setNotice(`Jeton généré pour ${d.domain}. Ajoutez-le puis cliquez « Vérifier ».`);
+        toast.info(`Jeton généré pour ${d.domain}. Ajoutez-le puis cliquez « Vérifier ».`);
         await load();
       }
     } finally {
@@ -58,8 +56,6 @@ export default function DomainsPanel() {
 
   async function verify(domain: string) {
     setBusy(true);
-    setError(null);
-    setNotice(null);
     try {
       const r = await fetch("/api/domains/verify", {
         method: "POST",
@@ -68,13 +64,14 @@ export default function DomainsPanel() {
       });
       if (!r.ok) {
         const err = await r.json().catch(() => ({}));
-        setError(err.error || "Vérification indisponible.");
+        toast.error(err.error || "Vérification indisponible.");
         await load();
         return;
       }
       const d = await r.json();
-      if (d.verified) setNotice(`${domain} vérifié via ${d.method === "dns" ? "DNS" : "fichier"} ✓`);
-      else setError(d.reason || "Vérification échouée.");
+      if (d.verified)
+        toast.success(`${domain} vérifié via ${d.method === "dns" ? "DNS" : "fichier"} ✓`);
+      else toast.error(d.reason || "Vérification échouée.");
       await load();
     } finally {
       setBusy(false);
@@ -107,17 +104,6 @@ export default function DomainsPanel() {
           Générer un jeton
         </button>
       </form>
-
-      {notice && (
-        <p className="mt-4 rounded-lg border border-safe/30 bg-safe/10 px-4 py-2.5 text-sm text-safe">
-          {notice}
-        </p>
-      )}
-      {error && (
-        <p role="alert" className="mt-4 rounded-lg border border-risk/30 bg-risk/10 px-4 py-2.5 text-sm text-risk">
-          {error}
-        </p>
-      )}
 
       <ul className="mt-6 space-y-4">
         {domains.length === 0 && (
