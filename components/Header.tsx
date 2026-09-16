@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import ContactCard from "@/components/ContactCard";
 
 const NAV = [
   { label: "Le service", href: "#service" },
@@ -61,6 +62,7 @@ export default function Header() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
+          <ContactCard />
           <Link
             href="/login"
             className="rounded-xl px-3 py-2 text-sm font-medium text-muted transition-colors hover:text-fg"
@@ -98,6 +100,9 @@ export default function Header() {
             ))}
           </nav>
           <div className="mt-4 flex flex-col gap-2">
+            <div className="flex justify-center pb-1">
+              <ContactCard />
+            </div>
             <Link
               href="/signup"
               onClick={() => setOpen(false)}

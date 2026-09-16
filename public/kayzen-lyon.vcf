@@ -1,0 +1,11 @@
+BEGIN:VCARD
+VERSION:3.0
+N:LYON;KAYZEN;;;
+FN:KAYZEN LYON — Sentinel by Kayzen
+ORG:KAYZEN LYON
+TITLE:Cybersécurité offensive & pentest IA
+TEL;TYPE=WORK,VOICE:+33487776861
+EMAIL;TYPE=WORK:contact@kayzen-lyon.fr
+ADR;TYPE=WORK:;;6 rue Pierre Termier;Lyon;;69009;France
+URL:https://sentinel.kayzen-lyon.com
+END:VCARD
