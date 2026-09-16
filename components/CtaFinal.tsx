@@ -33,7 +33,7 @@ export default function CtaFinal() {
               Demander mon audit gratuit
             </a>
             <a
-              href="https://kayzen-lyon.fr"
+              href="https://www.kayzen-lyon.com"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-ghost w-full sm:w-auto"

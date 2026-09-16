@@ -9,7 +9,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://sentinel.kayzen-lyon.fr"),
+  metadataBase: new URL("https://sentinel.kayzen-lyon.com"),
   title: {
     default: "Sentinel by Kayzen — Pentest IA autonome & cybersécurité offensive",
     template: "%s | Sentinel by Kayzen",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     "Kayzen",
     "Lyon",
   ],
-  authors: [{ name: "Kayzen Web", url: "https://kayzen-lyon.fr" }],
+  authors: [{ name: "Kayzen Web", url: "https://www.kayzen-lyon.com" }],
   creator: "Kayzen Web",
   openGraph: {
     type: "website",

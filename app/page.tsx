@@ -17,31 +17,31 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "Organization",
-      "@id": "https://sentinel.kayzen-lyon.fr/#org",
+      "@id": "https://sentinel.kayzen-lyon.com/#org",
       name: "Sentinel by Kayzen",
-      url: "https://sentinel.kayzen-lyon.fr",
-      logo: "https://sentinel.kayzen-lyon.fr/logo-mark.png",
-      parentOrganization: { "@type": "Organization", name: "Kayzen Web", url: "https://kayzen-lyon.fr" },
+      url: "https://sentinel.kayzen-lyon.com",
+      logo: "https://sentinel.kayzen-lyon.com/logo-mark.png",
+      parentOrganization: { "@type": "Organization", name: "Kayzen Web", url: "https://www.kayzen-lyon.com" },
       areaServed: "FR",
       address: { "@type": "PostalAddress", addressLocality: "Lyon", addressCountry: "FR" },
       email: "contact@kayzen-lyon.fr",
     },
     {
       "@type": "WebSite",
-      "@id": "https://sentinel.kayzen-lyon.fr/#website",
-      url: "https://sentinel.kayzen-lyon.fr",
+      "@id": "https://sentinel.kayzen-lyon.com/#website",
+      url: "https://sentinel.kayzen-lyon.com",
       name: "Sentinel by Kayzen",
       inLanguage: "fr-FR",
-      publisher: { "@id": "https://sentinel.kayzen-lyon.fr/#org" },
+      publisher: { "@id": "https://sentinel.kayzen-lyon.com/#org" },
     },
     {
       "@type": "Service",
       name: "Sentinel by Kayzen",
       serviceType: "Scan de sécurité IA & pentest",
-      provider: { "@id": "https://sentinel.kayzen-lyon.fr/#org" },
+      provider: { "@id": "https://sentinel.kayzen-lyon.com/#org" },
       description:
         "Scanner de posture de sécurité en self-service (en-têtes, TLS, CSP, expositions) et audit managé par les experts Kayzen.",
-      url: "https://sentinel.kayzen-lyon.fr",
+      url: "https://sentinel.kayzen-lyon.com",
       offers: {
         "@type": "Offer",
         priceCurrency: "EUR",
@@ -60,12 +60,19 @@ const jsonLd = {
   ],
 };
 
+// `JSON.stringify` n'échappe pas le HTML : un `<` dans les données sortirait
+// du <script>. On neutralise les caractères à risque avant l'injection.
+const jsonLdHtml = JSON.stringify(jsonLd)
+  .replace(/</g, "\\u003c")
+  .replace(/>/g, "\\u003e")
+  .replace(/&/g, "\\u0026");
+
 export default function Page() {
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml }}
       />
       <Header />
       <main>

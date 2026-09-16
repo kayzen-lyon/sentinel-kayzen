@@ -27,7 +27,7 @@ function toSarif(target: string, findings: JobFindingRow[]): string {
           tool: {
             driver: {
               name: "Sentinel by Kayzen",
-              informationUri: "https://sentinel.kayzen-lyon.fr",
+              informationUri: "https://sentinel.kayzen-lyon.com",
               rules: [],
             },
           },

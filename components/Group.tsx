@@ -2,19 +2,19 @@ const ENTITIES = [
   {
     name: "Kayzen Web",
     role: "Agence de création de sites internet",
-    href: "https://kayzen-lyon.fr",
+    href: "https://www.kayzen-lyon.com",
     color: "brand",
   },
   {
     name: "Nexus",
     role: "SEO & visibilité à l'ère de l'IA (GEO · AEO · LLMO)",
-    href: "https://nexus.kayzen-lyon.fr",
+    href: "https://nexus.kayzen-lyon.com",
     color: "violet",
   },
   {
     name: "Konforme",
     role: "Mise en conformité accessibilité (EAA)",
-    href: "https://konforme.kayzen-lyon.fr",
+    href: "https://konforme.kayzen-lyon.com",
     color: "safe",
   },
   {

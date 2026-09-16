@@ -4,7 +4,7 @@ import type { Finding } from "./scanner";
 import { safeFetch } from "./ssrf";
 
 const UA =
-  "SentinelByKayzen/1.0 (+https://sentinel.kayzen-lyon.fr; passive security posture scan)";
+  "SentinelByKayzen/1.0 (+https://sentinel.kayzen-lyon.com; passive security posture scan)";
 
 type CertInfo = {
   issuer?: string;

@@ -17,7 +17,7 @@ export default function Page() {
 
       <h2>Éditeur du site</h2>
       <p>
-        Le site sentinel.kayzen-lyon.fr est édité par <strong>Kayzen Web</strong>,{" "}
+        Le site sentinel.kayzen-lyon.com est édité par <strong>Kayzen Web</strong>,{" "}
         <span className="todo">[forme juridique — ex. SASU / EI]</span>.
       </p>
       <ul>

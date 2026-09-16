@@ -11,7 +11,7 @@ import { dbConfigured, ensureSchema, query } from "./db";
  */
 
 const UA =
-  "SentinelByKayzen/1.0 (+https://sentinel.kayzen-lyon.fr; passive CVE correlation)";
+  "SentinelByKayzen/1.0 (+https://sentinel.kayzen-lyon.com; passive CVE correlation)";
 const CACHE_TTL_MS = 7 * 24 * 3600 * 1000; // 7 jours
 const MAX_LOOKUPS_PER_SCAN = 3; // garde-fou gratuité (limite NVD sans clé)
 const MAX_CVES_PER_COMPONENT = 8;

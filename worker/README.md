@@ -43,7 +43,7 @@ Un **Personal Access Token** (classic, scope `repo`, ou fine-grained avec permis
 | `GITHUB_DISPATCH_TOKEN` | le PAT ci-dessus |
 | `GITHUB_RUNNER_REPO` | `owner/nom-du-depot-runner` |
 | `WORKER_INGEST_SECRET` | **même** valeur que le secret du runner |
-| `APP_BASE_URL` | URL publique de Sentinel (ex. `https://sentinel.kayzen-lyon.fr`) |
+| `APP_BASE_URL` | URL publique de Sentinel (ex. `https://sentinel.kayzen-lyon.com`) |
 | `NVD_API_KEY` *(optionnel)* | clé NVD gratuite pour la corrélation CVE |
 
 Sans `GITHUB_DISPATCH_TOKEN` + `GITHUB_RUNNER_REPO`, un lancement de pentest est simplement

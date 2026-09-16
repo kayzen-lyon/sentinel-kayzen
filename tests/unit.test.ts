@@ -5,6 +5,7 @@ import { validateTargetUrl, safeFetch } from "../lib/ssrf";
 import { normalizeDomain, registrableDomain } from "../lib/domains";
 import { parseBanners } from "../lib/cve";
 import { analyzeForms } from "../lib/recon";
+import { safeInternalPath } from "../lib/redirect";
 
 test("validateEmail", () => {
   assert.equal(validateEmail("a@b.fr"), true);
@@ -102,4 +103,19 @@ test("analyzeForms détecte CSRF et autocomplétion", () => {
 
   // pas de champ mot de passe → rien à signaler
   assert.equal(analyzeForms(`<form><input type="text"></form>`).hasPassword, false);
+});
+
+test("safeInternalPath bloque les redirections externes", () => {
+  // chemins internes légitimes
+  assert.equal(safeInternalPath("/dashboard/team"), "/dashboard/team");
+  assert.equal(safeInternalPath("/dashboard?tab=domains"), "/dashboard?tab=domains");
+
+  // hors du site → repli
+  assert.equal(safeInternalPath("https://evil.tld"), "/dashboard");
+  assert.equal(safeInternalPath("//evil.tld"), "/dashboard");
+  assert.equal(safeInternalPath("/\\evil.tld"), "/dashboard");
+  assert.equal(safeInternalPath("/ok\\evil.tld"), "/dashboard");
+  assert.equal(safeInternalPath("javascript:alert(1)"), "/dashboard");
+  assert.equal(safeInternalPath(null), "/dashboard");
+  assert.equal(safeInternalPath(""), "/dashboard");
 });

@@ -14,9 +14,9 @@ const COLS = [
   {
     title: "Groupe Kayzen",
     links: [
-      { label: "Kayzen Web (agence)", href: "https://kayzen-lyon.fr" },
-      { label: "Nexus — SEO IA", href: "https://nexus.kayzen-lyon.fr" },
-      { label: "Konforme — Accessibilité", href: "https://konforme.kayzen-lyon.fr" },
+      { label: "Kayzen Web (agence)", href: "https://www.kayzen-lyon.com" },
+      { label: "Nexus — SEO IA", href: "https://nexus.kayzen-lyon.com" },
+      { label: "Konforme — Accessibilité", href: "https://konforme.kayzen-lyon.com" },
       { label: "Contact", href: "mailto:contact@kayzen-lyon.fr" },
     ],
   },

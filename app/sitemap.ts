@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE = "https://sentinel.kayzen-lyon.fr";
+const BASE = "https://sentinel.kayzen-lyon.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

@@ -5,4 +5,4 @@ Disallow: /confidentialite
 Disallow: /cgu
 Disallow: /accessibilite
 
-Sitemap: https://sentinel.kayzen-lyon.fr/sitemap.xml
+Sitemap: https://sentinel.kayzen-lyon.com/sitemap.xml
