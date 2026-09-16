@@ -26,6 +26,7 @@ const COLS = [
       { label: "Mentions légales", href: "/mentions-legales" },
       { label: "Politique de confidentialité", href: "/confidentialite" },
       { label: "CGU", href: "/cgu" },
+      { label: "CGV", href: "/cgv" },
       { label: "Accessibilité", href: "/accessibilite" },
     ],
   },
