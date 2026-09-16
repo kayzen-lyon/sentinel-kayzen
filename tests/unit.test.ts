@@ -6,6 +6,9 @@ import { normalizeDomain, registrableDomain } from "../lib/domains";
 import { parseBanners } from "../lib/cve";
 import { analyzeForms } from "../lib/recon";
 import { safeInternalPath } from "../lib/redirect";
+import { formatDate, formatDateTime } from "../lib/format";
+import { getPlaybook, PLAYBOOKS } from "../lib/playbooks";
+import { engineEventType } from "../lib/github";
 
 test("validateEmail", () => {
   assert.equal(validateEmail("a@b.fr"), true);
@@ -118,4 +121,33 @@ test("safeInternalPath bloque les redirections externes", () => {
   assert.equal(safeInternalPath("javascript:alert(1)"), "/dashboard");
   assert.equal(safeInternalPath(null), "/dashboard");
   assert.equal(safeInternalPath(""), "/dashboard");
+});
+
+test("formatDate / formatDateTime — fuseau figé Europe/Paris", () => {
+  // 2026-01-15T10:30:00Z → 11:30 heure de Paris (UTC+1 en hiver).
+  const iso = "2026-01-15T10:30:00Z";
+  assert.equal(formatDate(iso), "15/01/2026");
+  assert.equal(formatDateTime(iso), "15/01/2026 11:30");
+  // Le format ne doit pas dépendre du fuseau de la machine.
+  assert.equal(formatDate(new Date(iso)), "15/01/2026");
+});
+
+test("getPlaybook — id connu, inconnu, vide", () => {
+  const pb = getPlaybook("web-owasp");
+  assert.ok(pb);
+  assert.equal(pb?.id, "web-owasp");
+  assert.ok(pb?.mode === "standard" || pb?.mode === "deep");
+  assert.equal(getPlaybook("inexistant"), null);
+  assert.equal(getPlaybook(null), null);
+  assert.equal(getPlaybook(undefined), null);
+  // Tous les playbooks ont un id unique et un mode valide.
+  const ids = new Set(PLAYBOOKS.map((p) => p.id));
+  assert.equal(ids.size, PLAYBOOKS.length);
+  for (const p of PLAYBOOKS) assert.ok(p.mode === "standard" || p.mode === "deep");
+});
+
+test("engineEventType — sélection du workflow runner", () => {
+  assert.equal(engineEventType("oss"), "oss-scan");
+  assert.equal(engineEventType("strix"), "strix-scan");
+  assert.equal(engineEventType(undefined), "strix-scan");
 });

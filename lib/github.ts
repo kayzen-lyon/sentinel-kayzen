@@ -28,13 +28,18 @@ export type DispatchPayload = {
   engine?: ScanEngine;
 };
 
+/** event_type de repository_dispatch écouté par le workflow de chaque moteur. */
+export function engineEventType(engine: ScanEngine | undefined): string {
+  return engine === "oss" ? "oss-scan" : "strix-scan";
+}
+
 export async function dispatchWorkerRun(payload: DispatchPayload): Promise<void> {
   const token = process.env.GITHUB_DISPATCH_TOKEN;
   const repo = process.env.GITHUB_RUNNER_REPO;
   if (!token || !repo) throw new Error("Runner GitHub non configuré.");
 
   // Chaque moteur écoute son propre event_type de repository_dispatch.
-  const eventType = payload.engine === "oss" ? "oss-scan" : "strix-scan";
+  const eventType = engineEventType(payload.engine);
 
   const res = await fetch(`https://api.github.com/repos/${repo}/dispatches`, {
     method: "POST",

@@ -32,8 +32,11 @@ export default function Page() {
 
       <h2>Hébergeur</h2>
       <p>
-        Le site est hébergé par <span className="todo">[nom de l'hébergeur — ex. Vercel Inc., OVH…]</span>,{" "}
-        <span className="todo">[adresse de l'hébergeur]</span>.
+        Le site est hébergé par <strong>Vercel Inc.</strong>, 340 S Lemon Avenue #4133,
+        Walnut, CA 91789, États-Unis (<a href="https://vercel.com">vercel.com</a>). La
+        base de données est opérée par notre prestataire d'hébergement PostgreSQL (Neon
+        ou Supabase selon la configuration), au sein de l'Union européenne lorsque cette
+        région est sélectionnée.
       </p>
 
       <h2>Propriété intellectuelle</h2>
@@ -64,8 +67,9 @@ export default function Page() {
       </p>
 
       <p className="todo">
-        ⚠️ Modèle à faire valider — remplacez chaque champ [entre crochets] par vos
-        informations réelles et faites relire par un juriste avant mise en ligne.
+        ⚠️ Seuls les champs d'identification légale de l'éditeur (forme juridique, SIRET,
+        TVA, adresse du siège, directeur de la publication) restent à renseigner avec vos
+        données officielles, puis à faire relire par un juriste avant mise en ligne.
       </p>
     </LegalShell>
   );

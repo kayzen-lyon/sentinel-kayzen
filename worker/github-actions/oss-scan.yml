@@ -54,6 +54,12 @@ jobs:
           chmod +x nuclei
           ./nuclei -version
 
+      - name: Install Nuclei templates
+        # Indispensable sur un runner vierge : sans templates, le scan échoue
+        # avec « no templates provided ». -disable-update-check ne télécharge PAS
+        # les templates, il ne fait que désactiver la vérification de version.
+        run: ./nuclei -update-templates -disable-update-check
+
       - name: Install testssl.sh
         run: |
           git clone --depth 1 https://github.com/drwetter/testssl.sh.git

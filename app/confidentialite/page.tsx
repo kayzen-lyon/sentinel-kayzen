@@ -32,11 +32,12 @@ export default function Page() {
           <strong>Données techniques</strong> : cible d'audit fournie volontairement,
           journaux de connexion, adresse IP.
         </li>
-        <li>
-          <strong>Mesure d'audience</strong> : données de navigation (le cas échéant,
-          via un outil respectueux de la vie privée).
-        </li>
       </ul>
+      <p>
+        Le site <strong>ne recourt à aucun outil de mesure d'audience ni traceur
+        publicitaire tiers</strong> (pas de Google Analytics, pas de pixel, pas de
+        régie). Seul un cookie strictement nécessaire est déposé (voir « Cookies »).
+      </p>
 
       <h2>Finalités et base légale</h2>
       <ul>
@@ -54,7 +55,7 @@ export default function Page() {
 
       <h2>Durée de conservation</h2>
       <p>
-        Les données de prospection sont conservées <span className="todo">[durée — ex. 3 ans]</span>{" "}
+        Les données de prospection sont conservées <strong>3 ans</strong>{" "}
         après le dernier contact. Les données contractuelles sont conservées selon les
         durées légales en vigueur.
       </p>
@@ -67,15 +68,40 @@ export default function Page() {
         également introduire une réclamation auprès de la CNIL (www.cnil.fr).
       </p>
 
+      <h2>Cookies</h2>
+      <p>
+        Sentinel utilise un unique cookie <strong>strictement nécessaire</strong>,{" "}
+        <code>sentinel_session</code>, qui maintient votre session authentifiée. Il est{" "}
+        <code>httpOnly</code>, <code>Secure</code> et <code>SameSite=Lax</code>, et n'a
+        aucune finalité publicitaire ou de suivi. Étant indispensable au service, il ne
+        requiert pas de consentement préalable (article 82 de la loi Informatique et
+        Libertés). Aucun cookie tiers n'est déposé.
+      </p>
+
       <h2>Sous-traitants</h2>
       <p>
-        Nous faisons appel à des prestataires (hébergement, e-mail, moteur d'analyse
-        Strix) qui n'accèdent aux données que pour les besoins du service :{" "}
-        <span className="todo">[lister les sous-traitants]</span>.
+        Nous faisons appel aux prestataires suivants, qui n'accèdent aux données que pour
+        les besoins du service :
+      </p>
+      <ul>
+        <li><strong>Vercel Inc.</strong> — hébergement du site et des fonctions serveur.</li>
+        <li><strong>Neon / Supabase</strong> — base de données (comptes, historique des scans).</li>
+        <li><strong>Resend</strong> — envoi des rapports et e-mails transactionnels.</li>
+        <li><strong>GitHub</strong> — exécution des runners d'analyse (GitHub Actions).</li>
+        <li>
+          <strong>Google</strong> (API Gemini) — moteur d'agents Strix, uniquement lors
+          d'un pentest lancé volontairement sur un domaine dont vous êtes propriétaire.
+        </li>
+      </ul>
+      <p>
+        Certains prestataires sont situés hors UE (notamment aux États-Unis) ; les
+        transferts sont encadrés par les clauses contractuelles types de la Commission
+        européenne.
       </p>
 
       <p className="todo">
-        ⚠️ Modèle à adapter à vos traitements réels et à faire valider avant publication.
+        ⚠️ Seules les durées de conservation ci-dessus restent à confirmer selon vos
+        pratiques réelles ; faites relire l'ensemble par un juriste avant publication.
       </p>
     </LegalShell>
   );
