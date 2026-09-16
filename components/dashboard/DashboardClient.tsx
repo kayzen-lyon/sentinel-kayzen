@@ -5,8 +5,14 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ScanResult } from "@/lib/scanner";
+import dynamic from "next/dynamic";
 import ScanResultView from "./ScanResultView";
-import DomainsPanel from "./DomainsPanel";
+
+// Chargé à la demande : le JS du panneau Domaines n'est téléchargé qu'à
+// l'ouverture de l'onglet, pas au premier rendu du tableau de bord.
+const DomainsPanel = dynamic(() => import("./DomainsPanel"), {
+  loading: () => <div className="skeleton h-40 w-full" />,
+});
 
 type HistoryItem = {
   id: string | null;
