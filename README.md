@@ -1,7 +1,7 @@
 # Sentinel by Kayzen
 
 [![CI](https://github.com/skyymar69-rgb/sentinel-kayzen/actions/workflows/ci.yml/badge.svg)](https://github.com/skyymar69-rgb/sentinel-kayzen/actions/workflows/ci.yml)
-[![Licence: AGPL v3](https://img.shields.io/badge/licence-AGPL--3.0-blue.svg)](LICENSE)
+[![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 [![Sécurité : divulgation coordonnée](https://img.shields.io/badge/sécurité-SECURITY.md-brightgreen.svg)](SECURITY.md)
 
 
@@ -91,10 +91,10 @@ le footer et le favicon ; le wordmark navy est réservé aux fonds clairs
 
 ## Open source & qualité
 
-Sentinel est **open source** sous licence **AGPL-3.0** (voir [`LICENSE`](LICENSE)) :
-le code hébergé, y compris toute version modifiée exploitée en SaaS, doit rester
-ouvert. Pour maximiser l'adoption plutôt que protéger l'hébergement, remplacez le
-fichier `LICENSE` par MIT ou Apache-2.0 et ajustez les mentions.
+Sentinel est **open source** sous licence **MIT** (voir [`LICENSE`](LICENSE)) :
+réutilisation libre, y compris commerciale, à condition de conserver la mention
+de copyright. Pour un modèle open-core protégeant l'hébergement SaaS, basculez le
+fichier `LICENSE` en AGPL-3.0 et ajustez les mentions.
 
 Chaîne de vérification **100 % open source**, exécutée en CI sur chaque PR
 ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) :
@@ -123,4 +123,4 @@ Contribuer : [`CONTRIBUTING.md`](CONTRIBUTING.md) · Sécurité : [`SECURITY.md`
 
 ## Licence
 
-[AGPL-3.0](LICENSE) © Kayzen Web. Voir aussi [`NOTICE`](NOTICE) le cas échéant.
+[MIT](LICENSE) © 2026 Kayzen Web.

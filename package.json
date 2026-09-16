@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Sentinel by Kayzen — Pentest IA autonome & cybersécurité offensive. Groupe Kayzen (Nexus, Konforme).",
-  "license": "AGPL-3.0-or-later",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

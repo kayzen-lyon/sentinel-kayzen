@@ -1,6 +1,6 @@
 # Contribuer à Sentinel
 
-Merci de votre intérêt ! Sentinel est un projet **open source** (AGPL-3.0) et les
+Merci de votre intérêt ! Sentinel est un projet **open source** (MIT) et les
 contributions sont les bienvenues.
 
 ## Démarrer
@@ -52,4 +52,4 @@ Format conventionnel : `type(scope): résumé` (`feat`, `fix`, `docs`, `chore`,
 ## Licence des contributions
 
 En contribuant, vous acceptez que votre travail soit distribué sous la licence
-**AGPL-3.0** du projet.
+**MIT** du projet.
