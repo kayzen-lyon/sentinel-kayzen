@@ -34,26 +34,40 @@ export default function Page() {
         <li>Contrastes conformes sur les textes et composants interactifs.</li>
       </ul>
 
+      <h2>Cadre légal</h2>
+      <p>
+        Ce site vise la conformité à la directive européenne (UE) 2019/882
+        (<strong>European Accessibility Act</strong>), transposée en droit français, et
+        applique les critères du <strong>RGAA</strong> alignés sur les <strong>WCAG 2.1
+        niveau AA</strong>.
+      </p>
+
       <h2>État de conformité</h2>
       <p>
-        <span className="todo">
-          [À compléter après audit : conforme / partiellement conforme / non conforme,
-          et taux de conformité RGAA.]
-        </span>
+        L'accessibilité a été intégrée dès la conception (accessibilité «&nbsp;by
+        design&nbsp;»). À ce jour, le site n'a pas encore fait l'objet d'un{" "}
+        <strong>audit RGAA formel</strong> par un tiers&nbsp;: aucun taux de conformité
+        officiel ne peut donc être déclaré. Un audit complet des 106 critères, réalisé par
+        notre entité <strong>Konforme</strong>, est planifié&nbsp;; ses résultats et la
+        date de vérification seront publiés ici.
       </p>
 
       <h2>Retour et contact</h2>
       <p>
         Si vous rencontrez une difficulté d'accès à un contenu ou une fonctionnalité,
-        contactez-nous à <a href="mailto:contact@kayzen-lyon.fr">contact@kayzen-lyon.fr</a>.
-        Nous nous efforçons de répondre sous 24 h ouvrées et de proposer une alternative
-        accessible.
+        contactez-nous à <a href="mailto:contact@kayzen-lyon.fr">contact@kayzen-lyon.fr</a>{" "}
+        ou au <a href="tel:+33487776861">+33 (0)4 87 77 68 61</a>. Nous répondons sous 24 h
+        ouvrées et proposons une alternative accessible.
       </p>
 
-      <p className="todo">
-        ⚠️ Déclaration à finaliser après un audit d'accessibilité formel (Konforme peut
-        le réaliser) : date d'audit, référentiel, résultats détaillés et voie de recours
-        (Défenseur des droits).
+      <h2>Voie de recours</h2>
+      <p>
+        Si une réponse satisfaisante ne vous est pas apportée, vous pouvez saisir le{" "}
+        <a href="https://www.defenseurdesdroits.fr" target="_blank" rel="noopener noreferrer">
+          Défenseur des droits
+        </a>{" "}
+        (formulaire en ligne, ou par courrier&nbsp;: Défenseur des droits, Libre réponse
+        71120, 75342 Paris CEDEX 07).
       </p>
     </LegalShell>
   );

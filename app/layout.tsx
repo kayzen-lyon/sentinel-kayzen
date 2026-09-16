@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { jakarta, outfit } from "./fonts";
 import { ToastProvider } from "@/components/ui/Toast";
+import CookieBanner from "@/components/CookieBanner";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -71,6 +72,7 @@ export default function RootLayout({
           Aller au contenu principal
         </a>
         <ToastProvider>{children}</ToastProvider>
+        <CookieBanner />
       </body>
     </html>
   );
