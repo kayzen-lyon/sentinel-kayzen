@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { inter, outfit } from "./fonts";
+import { jakarta, outfit } from "./fonts";
 import { ToastProvider } from "@/components/ui/Toast";
 import "./globals.css";
 
 export const viewport: Viewport = {
-  themeColor: "#09090b",
+  themeColor: "#1f3b61",
   width: "device-width",
   initialScale: 1,
 };
@@ -62,7 +62,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${inter.variable} ${outfit.variable}`}>
+    <html lang="fr" className={`${jakarta.variable} ${outfit.variable}`}>
       <body>
         <a
           href="#contenu"

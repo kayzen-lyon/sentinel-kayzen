@@ -29,10 +29,10 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
+      className={`band-dark fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
         scrolled
-          ? "border-b border-border bg-bg/85 backdrop-blur-xl"
-          : "border-b border-transparent"
+          ? "border-b border-border bg-secondary/90 backdrop-blur-xl"
+          : "border-b border-transparent bg-transparent"
       }`}
     >
       <div className="container-x flex h-[72px] items-center justify-between">
@@ -127,7 +127,7 @@ function Logo() {
       width={40}
       height={40}
       priority
-      className="h-10 w-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]"
+      className="h-10 w-auto"
     />
   );
 }

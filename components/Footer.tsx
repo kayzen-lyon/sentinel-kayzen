@@ -33,7 +33,7 @@ const COLS = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-bg-elev/40">
+    <footer className="band-dark border-t border-border">
       <div className="container-x py-16">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
@@ -43,7 +43,7 @@ export default function Footer() {
                 alt="Sentinel by Kayzen"
                 width={40}
                 height={40}
-                className="h-10 w-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]"
+                className="h-10 w-auto"
               />
               <span className="flex flex-col leading-none">
                 <span className="font-heading text-lg font-semibold text-fg">Sentinel</span>

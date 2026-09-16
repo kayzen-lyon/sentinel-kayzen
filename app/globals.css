@@ -1,40 +1,43 @@
 @import "tailwindcss";
 
 /* ============================================================
-   SENTINEL BY KAYZEN — Design tokens
-   Charte graphique reprise de Nexus (by Kayzen) :
-   police Outfit/Inter, bleu #2563EB, base zinc, échelle
-   nombre d'or, typographie fluide clamp(), easings spring.
-   Accent cyber : vert émeraude "safe" + rouge/ambre "risk".
+   SENTINEL BY KAYZEN — Design tokens (charte Kayzen Web)
+   Thème clair : surface blanche, primaire terracotta #b74831,
+   secondaire navy #1f3b61 (bandes hero/header/footer), tertiaire
+   émeraude #34d399. Polices Outfit (titres) + Plus Jakarta Sans
+   (corps). Boutons pilule. Typographie fluide clamp().
    ============================================================ */
 
 :root {
   /* Fonts (fournies par next/font) */
   --font-heading: var(--font-outfit), system-ui, sans-serif;
-  --font-body: var(--font-inter), system-ui, sans-serif;
+  --font-body: var(--font-jakarta), system-ui, sans-serif;
 
   /* Surfaces — thème sombre (identique au rendu Nexus) */
-  --bg: 9 9 11; /* #09090B zinc-950 */
-  --bg-elev: 24 24 27; /* #18181B zinc-900 */
-  --bg-card: 24 24 27;
-  --bg-hover: 39 39 42; /* #27272A zinc-800 */
-  --fg: 244 244 245; /* #F4F4F5 */
-  --fg-muted: 161 161 170; /* #A1A1AA zinc-400 */
-  --fg-subtle: 113 113 122; /* #71717A zinc-500 */
-  --border: 39 39 42; /* #27272A */
-  --border-strong: 63 63 70; /* #3F3F46 */
+  /* Surfaces (charte Kayzen — thème clair) */
+  --bg: 255 255 255; /* surface #ffffff */
+  --bg-elev: 240 240 240; /* surface-container-low #f0f0f0 */
+  --bg-card: 255 255 255; /* cartes blanches */
+  --bg-hover: 233 236 239; /* surface-container-high #e9ecef */
+  --fg: 31 41 55; /* on-surface #1f2937 */
+  --fg-muted: 108 117 125; /* on-surface-variant #6c757d */
+  --fg-subtle: 156 163 175; /* outline #9ca3af */
+  --border: 208 208 208; /* outline-variant #d0d0d0 */
+  --border-strong: 156 163 175; /* outline #9ca3af */
 
   /* Marque — bleu Kayzen (identique Nexus) */
-  --brand: 37 99 235; /* #2563EB blue-600 */
-  --brand-hover: 29 78 216; /* #1D4ED8 */
-  --brand-light: 96 165 250; /* #60A5FA blue-400 (liens sur sombre) */
+  --brand: 183 72 49; /* primary terracotta #b74831 */
+  --brand-hover: 160 61 40; /* #a03d28 */
+  --brand-light: 183 72 49; /* liens : primary (contraste sur blanc) */
+  --secondary: 31 59 97; /* navy #1f3b61 — hero/header/footer & titres */
+  --secondary-hover: 15 31 53; /* #0f1f35 */
 
   /* Accents cyber */
-  --safe: 34 197 94; /* #22C55E émeraude — statut sécurisé / éco */
-  --safe-light: 134 239 172; /* #86EFAC */
-  --risk: 239 68 68; /* #EF4444 rouge — vulnérabilité critique */
-  --warn: 234 179 8; /* #EAB308 ambre — alerte moyenne */
-  --violet: 124 58 237; /* #7C3AED */
+  --safe: 16 122 87; /* émeraude foncé — texte de succès (contraste sur clair) */
+  --safe-light: 52 211 153; /* tertiary #34d399 — accents/fonds */
+  --risk: 220 38 38; /* error #dc2626 */
+  --warn: 217 119 6; /* amber-600 — alerte sur fond clair */
+  --violet: 31 59 97; /* réutilise le navy pour les dégradés */
 
   /* Typographie fluide (échelle Nexus) */
   --text-sm: clamp(0.8rem, 0.75rem + 0.2vw, 0.875rem);
@@ -66,10 +69,11 @@
   --dur-slow: 600ms;
 
   /* Ombres */
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.25);
-  --shadow-brand: 0 8px 32px rgba(37, 99, 235, 0.25);
-  --shadow-glow: 0 0 40px rgba(37, 99, 235, 0.2);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.12);
+  --shadow-brand: 0 4px 12px rgba(183, 72, 49, 0.25);
+  --shadow-glow: 0 0 24px rgba(183, 72, 49, 0.18);
 
   --scroll-margin: 88px;
 }
@@ -91,6 +95,8 @@
   --color-brand: rgb(var(--brand));
   --color-brand-hover: rgb(var(--brand-hover));
   --color-brand-light: rgb(var(--brand-light));
+  --color-secondary: rgb(var(--secondary));
+  --color-secondary-hover: rgb(var(--secondary-hover));
   --color-safe: rgb(var(--safe));
   --color-safe-light: rgb(var(--safe-light));
   --color-risk: rgb(var(--risk));
@@ -131,7 +137,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::selection {
-  background-color: rgba(37, 99, 235, 0.35);
+  background-color: rgba(183, 72, 49, 0.2);
   color: rgb(var(--fg));
 }
 
@@ -148,7 +154,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .gradient-text {
-  background: linear-gradient(120deg, rgb(var(--brand-light)), rgb(var(--violet)));
+  background: linear-gradient(120deg, rgb(var(--brand)), rgb(var(--brand-light)));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -156,9 +162,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .grid-glow {
   background-image:
-    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.15), transparent 55%),
-    linear-gradient(to right, rgba(63, 63, 70, 0.25) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(63, 63, 70, 0.25) 1px, transparent 1px);
+    radial-gradient(circle at 50% 0%, rgba(183, 72, 49, 0.22), transparent 55%),
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   background-size: 100% 100%, 56px 56px, 56px 56px;
 }
 
@@ -186,8 +192,8 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   font-size: var(--text-base);
   line-height: 1;
-  padding: 0.85rem 1.4rem;
-  border-radius: 12px;
+  padding: 0.75rem 2rem;
+  border-radius: 9999px;
   transition: all var(--dur-normal) var(--ease-out);
   cursor: pointer;
   white-space: nowrap;
@@ -321,8 +327,8 @@ h1, h2, h3, h4, h5, h6 {
   background-color: rgb(var(--bg));
   color: rgb(var(--fg));
   border: 1px solid rgb(var(--border-strong));
-  border-radius: 12px;
-  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
   font-family: var(--font-body);
   font-size: var(--text-base);
   line-height: 1.4;
@@ -389,7 +395,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Contrôles natifs (checkbox, radio, select) teintés à la marque. */
 :root {
   accent-color: rgb(var(--brand));
-  color-scheme: dark;
+  color-scheme: light;
 }
 input,
 textarea,
@@ -477,4 +483,23 @@ img, svg, video, canvas {
 }
 .toast-in {
   animation: toast-in var(--dur-normal) var(--ease-out) both;
+}
+
+
+/* Bande sombre (hero / en-tête / pied de page) — charte Kayzen : navy #1f3b61.
+   Redéfinit les tokens sémantiques localement, donc les composants s'adaptent. */
+.band-dark {
+  --bg: 31 59 97;
+  --bg-elev: 26 48 80;
+  --bg-card: 26 48 80;
+  --bg-hover: 40 62 95;
+  --fg: 245 246 248;
+  --fg-muted: 199 211 226;
+  --fg-subtle: 152 170 194;
+  --border: 60 82 115;
+  --border-strong: 92 114 148;
+  --brand-light: 255 179 153; /* inverse-primary #ffb399 — liens/accents sur navy */
+  --safe: 52 211 153; /* tertiary clair pour contraste sur navy */
+  background-color: rgb(var(--bg));
+  color: rgb(var(--fg));
 }
