@@ -3,6 +3,8 @@ import Hero from "@/components/Hero";
 import Problem from "@/components/Problem";
 import Features from "@/components/Features";
 import HowItWorks from "@/components/HowItWorks";
+import Engines from "@/components/Engines";
+import Integrations from "@/components/Integrations";
 import Offers from "@/components/Offers";
 import Coverage from "@/components/Coverage";
 import Pricing from "@/components/Pricing";
@@ -89,8 +91,10 @@ export default function Page() {
       <main>
         <Hero />
         <Problem />
+        <Engines />
         <Features />
         <HowItWorks />
+        <Integrations />
         <Offers />
         <Coverage />
         <Pricing />

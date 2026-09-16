@@ -9,11 +9,11 @@ const MANAGED = [
 ];
 
 const PLATFORM = [
-  "Connectez vos dépôts et domaines en autonomie",
-  "Lancez des pentests IA à la demande, 24/7",
-  "Intégration CI/CD : un scan à chaque pull request",
-  "Autofix en pull requests prêtes à merger",
-  "Idéal pour équipes produit en déploiement continu",
+  "Scan passif instantané + pentest à la demande, 24/7",
+  "Deux moteurs : agents Strix (IA) ou OSS déterministe (Nuclei/testssl)",
+  "Scan à chaque pull request : statut de check + commentaire",
+  "Tickets Jira/Linear, alertes Slack, exports SARIF/CSV/JSON",
+  "Pilotage par API & serveur MCP (Claude, Cursor, CI)",
 ];
 
 export default function Offers() {

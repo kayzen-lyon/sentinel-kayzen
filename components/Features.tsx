@@ -1,33 +1,39 @@
 const FEATURES = [
   {
-    title: "Orchestration multi-agents",
-    body: "Un graphe d'agents IA spécialisés — reconnaissance, exploitation, post-exploitation — qui collaborent et enchaînent les vulnérabilités comme une vraie équipe red-team.",
-    icon: "graph",
-  },
-  {
     title: "Validation par PoC réels",
-    body: "Chaque faille est exploitée pour de vrai et livrée avec une preuve de concept reproductible. Zéro faux positif : ce que Sentinel remonte est exploitable.",
+    body: "Chaque faille est exploitée pour de vrai et livrée avec une preuve de concept reproductible, un score CVSS et sa classification OWASP. Zéro faux positif : ce que Sentinel remonte est exploitable.",
     icon: "check",
+    accent: "safe",
   },
   {
-    title: "Proxy d'interception HTTP",
-    body: "Manipulation et analyse complètes des requêtes/réponses via Caido pour tester XSS, CSRF, contournements d'authentification et logique métier.",
-    icon: "proxy",
+    title: "Playbooks spécialisés",
+    body: "Des scénarios prêts à l'emploi pour les surfaces modernes : API GraphQL, supply-chain, sécurité des LLM et environnements cloud-native. L'expertise d'un red-team, encapsulée.",
+    icon: "target",
+    accent: "brand",
   },
   {
-    title: "Sandbox d'exploitation",
-    body: "Un environnement Python isolé pour écrire et valider des exploits sur mesure, exécuter du code et automatiser la post-exploitation en toute sûreté.",
-    icon: "terminal",
-  },
-  {
-    title: "Recon & OSINT automatisés",
-    body: "Cartographie de la surface d'attaque, énumération de sous-domaines et fingerprinting pour ne laisser aucun point d'entrée dans l'ombre.",
+    title: "Recon, CVE & exposition",
+    body: "Énumération de sous-domaines (crt.sh), fingerprinting, corrélation CVE en continu (NVD) et détection d'expositions (.env, .git, secrets). Aucun point d'entrée laissé dans l'ombre.",
     icon: "radar",
+    accent: "brand",
   },
   {
-    title: "Autofix & rapports conformité",
-    body: "Correctifs générés en pull requests prêtes à merger et rapports de pentest exploitables pour vos audits et vos exigences réglementaires.",
+    title: "Gouvernance & collaboration",
+    body: "Organisations, rôles (RBAC), journal d'audit, approbation humaine avant chaque run offensif et suivi du statut de chaque vulnérabilité. Pensé pour les équipes, pas pour un poste isolé.",
+    icon: "shield",
+    accent: "secondary",
+  },
+  {
+    title: "Pilotage par API & MCP",
+    body: "Un serveur MCP natif et des clés API : déclenchez un scan, listez vos findings ou lancez un pentest directement depuis Claude, Cursor ou votre CI. La sécurité offensive as-code.",
+    icon: "terminal",
+    accent: "secondary",
+  },
+  {
+    title: "Exports & rapports conformité",
+    body: "Rapport de pentest imprimable (PDF), envoi e-mail automatique et exports SARIF / CSV / JSON pour brancher vos findings dans GitHub, vos SIEM ou vos audits réglementaires.",
     icon: "doc",
+    accent: "safe",
   },
 ];
 
@@ -36,23 +42,33 @@ export default function Features() {
     <section id="service" className="border-t border-border py-24">
       <div className="container-x">
         <div className="mx-auto max-w-2xl text-center">
-          <span className="eyebrow">La boîte à outils</span>
+          <span className="eyebrow">La plateforme</span>
           <h2
             className="mt-4 font-heading font-bold text-fg"
             style={{ fontSize: "var(--text-4xl)" }}
           >
-            L'arsenal complet d'un pentester, piloté par l'IA
+            L'arsenal complet d'un pentester, opérationnel en continu
           </h2>
           <p className="mt-4 text-lg text-muted">
-            Sentinel s'appuie sur le moteur open-source Strix : les mêmes outils
-            que les experts en sécurité offensive, disponibles en continu.
+            Au-delà du scan : validation, spécialisation, gouvernance et
+            intégration. Tout ce qu'il faut pour industrialiser votre sécurité
+            offensive.
           </p>
         </div>
 
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (
-            <article key={f.title} className="card p-7">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand/10 text-brand-light">
+            <article
+              key={f.title}
+              className="card group p-7 transition-transform hover:-translate-y-1"
+            >
+              <span
+                className="inline-flex h-12 w-12 items-center justify-center rounded-xl transition-colors"
+                style={{
+                  backgroundColor: `rgb(var(--${f.accent}) / 0.12)`,
+                  color: `rgb(var(--${f.accent}))`,
+                }}
+              >
                 <Icon name={f.icon} />
               </span>
               <h3 className="mt-5 font-heading text-lg font-semibold text-fg">
@@ -82,13 +98,6 @@ function Icon({ name }: { name: string }) {
     "aria-hidden": true,
   };
   switch (name) {
-    case "graph":
-      return (
-        <svg {...common}>
-          <circle cx="6" cy="6" r="2.4" /><circle cx="18" cy="7" r="2.4" /><circle cx="12" cy="18" r="2.4" />
-          <path d="M8 7.5 10.5 16M15.7 8.4 13.2 16M8.3 6.4 15.6 6.8" />
-        </svg>
-      );
     case "check":
       return (
         <svg {...common}>
@@ -96,22 +105,29 @@ function Icon({ name }: { name: string }) {
           <path d="m8.7 12 2.3 2.3 4.4-4.5" />
         </svg>
       );
-    case "proxy":
+    case "target":
       return (
         <svg {...common}>
-          <path d="M4 8h16M4 16h16" /><circle cx="9" cy="8" r="1.6" fill="currentColor" stroke="none" /><circle cx="15" cy="16" r="1.6" fill="currentColor" stroke="none" />
-        </svg>
-      );
-    case "terminal":
-      return (
-        <svg {...common}>
-          <rect x="3" y="4" width="18" height="16" rx="2" /><path d="m7 9 3 3-3 3M13 15h4" />
+          <circle cx="12" cy="12" r="8.5" /><circle cx="12" cy="12" r="4.5" /><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
         </svg>
       );
     case "radar":
       return (
         <svg {...common}>
           <path d="M12 12 19 5M12 21a9 9 0 1 1 8.5-6" /><circle cx="12" cy="12" r="3.4" />
+        </svg>
+      );
+    case "shield":
+      return (
+        <svg {...common}>
+          <path d="M12 2 4 5v6c0 4.5 3.2 8.7 8 10.6 4.8-1.9 8-6.1 8-10.6V5l-8-3Z" />
+          <circle cx="12" cy="10" r="2.2" /><path d="M8.5 16c.7-2 2-3 3.5-3s2.8 1 3.5 3" />
+        </svg>
+      );
+    case "terminal":
+      return (
+        <svg {...common}>
+          <rect x="3" y="4" width="18" height="16" rx="2" /><path d="m7 9 3 3-3 3M13 15h4" />
         </svg>
       );
     case "doc":

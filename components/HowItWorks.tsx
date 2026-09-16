@@ -2,7 +2,7 @@ const STEPS = [
   {
     n: "01",
     title: "Connectez votre cible",
-    body: "Un dépôt GitHub, une API, une application déployée ou un simple domaine. En white-box, grey-box ou black-box — vous fixez le périmètre et les règles d'engagement.",
+    body: "Un domaine, une API ou un dépôt GitHub. Le scan passif est instantané et gratuit ; le pentest offensif se débloque après vérification de propriété du domaine.",
   },
   {
     n: "02",
@@ -16,8 +16,8 @@ const STEPS = [
   },
   {
     n: "04",
-    title: "Corrigez et rejouez",
-    body: "Recevez des correctifs en pull requests et un rapport de conformité. Rebranchez Sentinel sur votre CI/CD pour bloquer les failles à chaque release.",
+    title: "Corrigez, suivez, rejouez",
+    body: "Créez des tickets Jira/Linear, exportez en SARIF/CSV/JSON, recevez le rapport par e-mail et rebranchez Sentinel sur votre CI/CD pour bloquer les failles à chaque release.",
   },
 ];
 
