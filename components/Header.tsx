@@ -6,11 +6,11 @@ import { useEffect, useState } from "react";
 import ContactCard from "@/components/ContactCard";
 
 const NAV = [
-  { label: "Le service", href: "#service" },
-  { label: "Plateforme", href: "#plateforme" },
-  { label: "Couverture", href: "#couverture" },
-  { label: "Tarifs", href: "#tarifs" },
-  { label: "FAQ", href: "#faq" },
+  { label: "Le service", href: "/#service" },
+  { label: "Plateforme", href: "/#plateforme" },
+  { label: "Couverture", href: "/#couverture" },
+  { label: "Tarifs", href: "/#tarifs" },
+  { label: "FAQ", href: "/#faq" },
 ];
 
 export default function Header() {
@@ -37,7 +37,7 @@ export default function Header() {
       }`}
     >
       <div className="container-x flex h-[72px] items-center justify-between">
-        <a href="#" className="flex items-center gap-2.5" aria-label="Sentinel by Kayzen, accueil">
+        <Link href="/" className="flex items-center gap-2.5" aria-label="Sentinel by Kayzen, accueil">
           <Logo />
           <span className="flex flex-col leading-none">
             <span className="font-heading text-[1.15rem] font-semibold tracking-tight text-fg">
@@ -47,7 +47,7 @@ export default function Header() {
               by Kayzen
             </span>
           </span>
-        </a>
+        </Link>
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Navigation principale">
           {NAV.map((n) => (

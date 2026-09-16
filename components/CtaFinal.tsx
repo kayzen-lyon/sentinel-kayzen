@@ -1,3 +1,5 @@
+import ContactForm from "@/components/ContactForm";
+
 export default function CtaFinal() {
   return (
     <section id="contact" className="border-t border-border py-24">
@@ -17,24 +19,17 @@ export default function CtaFinal() {
             Lancez un premier audit avec les experts Kayzen. Vous repartez avec une
             cartographie claire de vos risques et un plan d'action priorisé.
           </p>
-          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a
-              href="mailto:contact@kayzen-lyon.fr?subject=Demande%20d'audit%20Sentinel"
-              className="btn btn-primary w-full sm:w-auto"
-            >
-              Demander mon audit gratuit
-            </a>
+          <ContactForm />
+          <p className="mt-5 text-center text-sm text-subtle">
+            Réponse sous 24 h ouvrées · Sans engagement · Confidentialité garantie ·{" "}
             <a
               href="https://www.kayzen-lyon.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-ghost w-full sm:w-auto"
+              className="text-brand underline underline-offset-2"
             >
               Découvrir Kayzen Web
             </a>
-          </div>
-          <p className="mt-5 text-sm text-subtle">
-            Réponse sous 24 h ouvrées · Sans engagement · Confidentialité garantie
           </p>
         </div>
       </div>

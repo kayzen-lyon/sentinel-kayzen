@@ -4,8 +4,8 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
- * Carte de contact numérique KAYZEN LYON : coordonnées, vCard téléchargeable et
- * QR codes (vCard, site, Maps, avis). Modale accessible (RGAA/WCAG) — focus piégé,
+ * Carte de contact numérique KAYZEN LYON : coordonnées, vCard téléchargeable et un
+ * QR code vCard, + liens site/localisation/avis. Modale accessible (RGAA/WCAG) — focus piégé,
  * Escape, retour du focus au déclencheur, verrou de défilement.
  */
 export default function ContactCard() {
@@ -123,33 +123,56 @@ export default function ContactCard() {
                 <Row label="Adresse">6, rue Pierre Termier, 69009 Lyon</Row>
               </dl>
 
+              <div className="mt-6 flex flex-col items-center">
+                <span className="rounded-xl border border-border bg-bg p-2.5">
+                  <Image
+                    src="/qr/vcard.svg"
+                    alt="QR code de la carte de visite vCard de KAYZEN LYON"
+                    width={180}
+                    height={180}
+                    className="h-auto w-44"
+                    unoptimized
+                  />
+                </span>
+                <p className="mt-3 text-center text-xs text-subtle">
+                  Scannez pour enregistrer le contact
+                </p>
+              </div>
+
               <a
                 href="/kayzen-lyon.vcf"
                 download
                 className="btn btn-primary mt-5 w-full"
               >
-                Enregistrer le contact (vCard)
+                Enregistrer dans mes contacts
               </a>
 
-              <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <Qr src="/qr/vcard.svg" label="vCard" alt="QR code de la carte de visite vCard de KAYZEN LYON" />
-                <Qr src="/qr/site.svg" label="Site" alt="QR code vers le site Sentinel by Kayzen" />
-                <Qr
-                  src="/qr/maps.svg"
-                  label="Itinéraire"
-                  alt="QR code vers l'itinéraire Google Maps de KAYZEN LYON"
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm">
+                <a
+                  href="https://sentinel.kayzen-lyon.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand hover:underline"
+                >
+                  Site web
+                </a>
+                <a
                   href="https://www.google.com/maps/search/?api=1&query=KAYZEN%20LYON%2C%206%20rue%20Pierre%20Termier%2C%2069009%20Lyon"
-                />
-                <Qr
-                  src="/qr/avis.svg"
-                  label="Avis"
-                  alt="QR code vers les avis Google de KAYZEN LYON"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand hover:underline"
+                >
+                  Localisation
+                </a>
+                <a
                   href="https://www.google.com/search?q=KAYZEN%20LYON%20avis"
-                />
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand hover:underline"
+                >
+                  Avis Google
+                </a>
               </div>
-              <p className="mt-4 text-center text-xs text-subtle">
-                Scannez avec l'appareil photo de votre téléphone.
-              </p>
             </div>
           </div>
         </div>
@@ -164,43 +187,6 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
       <dt className="w-24 flex-none text-subtle">{label}</dt>
       <dd className="text-fg">{children}</dd>
     </div>
-  );
-}
-
-function Qr({
-  src,
-  label,
-  alt,
-  href,
-}: {
-  src: string;
-  label: string;
-  alt: string;
-  href?: string;
-}) {
-  const img = (
-    <span className="block rounded-lg border border-border bg-bg p-1.5">
-      <Image
-        src={src}
-        alt={alt}
-        width={120}
-        height={120}
-        className="h-auto w-full"
-        unoptimized
-      />
-    </span>
-  );
-  return (
-    <figure className="text-center">
-      {href ? (
-        <a href={href} target="_blank" rel="noopener noreferrer" className="block">
-          {img}
-        </a>
-      ) : (
-        img
-      )}
-      <figcaption className="mt-1.5 text-xs font-medium text-muted">{label}</figcaption>
-    </figure>
   );
 }
 
