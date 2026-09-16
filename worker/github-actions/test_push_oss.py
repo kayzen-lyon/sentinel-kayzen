@@ -59,6 +59,27 @@ check(f1["payload"]["cwe"] == ["CWE-311"], "cwe non repris")
 check(mod.map_nuclei([None, "x", {}]) is not None, "entrées invalides doivent être tolérées")
 check(len(mod.map_nuclei([{}])) == 1, "un dict vide reste mappé avec des valeurs par défaut")
 
+# nativeId unique quand un template matche plusieurs fois la même URL (matcher-name).
+multi = [
+    {"template-id": "http-missing-security-headers",
+     "info": {"name": "Missing Headers", "severity": "info"},
+     "matched-at": "https://cible.example", "matcher-name": "content-security-policy"},
+    {"template-id": "http-missing-security-headers",
+     "info": {"name": "Missing Headers", "severity": "info"},
+     "matched-at": "https://cible.example", "matcher-name": "strict-transport-security"},
+]
+mm = mod.map_nuclei(multi)
+check(len({f["nativeId"] for f in mm}) == 2, "nativeId doit rester unique par matcher-name (sinon l'upsert écrase)")
+check("content-security-policy" in mm[0]["nativeId"], "matcher-name absent du nativeId")
+# Repli sur extracted-results quand matcher-name absent.
+ext = mod.map_nuclei([
+    {"template-id": "t", "info": {"name": "n", "severity": "info"},
+     "matched-at": "https://x", "extracted-results": ["a"]},
+    {"template-id": "t", "info": {"name": "n", "severity": "info"},
+     "matched-at": "https://x", "extracted-results": ["b"]},
+])
+check(len({f["nativeId"] for f in ext}) == 2, "repli extracted-results ne discrimine pas")
+
 # --- map_testssl : format JSON réel de testssl.sh ---------------------------
 testssl_rows = [
     {"id": "TLS1", "severity": "OK", "finding": "TLS 1.2 offert"},
@@ -85,4 +106,4 @@ os.environ["OSS_EXIT"] = "1"
 check(mod.terminal_status([]) == "error", "OSS_EXIT=1 → error")
 os.environ.pop("OSS_EXIT", None)
 
-print("OK — 6 groupes d'assertions du normaliseur OSS passent.")
+print("OK — 7 groupes d'assertions du normaliseur OSS passent.")

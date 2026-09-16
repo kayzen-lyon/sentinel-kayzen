@@ -69,10 +69,27 @@ def map_nuclei(items: list[dict]) -> list[dict]:
         native = f"nuclei:{template}"
         if matched:
             native += f"@{matched}"
+        # Un même template peut matcher plusieurs fois la même URL (ex. un match par
+        # en-tête manquant) : sans discriminant, les nativeId collisionnent et l'upsert
+        # (ON CONFLICT job_id+native_id) écrase les findings. matcher-name / extracted
+        # / matched-line lèvent l'ambiguïté.
+        discriminant = it.get("matcher-name")
+        if not discriminant:
+            extracted = it.get("extracted-results")
+            if isinstance(extracted, list) and extracted:
+                discriminant = ",".join(str(x) for x in extracted)
+        if not discriminant and it.get("matched-line"):
+            discriminant = str(it.get("matched-line"))
+        if discriminant:
+            native += f"#{discriminant}"
+        title = info.get("name") or template
+        matcher = it.get("matcher-name")
+        if matcher:
+            title = f"{title} — {matcher}"
         out.append(
             {
                 "nativeId": native[:200],
-                "title": info.get("name") or template,
+                "title": title,
                 "severity": norm_sev(info.get("severity")),
                 "cvss": cvss if isinstance(cvss, (int, float)) else None,
                 "payload": {
