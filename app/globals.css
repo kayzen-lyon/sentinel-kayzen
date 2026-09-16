@@ -154,18 +154,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .gradient-text {
-  background: linear-gradient(120deg, rgb(var(--brand)), rgb(var(--brand-light)));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: rgb(var(--brand));
 }
 
 .grid-glow {
   background-image:
-    radial-gradient(circle at 50% 0%, rgba(183, 72, 49, 0.22), transparent 55%),
     linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 100% 100%, 56px 56px, 56px 56px;
+  background-size: 56px 56px, 56px 56px;
 }
 
 .card {
@@ -456,24 +452,15 @@ img, svg, video, canvas {
   background-color: rgb(var(--bg-hover));
   border-radius: 8px;
 }
-.skeleton::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  transform: translateX(-100%);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.06),
-    transparent
-  );
-  animation: skeleton-shimmer 1.4s infinite;
+.skeleton {
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
 }
-@keyframes skeleton-shimmer {
-  100% { transform: translateX(100%); }
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .skeleton::after { animation: none; }
+  .skeleton { animation: none; }
 }
 
 /* Entrée des toasts. */

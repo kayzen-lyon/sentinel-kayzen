@@ -2,15 +2,7 @@ export default function CtaFinal() {
   return (
     <section id="contact" className="border-t border-border py-24">
       <div className="container-x">
-        <div className="relative overflow-hidden rounded-3xl border border-brand/40 bg-gradient-to-b from-brand/[0.12] to-transparent px-6 py-16 text-center sm:px-16">
-          <div
-            className="absolute inset-0 -z-10 opacity-60"
-            style={{
-              background:
-                "radial-gradient(circle at 50% 0%, rgba(37,99,235,0.25), transparent 60%)",
-            }}
-            aria-hidden="true"
-          />
+        <div className="relative overflow-hidden rounded-3xl border border-brand/40 bg-brand/[0.06] px-6 py-16 text-center sm:px-16">
           <span className="eyebrow justify-center">
             <span className="inline-block h-2 w-2 rounded-full bg-safe" />
             Audit initial offert

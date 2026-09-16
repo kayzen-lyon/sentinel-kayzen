@@ -4,10 +4,6 @@ export default function Hero() {
   return (
     <section id="contenu" className="band-dark relative overflow-hidden pt-[72px]">
       <div className="grid-glow absolute inset-0 -z-10" aria-hidden="true" />
-      <div
-        className="absolute inset-x-0 top-0 -z-10 h-[520px] bg-gradient-to-b from-brand/[0.08] to-transparent"
-        aria-hidden="true"
-      />
 
       <div className="container-x py-20 sm:py-28">
         <div className="mx-auto max-w-3xl text-center">

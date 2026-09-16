@@ -86,7 +86,15 @@ export default function Footer() {
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
           <p className="text-xs text-subtle">
-            © {new Date().getFullYear()} Sentinel by Kayzen — Kayzen Web. Tous droits réservés.
+            © {new Date().getFullYear()} Sentinel by Kayzen — KAYZEN LYON. Tous droits réservés.{" "}
+            <a
+              href="https://internet.kayzen-lyon.fr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-fg underline decoration-brand/50 underline-offset-2 hover:text-brand-light"
+            >
+              Fièrement réalisé par Kayzen Web
+            </a>
           </p>
           <p className="flex items-center gap-2 text-xs text-subtle">
             <span className="inline-block h-2 w-2 rounded-full bg-safe" />

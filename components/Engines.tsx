@@ -35,11 +35,6 @@ export default function Engines() {
 
         <div className="mt-14 grid gap-6 lg:grid-cols-2">
           <article className="card relative overflow-hidden p-8">
-            <div
-              className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full"
-              style={{ background: "radial-gradient(circle, rgb(var(--brand) / 0.12), transparent 70%)" }}
-              aria-hidden="true"
-            />
             <div className="flex items-center gap-3">
               <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand/12 text-brand">
                 <IconBolt />
@@ -61,11 +56,6 @@ export default function Engines() {
           </article>
 
           <article className="card relative overflow-hidden p-8">
-            <div
-              className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full"
-              style={{ background: "radial-gradient(circle, rgb(var(--safe) / 0.14), transparent 70%)" }}
-              aria-hidden="true"
-            />
             <div className="flex items-center gap-3">
               <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-safe/12 text-safe">
                 <IconCube />

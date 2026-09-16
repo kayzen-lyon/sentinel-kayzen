@@ -70,7 +70,7 @@ export default function Pricing() {
               key={p.name}
               className={`card relative p-8 ${
                 p.highlight
-                  ? "border-brand/50 bg-gradient-to-b from-brand/[0.08] to-transparent shadow-[var(--shadow-brand)]"
+                  ? "border-brand/50 bg-brand/[0.05] shadow-[var(--shadow-brand)]"
                   : ""
               }`}
             >

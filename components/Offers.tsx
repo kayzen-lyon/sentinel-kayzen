@@ -55,7 +55,7 @@ export default function Offers() {
             </a>
           </article>
 
-          <article className="card border-brand/40 bg-gradient-to-b from-brand/[0.06] to-transparent p-8">
+          <article className="card border-brand/40 bg-brand/[0.04] p-8">
             <span className="eyebrow">Plateforme self-service</span>
             <h3 className="mt-3 font-heading text-2xl font-semibold text-fg">
               Sentinel en autonomie

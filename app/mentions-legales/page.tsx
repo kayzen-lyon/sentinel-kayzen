@@ -18,17 +18,21 @@ export default function Page() {
 
       <h2>Éditeur du site</h2>
       <p>
-        Le site sentinel.kayzen-lyon.com est édité par <strong>Kayzen Web</strong>,{" "}
-        <span className="todo">[forme juridique — ex. SASU / EI]</span>.
+        Le site sentinel.kayzen-lyon.com est édité par <strong>KAYZEN LYON</strong>,
+        société par actions simplifiée unipersonnelle (SASU).
       </p>
       <ul>
-        <li>Raison sociale : <span className="todo">[Kayzen Web / à compléter]</span></li>
-        <li>Siège social : <span className="todo">[adresse complète, Lyon]</span></li>
-        <li>SIRET : <span className="todo">[numéro SIRET]</span></li>
-        <li>Numéro de TVA intracommunautaire : <span className="todo">[FR…]</span></li>
-        <li>Capital social : <span className="todo">[le cas échéant]</span></li>
-        <li>Directeur de la publication : <span className="todo">[nom du responsable]</span></li>
-        <li>Contact : <a href="mailto:contact@kayzen-lyon.fr">contact@kayzen-lyon.fr</a></li>
+        <li>Raison sociale : KAYZEN LYON (SASU)</li>
+        <li>Siège social : 6, rue Pierre Termier, 69009 Lyon, France</li>
+        <li>SIREN : 999 418 346 — SIRET (siège) : 999 418 346 00014</li>
+        <li>RCS : Lyon 999 418 346</li>
+        <li>Numéro de TVA intracommunautaire : FR85 999 418 346</li>
+        <li>Code APE : 4791B</li>
+        <li>Directeur de la publication : le président de KAYZEN LYON</li>
+        <li>
+          Téléphone : <a href="tel:+33487776861">+33 (0)4 87 77 68 61</a> — E-mail :{" "}
+          <a href="mailto:contact@kayzen-lyon.fr">contact@kayzen-lyon.fr</a>
+        </li>
       </ul>
 
       <h2>Hébergeur</h2>
@@ -67,10 +71,14 @@ export default function Page() {
         litige, les tribunaux français seront seuls compétents.
       </p>
 
-      <p className="todo">
-        ⚠️ Seuls les champs d'identification légale de l'éditeur (forme juridique, SIRET,
-        TVA, adresse du siège, directeur de la publication) restent à renseigner avec vos
-        données officielles, puis à faire relire par un juriste avant mise en ligne.
+      <h2>Réalisation du site</h2>
+      <p>
+        Ce site a été conçu et réalisé par <strong>Kayzen Web</strong>, agence web de
+        KAYZEN LYON —{" "}
+        <a href="https://internet.kayzen-lyon.fr" target="_blank" rel="noopener noreferrer">
+          internet.kayzen-lyon.fr
+        </a>
+        .
       </p>
     </LegalShell>
   );

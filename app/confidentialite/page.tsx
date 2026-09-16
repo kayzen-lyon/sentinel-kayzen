@@ -19,8 +19,9 @@ export default function Page() {
 
       <h2>Responsable du traitement</h2>
       <p>
-        Kayzen Web — <span className="todo">[adresse]</span>. Délégué à la protection
-        des données / contact : <a href="mailto:contact@kayzen-lyon.fr">contact@kayzen-lyon.fr</a>.
+        KAYZEN LYON (SASU) — 6, rue Pierre Termier, 69009 Lyon. Contact données
+        personnelles : <a href="mailto:contact@kayzen-lyon.fr">contact@kayzen-lyon.fr</a>,
+        <a href="tel:+33487776861">+33 (0)4 87 77 68 61</a>.
       </p>
 
       <h2>Données collectées</h2>
