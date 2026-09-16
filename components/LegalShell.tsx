@@ -21,7 +21,7 @@ export default function LegalShell({
             className="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-fg"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             Retour à l'accueil
           </Link>

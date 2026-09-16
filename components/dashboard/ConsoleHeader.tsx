@@ -67,7 +67,7 @@ export default function ConsoleHeader({ active }: { active: ConsoleTab }) {
             aria-expanded={open}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d={open ? "M6 6l12 12M6 18L18 6" : "M4 7h16M4 12h16M4 17h16"} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              <path d={open ? "M6 6l12 12M6 18L18 6" : "M4 7h16M4 12h16M4 17h16"} stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
             </svg>
           </button>
         </div>
