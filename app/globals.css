@@ -20,8 +20,8 @@
   --bg-card: 255 255 255; /* cartes blanches */
   --bg-hover: 233 236 239; /* surface-container-high #e9ecef */
   --fg: 31 41 55; /* on-surface #1f2937 */
-  --fg-muted: 108 117 125; /* on-surface-variant #6c757d */
-  --fg-subtle: 156 163 175; /* outline #9ca3af */
+  --fg-muted: 75 85 99; /* gray-600 #4b5563 — AA (7.5:1 sur blanc) */
+  --fg-subtle: 107 114 128; /* gray-500 #6b7280 — AA (4.8:1 sur blanc) */
   --border: 208 208 208; /* outline-variant #d0d0d0 */
   --border-strong: 156 163 175; /* outline #9ca3af */
 
@@ -36,7 +36,7 @@
   --safe: 16 122 87; /* émeraude foncé — texte de succès (contraste sur clair) */
   --safe-light: 52 211 153; /* tertiary #34d399 — accents/fonds */
   --risk: 220 38 38; /* error #dc2626 */
-  --warn: 217 119 6; /* amber-600 — alerte sur fond clair */
+  --warn: 180 83 9; /* amber-700 #b45309 — AA (5:1 sur blanc) */
   --violet: 31 59 97; /* réutilise le navy pour les dégradés */
 
   /* Typographie fluide (échelle Nexus) */
