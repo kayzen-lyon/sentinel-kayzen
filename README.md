@@ -1,8 +1,13 @@
 # Sentinel by Kayzen
 
+[![CI](https://github.com/skyymar69-rgb/sentinel-kayzen/actions/workflows/ci.yml/badge.svg)](https://github.com/skyymar69-rgb/sentinel-kayzen/actions/workflows/ci.yml)
+[![Licence: AGPL v3](https://img.shields.io/badge/licence-AGPL--3.0-blue.svg)](LICENSE)
+[![Sécurité : divulgation coordonnée](https://img.shields.io/badge/sécurité-SECURITY.md-brightgreen.svg)](SECURITY.md)
+
+
 Site vitrine de **Sentinel**, la nouvelle entité cybersécurité du groupe **Kayzen**
-(aux côtés de [Nexus](https://nexus.kayzen-lyon.fr) — SEO/IA — et
-[Konforme](https://konforme.kayzen-lyon.fr) — accessibilité EAA).
+(aux côtés de [Nexus](https://nexus.kayzen-lyon.com) — SEO/IA — et
+[Konforme](https://konforme.kayzen-lyon.com) — accessibilité EAA).
 
 Sentinel propose du **pentest IA autonome** basé sur le moteur open-source
 [Strix](https://strix.ai) : des agents qui trouvent, exploitent et prouvent les
@@ -37,7 +42,7 @@ fonctionne quand même (mode démo, sans historique persistant).
 
 ## Stack
 
-- **Next.js 15** (App Router) + **React 19** + **TypeScript**
+- **Next.js 16** (App Router) + **React 19** + **TypeScript**
 - **Tailwind CSS v4** (design tokens dans `app/globals.css`)
 - Polices `Outfit` (titres) + `Inter` (corps) via `next/font`
 - Charte graphique reprise à l'identique de Nexus (bleu `#2563EB`, base zinc-950,
@@ -84,6 +89,28 @@ fond blanc détouré → PNG transparents. L'emblème sert de marque dans le hea
 le footer et le favicon ; le wordmark navy est réservé aux fonds clairs
 (`logo-full.png`).
 
+## Open source & qualité
+
+Sentinel est **open source** sous licence **AGPL-3.0** (voir [`LICENSE`](LICENSE)) :
+le code hébergé, y compris toute version modifiée exploitée en SaaS, doit rester
+ouvert. Pour maximiser l'adoption plutôt que protéger l'hébergement, remplacez le
+fichier `LICENSE` par MIT ou Apache-2.0 et ajustez les mentions.
+
+Chaîne de vérification **100 % open source**, exécutée en CI sur chaque PR
+([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) :
+
+| Étape | Outil | Rôle |
+|---|---|---|
+| Types | `tsc` | typage strict |
+| Lint | ESLint + `eslint-plugin-security` | qualité + patterns dangereux |
+| SAST | Semgrep (OWASP Top 10, React, Next.js, secrets) | analyse statique |
+| Secrets | gitleaks | fuite de secrets dans git |
+| Dépendances | OSV-Scanner + `npm audit` | CVE des paquets |
+| MàJ | Dependabot | mises à jour de sécurité |
+
+En local : `npm run lint`, `npx tsc --noEmit`, `npm test`, `npm run build`.
+Contribuer : [`CONTRIBUTING.md`](CONTRIBUTING.md) · Sécurité : [`SECURITY.md`](SECURITY.md).
+
 ## À personnaliser avant mise en ligne
 
 - **Pages légales** — la structure est en place, mais chaque champ `[À COMPLÉTER]`
@@ -93,3 +120,7 @@ le footer et le favicon ; le wordmark navy est réservé aux fonds clairs
 - **Contact** — `contact@kayzen-lyon.fr` en `mailto` ; brancher un vrai formulaire /
   l'URL de la plateforme self-service.
 - **Statistiques du hero** (100+, 24/7…) — à remplacer par des chiffres vérifiables.
+
+## Licence
+
+[AGPL-3.0](LICENSE) © Kayzen Web. Voir aussi [`NOTICE`](NOTICE) le cas échéant.

@@ -47,6 +47,9 @@ export function parseBanners(...banners: (string | undefined)[]): DetectedCompon
   for (const raw of banners) {
     if (!raw) continue;
     // Capture les motifs "<produit>/<version>" (nginx/1.24.0, PHP/8.1.2, Apache/2.4.52).
+    // Faux positif safe-regex : un seul quantificateur par classe et {0,3}
+    // borné → pas de backtracking catastrophique, sûr sur entrée hostile.
+    // eslint-disable-next-line security/detect-unsafe-regex
     const re = /([a-zA-Z][a-zA-Z0-9_.-]*)\/(\d+(?:\.\d+){0,3})/g;
     let m: RegExpExecArray | null;
     while ((m = re.exec(raw)) !== null) {

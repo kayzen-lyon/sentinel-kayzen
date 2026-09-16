@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Qualité (types, lint, tests, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Type-check
+        run: npx tsc --noEmit
+      - name: Lint (ESLint + eslint-plugin-security)
+        run: npm run lint
+      - name: Tests unitaires
+        run: npm test
+      - name: Build
+        run: npm run build
+
+  sast:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install semgrep
+      - name: Semgrep scan (rulesets OSS)
+        run: |
+          semgrep scan \
+            --config p/typescript \
+            --config p/react \
+            --config p/nextjs \
+            --config p/javascript \
+            --config p/secrets \
+            --config p/owasp-top-ten \
+            --sarif --output semgrep.sarif
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
+
+  secrets:
+    name: Secrets (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deps:
+    name: Dépendances (osv-scanner + npm audit)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: npm audit (prod, échoue sur high+)
+        run: |
+          npm ci --ignore-scripts
+          npm audit --omit=dev --audit-level=high
+      - name: OSV-Scanner (binaire épinglé)
+        run: |
+          VER=1.9.2
+          curl -sSfL "https://github.com/google/osv-scanner/releases/download/v${VER}/osv-scanner_${VER}_linux_amd64" -o osv-scanner
+          chmod +x osv-scanner
+          ./osv-scanner --lockfile=package-lock.json
