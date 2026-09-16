@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import LegalShell from "@/components/LegalShell";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/mentions-legales" },
   title: "Mentions légales",
   robots: { index: false, follow: true },
 };

@@ -309,3 +309,136 @@ h1, h2, h3, h4, h5, h6 {
 .reveal {
   animation: float-up var(--dur-slow) var(--ease-out) both;
 }
+
+/* ============================================================
+   Améliorations design system — accessibilité, états, polish
+   ============================================================ */
+
+/* [FIX] La classe .input était utilisée par de nombreux composants sans être
+   définie : les champs s'affichaient avec le style navigateur par défaut. */
+.input {
+  width: 100%;
+  background-color: rgb(var(--bg));
+  color: rgb(var(--fg));
+  border: 1px solid rgb(var(--border-strong));
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.4;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+.input::placeholder {
+  color: rgb(var(--fg-subtle));
+}
+.input:hover:not(:disabled) {
+  border-color: rgb(var(--fg-subtle));
+}
+.input:focus,
+.input:focus-visible {
+  outline: none;
+  border-color: rgb(var(--brand));
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+}
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.input[aria-invalid="true"] {
+  border-color: rgb(var(--risk));
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+}
+
+/* Anneau de focus clavier cohérent sur toute l'interface (a11y). */
+:focus-visible {
+  outline: 2px solid rgb(var(--brand-light));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* La souris ne déclenche pas d'anneau (seul le clavier). */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* États d'interaction des boutons (retour visuel au clic / clavier / désactivé). */
+.btn:focus-visible {
+  outline: 2px solid rgb(var(--brand-light));
+  outline-offset: 3px;
+}
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.btn-primary:active {
+  background-color: rgb(var(--brand-hover));
+}
+
+/* Carte : anneau quand un enfant reçoit le focus clavier. */
+.card:focus-within {
+  border-color: rgb(var(--brand));
+}
+
+/* Contrôles natifs (checkbox, radio, select) teintés à la marque. */
+:root {
+  accent-color: rgb(var(--brand));
+  color-scheme: dark;
+}
+input,
+textarea,
+select {
+  caret-color: rgb(var(--brand-light));
+}
+
+/* Barre de défilement discrète cohérente avec le thème sombre. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--border-strong)) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--border-strong));
+  border-radius: 8px;
+  border: 2px solid rgb(var(--bg));
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(var(--fg-subtle));
+}
+
+/* Titres : évite les orphelins/veuves disgracieux. */
+h1, h2, h3 {
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
+}
+
+/* Média jamais débordant. */
+img, svg, video, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Cible d'ancre mise en évidence brièvement. */
+:target {
+  scroll-margin-top: var(--scroll-margin);
+}
+
+/* Le reveal ne doit jamais masquer le contenu si l'anim est coupée. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

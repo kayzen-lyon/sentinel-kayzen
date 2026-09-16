@@ -19,9 +19,17 @@ const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), browsing-topics=()" },
+  {
+    key: "Permissions-Policy",
+    value:
+      "camera=(), microphone=(), geolocation=(), browsing-topics=(), payment=(), usb=(), interest-cohort=()",
+  },
   { key: "X-DNS-Prefetch-Control", value: "on" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  // Ajoutés suite au scan Nuclei (en-têtes signalés manquants) — sûrs car le site
+  // ne sert que ses propres ressources (img-src 'self' data: blob:).
+  { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
+  { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
 ];
 
 const nextConfig = {

@@ -11,6 +11,17 @@ import Faq from "@/components/Faq";
 import CtaFinal from "@/components/CtaFinal";
 import Footer from "@/components/Footer";
 import { FAQ } from "@/lib/faq";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  openGraph: {
+    url: "/",
+    title: "Sentinel by Kayzen — Pentest IA autonome",
+    description:
+      "Des agents IA qui trouvent, exploitent et prouvent vos vulnérabilités par des PoC réels. Audit managé + plateforme self-service.",
+  },
+};
 
 const jsonLd = {
   "@context": "https://schema.org",

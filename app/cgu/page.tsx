@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import LegalShell from "@/components/LegalShell";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/cgu" },
   title: "Conditions générales d'utilisation",
   robots: { index: false, follow: true },
 };

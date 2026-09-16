@@ -5,6 +5,7 @@ import { getSession } from "@/lib/auth";
 import AuthCard from "@/components/auth/AuthCard";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/login" },
   title: "Connexion",
   robots: { index: false, follow: false },
 };
