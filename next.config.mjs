@@ -4,9 +4,17 @@ const csp = [
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'self'",
+  "frame-src 'none'",
+  "child-src 'none'",
+  "worker-src 'self' blob:",
+  "manifest-src 'self'",
+  "media-src 'self'",
   "img-src 'self' data: blob:",
   "font-src 'self'",
   "style-src 'self' 'unsafe-inline'",
+  // 'unsafe-inline' conservé volontairement : passer aux nonces forcerait un rendu
+  // dynamique de tout le site (perte du prérendu statique/CDN) pour un gain marginal
+  // — aucun script tiers, JSON-LD déjà échappé. Voir SECURITY.md.
   "script-src 'self' 'unsafe-inline'",
   "connect-src 'self'",
   "form-action 'self'",
