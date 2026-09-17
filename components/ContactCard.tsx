@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
- * Carte de contact numérique KAYZEN LYON : coordonnées, vCard téléchargeable et un
+ * Carte de contact numérique Kayzen Web : coordonnées, vCard téléchargeable et un
  * QR code vCard, + liens site/localisation/avis. Modale accessible (RGAA/WCAG) — focus piégé,
  * Escape, retour du focus au déclencheur, verrou de défilement.
  */
@@ -89,7 +89,7 @@ export default function ContactCard() {
                   id="contact-card-title"
                   className="font-heading text-lg font-semibold text-fg"
                 >
-                  Carte de contact — KAYZEN LYON
+                  Carte de contact — Kayzen Web
                 </h2>
                 <p className="mt-1 text-sm text-muted">
                   Sentinel by Kayzen · Cybersécurité offensive
@@ -127,7 +127,7 @@ export default function ContactCard() {
                 <span className="rounded-xl border border-border bg-bg p-2.5">
                   <Image
                     src="/qr/vcard.svg"
-                    alt="QR code de la carte de visite vCard de KAYZEN LYON"
+                    alt="QR code de la carte de visite vCard de Kayzen Web"
                     width={180}
                     height={180}
                     className="h-auto w-44"

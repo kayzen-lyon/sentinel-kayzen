@@ -13,23 +13,24 @@ export default function Page() {
       <p>
         Les présentes conditions générales de vente (ci-après «&nbsp;CGV&nbsp;») régissent
         la vente des prestations et abonnements du service{" "}
-        <strong>Sentinel by Kayzen</strong>, édité par la société{" "}
-        <strong>KAYZEN LYON</strong>. Toute commande implique l'acceptation sans réserve
+        <strong>Sentinel by Kayzen</strong>, édité par{" "}
+        <strong>Tarek BELHADJ (Kayzen Web)</strong>. Toute commande implique l'acceptation sans réserve
         des présentes CGV, qui prévalent sur tout autre document du client.
       </p>
 
       <h2>1. Identité du prestataire</h2>
       <p>
-        KAYZEN LYON, société par actions simplifiée unipersonnelle (SASU), SIREN 999&nbsp;418&nbsp;346,
-        RCS Lyon 999&nbsp;418&nbsp;346, TVA intracommunautaire FR85&nbsp;999&nbsp;418&nbsp;346,
-        code APE 4791B, siège social 6, rue Pierre Termier, 69009 Lyon.
-        Téléphone&nbsp;: <a href="tel:+33487776861">+33&nbsp;(0)4&nbsp;87&nbsp;77&nbsp;68&nbsp;61</a> —
+        Tarek BELHADJ, entrepreneur individuel exerçant sous le nom commercial Kayzen Web,
+        SIRET 493&nbsp;857&nbsp;262&nbsp;00098, immatriculé au Registre National des
+        Entreprises, code APE 62.01Z, TVA non applicable (art. L.&nbsp;233-3 du CIBS),
+        adresse&nbsp;: 6, rue Pierre Termier, 69009 Lyon. Téléphone&nbsp;:
+        <a href="tel:+33487776861">+33&nbsp;(0)4&nbsp;87&nbsp;77&nbsp;68&nbsp;61</a> —
         E-mail&nbsp;: <a href="mailto:contact@kayzen-lyon.fr">contact@kayzen-lyon.fr</a>.
       </p>
 
       <h2>2. Définitions</h2>
       <ul>
-        <li><strong>Prestataire</strong>&nbsp;: KAYZEN LYON.</li>
+        <li><strong>Prestataire</strong>&nbsp;: Tarek BELHADJ (Kayzen Web).</li>
         <li><strong>Client</strong>&nbsp;: toute personne physique ou morale souscrivant une prestation.</li>
         <li><strong>Services</strong>&nbsp;: l'audit de sécurité managé, la plateforme de scan et de pentest en libre-service, et les prestations associées.</li>
         <li><strong>Cible</strong>&nbsp;: le domaine, l'application, l'API ou le dépôt soumis à analyse.</li>

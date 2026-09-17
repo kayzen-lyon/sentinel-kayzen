@@ -18,17 +18,18 @@ export default function Page() {
 
       <h2>Éditeur du site</h2>
       <p>
-        Le site sentinel.kayzen-lyon.com est édité par <strong>KAYZEN LYON</strong>,
-        société par actions simplifiée unipersonnelle (SASU).
+        Le site sentinel.kayzen-lyon.com est édité par <strong>Tarek BELHADJ</strong>,
+        entrepreneur individuel exerçant sous le nom commercial{" "}
+        <strong>Kayzen Web</strong>.
       </p>
       <ul>
-        <li>Raison sociale : KAYZEN LYON (SASU)</li>
-        <li>Siège social : 6, rue Pierre Termier, 69009 Lyon, France</li>
-        <li>SIREN : 999 418 346 — SIRET (siège) : 999 418 346 00014</li>
-        <li>RCS : Lyon 999 418 346</li>
-        <li>Numéro de TVA intracommunautaire : FR85 999 418 346</li>
-        <li>Code APE : 4791B</li>
-        <li>Directeur de la publication : le président de KAYZEN LYON</li>
+        <li>Éditeur : Tarek BELHADJ — entrepreneur individuel (Kayzen Web)</li>
+        <li>Adresse : 6, rue Pierre Termier, 69009 Lyon, France</li>
+        <li>SIREN : 493 857 262 — SIRET (siège) : 493 857 262 00098</li>
+        <li>Immatriculé au Registre National des Entreprises (RNE)</li>
+        <li>Code APE : 62.01Z (programmation informatique)</li>
+        <li>TVA non applicable, art. L. 233-3 du CIBS (franchise en base de TVA)</li>
+        <li>Directeur de la publication : Tarek BELHADJ</li>
         <li>
           Téléphone : <a href="tel:+33487776861">+33 (0)4 87 77 68 61</a> — E-mail :{" "}
           <a href="mailto:contact@kayzen-lyon.fr">contact@kayzen-lyon.fr</a>
@@ -37,11 +38,16 @@ export default function Page() {
 
       <h2>Hébergeur</h2>
       <p>
-        Le site est hébergé par <strong>Vercel Inc.</strong>, 340 S Lemon Avenue #4133,
-        Walnut, CA 91789, États-Unis (<a href="https://vercel.com" target="_blank" rel="noopener noreferrer">vercel.com</a>). La
-        base de données est opérée par notre prestataire d'hébergement PostgreSQL (Neon
-        ou Supabase selon la configuration), au sein de l'Union européenne lorsque cette
-        région est sélectionnée.
+        Le site est hébergé par <strong>Vercel Inc.</strong>, 440 N Barranca Avenue
+        #4133, Covina, CA 91723, États-Unis (<a href="https://vercel.com" target="_blank" rel="noopener noreferrer">vercel.com</a>).
+        La base de données PostgreSQL (Neon / Supabase) est hébergée au sein de l'Union
+        européenne lorsque cette région est sélectionnée.
+      </p>
+
+      <h2>Nom de domaine et DNS</h2>
+      <p>
+        L'enregistrement du nom de domaine et la gestion DNS sont assurés par{" "}
+        <strong>IONOS SARL</strong>, 7 place de la Gare, 57200 Sarreguemines, France.
       </p>
 
       <h2>Propriété intellectuelle</h2>
@@ -73,10 +79,9 @@ export default function Page() {
 
       <h2>Réalisation du site</h2>
       <p>
-        Ce site a été conçu et réalisé par <strong>Kayzen Web</strong>, agence web de
-        KAYZEN LYON —{" "}
-        <a href="https://internet.kayzen-lyon.fr" target="_blank" rel="noopener noreferrer">
-          internet.kayzen-lyon.fr
+        Ce site a été conçu et réalisé par <strong>Kayzen Web</strong> —{" "}
+        <a href="https://www.kayzen-lyon.com" target="_blank" rel="noopener noreferrer">
+          www.kayzen-lyon.com
         </a>
         .
       </p>

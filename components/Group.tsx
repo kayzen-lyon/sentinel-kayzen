@@ -40,11 +40,10 @@ export default function Group() {
               Une nouvelle brique du groupe Kayzen
             </h2>
             <p className="mt-4 text-lg text-muted">
-              Sentinel rejoint Nexus et Konforme aux côtés de l'agence{" "}
+              Sentinel rejoint Nexus et Konforme aux côtés de{" "}
               <strong className="font-semibold text-fg">Kayzen Web</strong> :
-              même exigence, même équipe lyonnaise, même approche
-              éco-responsable du numérique. Vos sites sont créés, référencés,
-              rendus accessibles — et désormais protégés.
+              même exigence, même équipe lyonnaise. Vos sites sont créés,
+              référencés, rendus accessibles — et désormais protégés.
             </p>
 
             <div className="mt-8 flex items-start gap-4 rounded-2xl border border-safe/25 bg-safe/[0.06] p-5">
@@ -55,9 +54,9 @@ export default function Group() {
                 </svg>
               </span>
               <p className="text-sm leading-relaxed text-muted">
-                <strong className="font-semibold text-fg">Numérique responsable.</strong>{" "}
-                Infrastructure sobre, matériel reconditionné et sécurité qui
-                prolonge la vie de vos applications plutôt que de la fragiliser.
+                <strong className="font-semibold text-fg">Un seul interlocuteur.</strong>{" "}
+                Design, SEO, accessibilité et sécurité par une même équipe : une
+                continuité rare, de la création de votre site à sa protection.
               </p>
             </div>
           </div>

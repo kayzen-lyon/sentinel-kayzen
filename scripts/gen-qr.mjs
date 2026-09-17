@@ -8,16 +8,16 @@ mkdirSync("public/qr", { recursive: true });
 const SITE = "https://sentinel.kayzen-lyon.com";
 const MAPS =
   "https://www.google.com/maps/search/?api=1&query=" +
-  encodeURIComponent("KAYZEN LYON, 6 rue Pierre Termier, 69009 Lyon");
-const AVIS = "https://www.google.com/search?q=" + encodeURIComponent("KAYZEN LYON avis");
+  encodeURIComponent("Kayzen, 6 rue Pierre Termier, 69009 Lyon");
+const AVIS = "https://www.google.com/search?q=" + encodeURIComponent("Kayzen Web Lyon avis");
 
 const VCARD = [
   "BEGIN:VCARD",
   "VERSION:3.0",
-  "N:LYON;KAYZEN;;;",
-  "FN:KAYZEN LYON — Sentinel by Kayzen",
-  "ORG:KAYZEN LYON",
-  "TITLE:Cybersécurité offensive & pentest IA",
+  "N:BELHADJ;Tarek;;;",
+  "FN:Tarek BELHADJ — Kayzen Web",
+  "ORG:Kayzen Web",
+  "TITLE:Création web, SEO & cybersécurité",
   "TEL;TYPE=WORK,VOICE:+33487776861",
   "EMAIL;TYPE=WORK:contact@kayzen-lyon.fr",
   "ADR;TYPE=WORK:;;6 rue Pierre Termier;Lyon;;69009;France",

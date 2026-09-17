@@ -19,7 +19,8 @@ export default function Page() {
 
       <h2>Responsable du traitement</h2>
       <p>
-        KAYZEN LYON (SASU) — 6, rue Pierre Termier, 69009 Lyon. Contact données
+        Tarek BELHADJ (Kayzen Web, entrepreneur individuel) — 6, rue Pierre Termier,
+        69009 Lyon. Contact données
         personnelles : <a href="mailto:contact@kayzen-lyon.fr">contact@kayzen-lyon.fr</a>,
         <a href="tel:+33487776861">+33 (0)4 87 77 68 61</a>.
       </p>

@@ -54,8 +54,8 @@ export default function Footer() {
               </span>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
-              Pentest IA autonome et cybersécurité offensive. Une entité du groupe
-              Kayzen, agence web éco-responsable basée à Lyon.
+              Pentest IA autonome et cybersécurité offensive. Une marque de Kayzen,
+              studio lyonnais de création web, SEO et cybersécurité.
             </p>
             <p className="mt-4 text-xs text-subtle">
               Propulsé par le moteur open-source Strix (licence Apache 2.0).
@@ -87,9 +87,10 @@ export default function Footer() {
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
           <p className="text-xs text-subtle">
-            © {new Date().getFullYear()} Sentinel by Kayzen — KAYZEN LYON. Tous droits réservés.{" "}
+            © {new Date().getFullYear()} Sentinel by Kayzen — Kayzen Web, Tarek BELHADJ,
+            entrepreneur individuel. Tous droits réservés.{" "}
             <a
-              href="https://internet.kayzen-lyon.fr"
+              href="https://www.kayzen-lyon.com"
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-fg underline decoration-brand/50 underline-offset-2 hover:text-brand-light"
@@ -98,8 +99,8 @@ export default function Footer() {
             </a>
           </p>
           <p className="flex items-center gap-2 text-xs text-subtle">
-            <span className="inline-block h-2 w-2 rounded-full bg-safe" />
-            Web éco-responsable · Fait à Lyon
+            <span className="inline-block h-2 w-2 rounded-full bg-brand" />
+            Conçu &amp; hébergé à Lyon · France
           </p>
         </div>
       </div>
