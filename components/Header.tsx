@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import ContactCard from "@/components/ContactCard";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 const NAV = [
   { label: "Le service", href: "/#service" },
@@ -30,17 +31,15 @@ export default function Header() {
 
   return (
     <header
-      className={`band-dark fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        scrolled
-          ? "border-b border-border bg-secondary/90 backdrop-blur-xl"
-          : "border-b border-transparent bg-transparent"
+      className={`site-chrome fixed inset-x-0 top-0 z-50 border-b transition-[border-color,box-shadow] duration-300 ${
+        scrolled ? "border-border shadow-[var(--shadow-sm)]" : "border-border"
       }`}
     >
-      <div className="container-x flex h-[72px] items-center justify-between">
+      <div className="container-x flex h-20 items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5" aria-label="Sentinel by Kayzen, accueil">
           <Logo />
           <span className="flex flex-col leading-none">
-            <span className="font-heading text-[1.15rem] font-semibold tracking-tight text-fg">
+            <span className="font-heading text-[1.15rem] font-bold tracking-tight text-heading">
               Sentinel
             </span>
             <span className="text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-subtle">
@@ -49,12 +48,12 @@ export default function Header() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Navigation principale">
+        <nav className="hidden items-center gap-6 md:flex" aria-label="Navigation principale">
           {NAV.map((n) => (
             <a
               key={n.href}
               href={n.href}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-hover hover:text-fg"
+              className="border-b-2 border-transparent py-2 font-heading text-sm font-semibold whitespace-nowrap text-fg transition-colors duration-150 hover:text-brand"
             >
               {n.label}
             </a>
@@ -63,26 +62,31 @@ export default function Header() {
 
         <div className="hidden items-center gap-2 md:flex">
           <ContactCard />
+          <ThemeToggle />
           <Link
             href="/login"
-            className="rounded-xl px-3 py-2 text-sm font-medium text-muted transition-colors hover:text-fg"
+            className="px-3 py-2 font-heading text-sm font-semibold text-fg transition-colors duration-150 hover:text-brand"
           >
             Connexion
           </Link>
-          <Link href="/signup" className="btn btn-primary !px-4 !py-2.5 text-sm">
+          <Link href="/signup" className="btn btn-primary">
             Scanner mon site
+            <IconArrow />
           </Link>
         </div>
 
-        <button
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-fg md:hidden"
-          onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-          aria-expanded={open}
-        >
-          <span className="sr-only">Menu</span>
-          {open ? <IconClose /> : <IconMenu />}
-        </button>
+        <div className="flex items-center gap-1 md:hidden">
+          <ThemeToggle />
+          <button
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-fg"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={open}
+          >
+            <span className="sr-only">Menu</span>
+            {open ? <IconClose /> : <IconMenu />}
+          </button>
+        </div>
       </div>
 
       {open && (
@@ -93,7 +97,7 @@ export default function Header() {
                 key={n.href}
                 href={n.href}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-3 text-base font-medium text-fg hover:bg-hover"
+                className="rounded-xl px-3 py-3 font-heading text-base font-semibold text-fg hover:bg-bg-elev hover:text-brand"
               >
                 {n.label}
               </a>
@@ -134,6 +138,14 @@ function Logo() {
       priority
       className="h-10 w-auto"
     />
+  );
+}
+
+function IconArrow() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 

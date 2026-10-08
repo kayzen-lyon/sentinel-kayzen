@@ -2,58 +2,62 @@ import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section id="contenu" className="band-dark relative overflow-hidden pt-[72px]">
-      <div className="grid-glow absolute inset-0 -z-10" aria-hidden="true" />
+    <section id="contenu" className="relative overflow-hidden pt-20">
+      <div className="container-x py-16 sm:py-24">
+        <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
+          <div>
+            <p className="eyebrow reveal mb-5">Cybersécurité offensive · Groupe Kayzen</p>
 
-      <div className="container-x py-20 sm:py-28">
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="eyebrow reveal mb-6 rounded-full border border-border-strong bg-card/60 px-4 py-1.5">
-            <span className="inline-block h-2 w-2 rounded-full bg-safe" />
-            Cybersécurité offensive — Groupe Kayzen
-          </span>
+            <h1
+              className="reveal leading-[1.06] text-fg"
+              style={{ fontSize: "clamp(2.25rem, 1.5rem + 3vw, 3.5rem)", animationDelay: "60ms" }}
+            >
+              Des hackers IA qui trouvent vos failles{" "}
+              <span className="gradient-text">avant les vrais.</span>
+            </h1>
 
-          <h1
-            className="reveal font-heading font-bold leading-[1.05] text-fg"
-            style={{ fontSize: "var(--text-hero)", animationDelay: "60ms" }}
-          >
-            Des hackers IA qui trouvent vos failles{" "}
-            <span className="gradient-text">avant les vrais</span>
-          </h1>
+            <p
+              className="reveal mt-6 max-w-xl text-fg"
+              style={{ fontSize: "var(--text-lg)", animationDelay: "120ms" }}
+            >
+              Sentinel déploie des agents autonomes qui exécutent réellement votre
+              application, exploitent les vulnérabilités et les prouvent par des{" "}
+              <strong className="font-semibold">PoC concrets</strong> — pas
+              de faux positifs. Un pentest complet en heures, pas en semaines.
+            </p>
 
-          <p
-            className="reveal mx-auto mt-6 max-w-2xl text-muted"
-            style={{ fontSize: "var(--text-lg)", animationDelay: "120ms" }}
-          >
-            Sentinel déploie des agents autonomes qui exécutent réellement votre
-            application, exploitent les vulnérabilités et les prouvent par des{" "}
-            <strong className="font-semibold text-fg">PoC concrets</strong> — pas
-            de faux positifs. Un pentest complet en heures, pas en semaines.
-          </p>
+            <div
+              className="reveal mt-8 flex flex-col gap-3 sm:flex-row"
+              style={{ animationDelay: "180ms" }}
+            >
+              <Link href="/signup" className="btn btn-primary btn-lg w-full sm:w-auto">
+                Scanner mon site gratuitement
+                <IconArrow />
+              </Link>
+              <a href="#contact" className="btn btn-ghost btn-lg w-full sm:w-auto">
+                Demander un audit managé
+              </a>
+            </div>
 
-          <div
-            className="reveal mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
-            style={{ animationDelay: "180ms" }}
-          >
-            <Link href="/signup" className="btn btn-primary w-full sm:w-auto">
-              Scanner mon site gratuitement
-              <IconArrow />
-            </Link>
-            <a href="#contact" className="btn btn-ghost w-full sm:w-auto">
-              Demander un audit managé
-            </a>
+            <ul
+              className="reveal mt-6 flex flex-wrap gap-2"
+              style={{ animationDelay: "220ms" }}
+            >
+              {["Moteur open-source Strix", "PoC validés", "Rapports prêts pour la conformité"].map(
+                (t) => (
+                  <li key={t} className="chip">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand" aria-hidden="true" />
+                    {t}
+                  </li>
+                )
+              )}
+            </ul>
           </div>
 
-          <p
-            className="reveal mt-5 text-sm text-subtle"
-            style={{ animationDelay: "220ms" }}
-          >
-            Basé sur le moteur open-source Strix · PoC validés · Rapports prêts pour la conformité
-          </p>
+          <TerminalPreview />
         </div>
 
-        <TerminalPreview />
-
-        <dl className="mx-auto mt-16 grid max-w-4xl grid-cols-2 gap-6 sm:grid-cols-4">
+        <dl className="band-dark stat-band mt-16 grid grid-cols-2 gap-6 px-6 py-8 md:grid-cols-4 md:px-10">
           {[
             ["100+", "vecteurs testés"],
             ["OWASP", "Top 10 & au-delà"],
@@ -61,7 +65,7 @@ export default function Hero() {
             ["24/7", "surveillance continue"],
           ].map(([n, l]) => (
             <div key={l} className="text-center">
-              <dt className="font-heading text-3xl font-bold text-fg">{n}</dt>
+              <dt className="font-heading text-3xl font-extrabold text-gold md:text-4xl">{n}</dt>
               <dd className="mt-1 text-sm text-muted">{l}</dd>
             </div>
           ))}
@@ -74,10 +78,10 @@ export default function Hero() {
 function TerminalPreview() {
   return (
     <div
-      className="reveal mx-auto mt-16 max-w-3xl"
+      className="reveal w-full min-w-0"
       style={{ animationDelay: "260ms" }}
     >
-      <div className="overflow-hidden rounded-2xl border border-border-strong bg-[#0c0c0f] shadow-[var(--shadow-lg)]">
+      <div className="band-dark overflow-hidden rounded-3xl shadow-[var(--shadow-section)]">
         <div className="flex items-center gap-2 border-b border-border px-4 py-3">
           <span className="h-3 w-3 rounded-full bg-risk/70" />
           <span className="h-3 w-3 rounded-full bg-warn/70" />

@@ -53,17 +53,17 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
           alt="Sentinel by Kayzen"
           width={44}
           height={44}
-          className="h-11 w-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]"
+          className="h-11 w-auto"
         />
         <span className="flex flex-col leading-none">
-          <span className="font-heading text-xl font-semibold text-fg">Sentinel</span>
+          <span className="font-heading text-xl font-bold text-heading">Sentinel</span>
           <span className="text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-subtle">
             by Kayzen
           </span>
         </span>
       </Link>
 
-      <div className="card p-8">
+      <div className="card p-8 sm:p-10">
         <h1 className="font-heading text-2xl font-bold text-fg">
           {isSignup ? "Créer votre compte" : "Connexion"}
         </h1>
@@ -162,7 +162,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-fg">{label}</span>
+      <span className="mb-1.5 block font-heading text-sm font-semibold text-fg">{label}</span>
       <input
         type={type}
         value={value}
@@ -170,7 +170,7 @@ function Field({
         autoComplete={autoComplete}
         required={required}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-border-strong bg-bg px-3.5 py-2.5 text-fg outline-none transition-colors placeholder:text-subtle focus:border-brand focus:ring-2 focus:ring-brand/30"
+        className="input"
       />
       {hint && <span className="mt-1 block text-xs text-subtle">{hint}</span>}
     </label>

@@ -14,7 +14,7 @@ export default function LegalShell({
   return (
     <>
       <Header />
-      <main id="contenu" className="pt-[72px]">
+      <main id="contenu" className="pt-20">
         <div className="container-x max-w-3xl py-16">
           <Link
             href="/"

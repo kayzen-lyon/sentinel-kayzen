@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default async function LoginPage() {
   if (await getSession()) redirect("/dashboard");
   return (
-    <main className="grid min-h-screen place-items-center px-6 py-16">
+    <main className="grid min-h-screen place-items-center bg-sunken px-6 py-16">
       <Suspense>
         <AuthCard mode="login" />
       </Suspense>

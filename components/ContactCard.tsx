@@ -73,7 +73,7 @@ export default function ContactCard() {
           }}
         >
           <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-navy-deep/50 backdrop-blur-sm"
             aria-hidden="true"
           />
           <div
@@ -81,7 +81,7 @@ export default function ContactCard() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="contact-card-title"
-            className="band-dark relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-lg"
+            className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-lg)]"
           >
             <div className="flex items-start justify-between gap-4 border-b border-border p-5">
               <div>

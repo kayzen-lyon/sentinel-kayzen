@@ -2,10 +2,14 @@ import type { Metadata, Viewport } from "next";
 import { jakarta, outfit } from "./fonts";
 import { ToastProvider } from "@/components/ui/Toast";
 import CookieBanner from "@/components/CookieBanner";
+import { THEME_INIT_SCRIPT } from "@/components/ui/ThemeToggle";
 import "./globals.css";
 
 export const viewport: Viewport = {
-  themeColor: "#1f3b61",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d1621" },
+  ],
   width: "device-width",
   initialScale: 1,
 };
@@ -63,7 +67,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${jakarta.variable} ${outfit.variable}`}>
+    <html lang="fr" className={`${jakarta.variable} ${outfit.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body>
         <a
           href="#contenu"

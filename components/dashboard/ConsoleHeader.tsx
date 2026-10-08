@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export type ConsoleTab =
   | "scan"
@@ -34,21 +35,21 @@ export default function ConsoleHeader({ active }: { active: ConsoleTab }) {
   }
 
   const linkCls = (key: ConsoleTab) =>
-    `rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-      key === active ? "bg-hover text-fg" : "text-muted hover:text-fg"
+    `border-b-2 py-2 font-heading text-sm font-semibold whitespace-nowrap transition-colors duration-150 ${
+      key === active ? "border-brand text-brand" : "border-transparent text-fg hover:text-brand"
     }`;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-bg/85 backdrop-blur-xl">
-      <div className="container-x flex h-[64px] items-center justify-between">
+    <header className="site-chrome sticky top-0 z-40 border-b border-border">
+      <div className="container-x flex h-20 items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2.5">
             <Image src="/logo-mark.png" alt="Sentinel by Kayzen" width={32} height={32} className="h-8 w-auto" />
-            <span className="font-heading text-base font-semibold text-fg">
+            <span className="font-heading text-base font-bold text-heading">
               Sentinel <span className="text-subtle">Console</span>
             </span>
           </Link>
-          <nav className="hidden gap-1 lg:flex">
+          <nav className="hidden gap-5 lg:flex">
             {TABS.map((t) => (
               <Link key={t.key} href={t.href} className={linkCls(t.key)}>
                 {t.label}
@@ -57,6 +58,7 @@ export default function ConsoleHeader({ active }: { active: ConsoleTab }) {
           </nav>
         </div>
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <button onClick={logout} className="btn btn-ghost !px-3.5 !py-2 text-sm">
             Déconnexion
           </button>
@@ -74,7 +76,7 @@ export default function ConsoleHeader({ active }: { active: ConsoleTab }) {
       </div>
 
       {open && (
-        <nav className="container-x flex flex-col gap-1 border-t border-border py-3 lg:hidden">
+        <nav className="container-x flex flex-col items-start gap-1 border-t border-border py-3 lg:hidden">
           {TABS.map((t) => (
             <Link
               key={t.key}
