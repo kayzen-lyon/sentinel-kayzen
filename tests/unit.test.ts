@@ -237,3 +237,41 @@ test("stripe : signature de webhook et offre du prix", async () => {
   assert.equal(planFromPrice({ id: "price_x", metadata: { sentinel_plan: "enterprise" } }), "enterprise");
   assert.equal(planFromPrice({ id: "price_x", metadata: { sentinel_plan: "free" } }), "platform");
 });
+
+test("wafdetect : WAF et CAPTCHA détectés sur en-têtes et corps", async () => {
+  const { detectWafCaptcha } = await import("../lib/wafdetect");
+  const h = new Headers({ "cf-ray": "abc123", server: "cloudflare" });
+  const wafOnly = detectWafCaptcha(h, [], "<html>ok</html>");
+  assert.equal(wafOnly.length, 1);
+  assert.match(wafOnly[0].title, /Cloudflare/);
+  assert.equal(wafOnly[0].severity, "info");
+
+  const body = '<div class="g-recaptcha"></div><script src="https://www.google.com/recaptcha/api.js"></script>';
+  const captcha = detectWafCaptcha(new Headers(), [], body);
+  assert.equal(captcha.length, 1);
+  assert.match(captcha[0].title, /reCAPTCHA/);
+
+  assert.equal(detectWafCaptcha(new Headers(), [], "<html>rien</html>").length, 0);
+});
+
+test("findingsFormat : dédup, CSV et JUnit", async () => {
+  const { dedupeFindings, findingsToCsv, findingsToJUnit } = await import("../lib/findingsFormat");
+  const raw = [
+    { id: "a", title: "Injection SQL", severity: "critical" },
+    { id: "b", title: "injection sql", severity: "critical" },
+    { id: "c", title: "Cookie sans SameSite", severity: "low" },
+  ];
+  const deduped = dedupeFindings(raw);
+  assert.equal(deduped.length, 2);
+  assert.equal(deduped[0].occurrences, 2); // les deux « injection SQL » fusionnent
+  assert.equal(deduped[0].severity, "critical"); // tri par gravité
+
+  const csv = findingsToCsv(deduped);
+  assert.ok(csv.startsWith("﻿")); // BOM Excel
+  assert.match(csv, /Injection SQL/);
+
+  const xml = findingsToJUnit("Suite", "exemple.fr", deduped);
+  assert.match(xml, /<testsuite name="Suite"/);
+  assert.match(xml, /failures="1"/); // seul le critique est un échec
+  assert.match(xml, /<failure message="Injection SQL">/);
+});

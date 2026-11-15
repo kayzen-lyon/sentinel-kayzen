@@ -143,7 +143,30 @@ export default function DashboardClient({
         .map(esc)
         .join(",")
     );
-    download([header, ...rows].join("\r\n"), "text/csv;charset=utf-8", "csv");
+    download("﻿" + [header, ...rows].join("\r\n"), "text/csv;charset=utf-8", "csv");
+  }
+
+  function exportJunit() {
+    if (!result) return;
+    const esc = (s: string) =>
+      (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    const rank: Record<string, number> = { critical: 5, high: 4, medium: 3, low: 2, info: 1 };
+    const shown = result.findings.filter((f) => f.state === "fail" || f.state === "warn");
+    const fails = shown.filter((f) => (rank[f.severity] ?? 0) >= 3);
+    const cases = shown
+      .map((f) => {
+        const name = esc(`[${f.severity.toUpperCase()}] ${f.title}`);
+        const cls = esc(f.category || "security");
+        if ((rank[f.severity] ?? 0) < 3) return `    <testcase name="${name}" classname="${cls}" />`;
+        const body = esc([f.detail, f.recommendation].filter(Boolean).join("\n\n"));
+        return `    <testcase name="${name}" classname="${cls}">\n      <failure message="${esc(f.title)}">${body}</failure>\n    </testcase>`;
+      })
+      .join("\n");
+    const xml =
+      `<?xml version="1.0" encoding="UTF-8"?>\n<testsuites>\n` +
+      `  <testsuite name="Sentinel scan" hostname="${esc(prettyHost(result.targetUrl))}" tests="${shown.length}" failures="${fails.length}">\n` +
+      `${cases}\n  </testsuite>\n</testsuites>\n`;
+    download(xml, "application/xml;charset=utf-8", "junit.xml");
   }
 
   // Historique des scores pour le domaine courant (sparkline)
@@ -251,6 +274,9 @@ export default function DashboardClient({
                         </button>
                         <button onClick={exportCsv} className="btn btn-ghost !px-3 !py-1.5 text-xs">
                           CSV
+                        </button>
+                        <button onClick={exportJunit} className="btn btn-ghost !px-3 !py-1.5 text-xs">
+                          JUnit
                         </button>
                         <button onClick={() => window.print()} className="btn btn-ghost !px-3 !py-1.5 text-xs">
                           Imprimer / PDF

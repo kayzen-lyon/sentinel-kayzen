@@ -102,6 +102,10 @@ export async function runScan(
   const isHttps = finalUrl.startsWith("https://");
   const get = (k: string) => h.get(k) || "";
 
+  // Corps de la page principale, lu une seule fois (plafonné) : sert à détecter
+  // les WAF/CDN et les défis anti-bot (CAPTCHA) sur en-têtes + contenu.
+  const bodyText = (await res.text().catch(() => "")).slice(0, 20000);
+
   // 1. HTTPS
   add(
     isHttps
@@ -506,6 +510,14 @@ export async function runScan(
   }
 
   // 9. security.txt
+  // WAF/CDN et CAPTCHA (informatif) — sur en-têtes, cookies et corps de la page.
+  try {
+    const { detectWafCaptcha } = await import("./wafdetect");
+    for (const f of detectWafCaptcha(h, cookies, bodyText)) add(f);
+  } catch {
+    /* best-effort */
+  }
+
   const origin = new URL(finalUrl).origin;
   const sec = await fetchSafe(`${origin}/.well-known/security.txt`, {
     timeoutMs: 6000,
