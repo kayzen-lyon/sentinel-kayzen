@@ -944,3 +944,6 @@ a:focus-visible .link-grow::after { transform: scaleX(1); }
   .animate-slide-up { animation: none; }
   .scroll-progress-bar { display: none; }
 }
+
+/* Courbe du score : hauteur fixe (la regle globale svg{height:auto} letirait). */
+.sparkline { height: 28px; min-width: 0; overflow: visible; }

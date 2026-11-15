@@ -13,6 +13,8 @@ export type NormFinding = {
   recommendation?: string | null;
   cvss?: number | null;
   status?: string | null;
+  /** Exigences de conformité liées (ex. « PCI 6.2.4 · ISO A.8.26 »). */
+  controls?: string | null;
 };
 
 const SEVERITY_RANK: Record<string, number> = {
@@ -50,11 +52,11 @@ function csvCell(v: unknown): string {
 
 /** CSV : une ligne d'en-tête puis une ligne par finding (BOM pour Excel). */
 export function findingsToCsv(findings: NormFinding[]): string {
-  const header = ["id", "titre", "gravite", "categorie", "cvss", "statut", "detail", "recommandation"];
+  const header = ["id", "titre", "gravite", "categorie", "cvss", "statut", "detail", "recommandation", "conformite"];
   const lines = [header.join(",")];
   for (const f of findings) {
     lines.push(
-      [f.id, f.title, f.severity, f.category, f.cvss, f.status, f.detail, f.recommendation]
+      [f.id, f.title, f.severity, f.category, f.cvss, f.status, f.detail, f.recommendation, f.controls]
         .map(csvCell)
         .join(",")
     );

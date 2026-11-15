@@ -275,3 +275,30 @@ test("findingsFormat : dédup, CSV et JUnit", async () => {
   assert.match(xml, /failures="1"/); // seul le critique est un échec
   assert.match(xml, /<failure message="Injection SQL">/);
 });
+
+test("scanDiff : nouveaux, corrigés, inchangés", async () => {
+  const { diffFindings } = await import("../lib/scanDiff");
+  const f = (id: string, state: string) => ({ id, title: id, severity: "medium", state });
+  const d = diffFindings(
+    [f("csp", "fail"), f("hsts", "warn"), f("https", "pass")],
+    [f("csp", "fail"), f("hsts", "pass"), f("cors", "fail"), f("waf", "info")]
+  );
+  assert.deepEqual(d.added.map((x) => x.id), ["cors"]);
+  assert.deepEqual(d.fixed.map((x) => x.id), ["hsts"]);
+  assert.deepEqual(d.persisting.map((x) => x.id), ["csp"]);
+});
+
+test("compliance : correspondances et synthèse", async () => {
+  const { controlsFor, controlsLabel, complianceSummary } = await import("../lib/compliance");
+  assert.equal(controlsLabel(controlsFor("csp")), "PCI 6.2.4, 6.4.3 · ISO A.8.26 · SOC2 CC6.6");
+  assert.deepEqual(controlsFor("inconnu", "TLS").pci, ["4.2.1"]); // repli par catégorie
+  assert.deepEqual(controlsFor("inconnu", "Autre"), {});
+  const rows = complianceSummary([
+    { id: "csp", failing: true },
+    { id: "xfo", failing: true },
+    { id: "https", failing: false },
+  ]);
+  const pci624 = rows.find((r) => r.framework === "pci" && r.control === "6.2.4");
+  assert.equal(pci624?.failing, 2);
+  assert.ok(!rows.some((r) => r.control === "4.2.1")); // https n'est pas en échec
+});

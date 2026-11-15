@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
 import { getScan } from "@/lib/scans";
 import { findingsToCsv, findingsToJUnit, type NormFinding } from "@/lib/findingsFormat";
+import { controlsFor, controlsLabel } from "@/lib/compliance";
 
 export const runtime = "nodejs";
 
@@ -17,6 +18,7 @@ function normalize(scan: { findings: { id: string; title: string; severity: stri
       category: f.category ?? null,
       detail: f.detail ?? null,
       recommendation: f.recommendation ?? null,
+      controls: controlsLabel(controlsFor(f.id, f.category)),
     }));
 }
 

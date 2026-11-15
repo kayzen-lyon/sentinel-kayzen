@@ -4,7 +4,9 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { ScanResult } from "@/lib/scanner";
-import ScanResultView from "./ScanResultView";
+import ScanResultView, { type ScanComparison } from "./ScanResultView";
+import { diffFindings } from "@/lib/scanDiff";
+import { controlsFor, controlsLabel } from "@/lib/compliance";
 
 type HistoryItem = {
   id: string | null;
@@ -40,6 +42,30 @@ export default function DashboardClient({
   const [result, setResult] = useState<ScanResult | null>(null);
   const [resultDeep, setResultDeep] = useState(false);
   const [scans, setScans] = useState<HistoryItem[]>(initialScans);
+  const [comparison, setComparison] = useState<ScanComparison | null>(null);
+
+  /** Compare `current` au scan terminé précédent de la même cible, pris dans `older`. */
+  async function compareWithPrevious(current: ScanResult, older: HistoryItem[]) {
+    setComparison(null);
+    const host = prettyHost(current.targetUrl);
+    const prev = older.find((s) => s.status === "done" && prettyHost(s.target_url) === host);
+    if (!prev) return;
+    let findings = prev.result?.findings;
+    if (!findings && prev.id) {
+      try {
+        const res = await fetch(`/api/scan/${prev.id}`);
+        if (res.ok) findings = (await res.json()).scan?.findings;
+      } catch {
+        /* pas de comparaison */
+      }
+    }
+    if (!findings) return;
+    setComparison({
+      diff: diffFindings(findings, current.findings),
+      baselineDate: prev.created_at,
+      baselineScore: prev.score,
+    });
+  }
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
@@ -68,6 +94,7 @@ export default function DashboardClient({
         const r: ScanResult = data.result;
         setResult(r);
         setResultDeep(Boolean(data.deep));
+        void compareWithPrevious(r, scans);
         setScans((prev) => [
           {
             id: data.id ?? null,
@@ -91,9 +118,11 @@ export default function DashboardClient({
   }
 
   async function openHistory(item: HistoryItem) {
+    const older = scans.slice(scans.indexOf(item) + 1);
     if (item.result) {
       setResult(item.result);
       setResultDeep(Boolean(item.deep));
+      void compareWithPrevious(item.result, older);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -103,13 +132,15 @@ export default function DashboardClient({
       if (!res.ok) return;
       const data = await res.json();
       if (data.scan?.findings) {
-        setResult({
+        const opened: ScanResult = {
           targetUrl: data.scan.target_url,
           grade: data.scan.grade,
           score: data.scan.score,
           summary: data.scan.summary,
           findings: data.scan.findings,
-        });
+        };
+        setResult(opened);
+        void compareWithPrevious(opened, older);
         setResultDeep(Boolean(data.scan.deep));
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
@@ -137,9 +168,9 @@ export default function DashboardClient({
   function exportCsv() {
     if (!result) return;
     const esc = (v: string) => `"${(v || "").replace(/"/g, '""')}"`;
-    const header = "titre,gravite,etat,categorie,detail,recommandation";
+    const header = "titre,gravite,etat,categorie,detail,recommandation,conformite";
     const rows = result.findings.map((f) =>
-      [f.title, f.severity, f.state, f.category, f.detail, f.recommendation || ""]
+      [f.title, f.severity, f.state, f.category, f.detail, f.recommendation || "", f.state === "pass" ? "" : controlsLabel(controlsFor(f.id, f.category))]
         .map(esc)
         .join(",")
     );
@@ -301,7 +332,7 @@ export default function DashboardClient({
                         pour débloquer le scan approfondi (TLS, SPF/DMARC, contenu mixte…).
                       </p>
                     )}
-                    <ScanResultView result={result} />
+                    <ScanResultView result={result} comparison={comparison} />
                   </div>
                 )}
 
@@ -405,7 +436,7 @@ function Sparkline({ values }: { values: number[] }) {
   const last = values[values.length - 1];
   const color = last >= 80 ? "safe" : last >= 50 ? "warn" : "risk";
   return (
-    <svg width={w} height={h} className="flex-1" aria-hidden="true">
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="sparkline flex-1" aria-hidden="true">
       <polyline
         points={pts.join(" ")}
         fill="none"

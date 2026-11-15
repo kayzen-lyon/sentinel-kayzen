@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from "react";
 import type { Finding, ScanResult, Severity } from "@/lib/scanner";
+import { complianceSummary, controlsFor, controlsLabel, FRAMEWORK_LABELS } from "@/lib/compliance";
+import type { ScanDiff } from "@/lib/scanDiff";
+import { formatDateTime } from "@/lib/format";
+
+/** Comparaison avec le scan précédent de la même cible (calculée par l’appelant). */
+export type ScanComparison = { diff: ScanDiff<Finding>; baselineDate: string; baselineScore: number | null };
 
 const SEV: Record<Severity, { label: string; color: string }> = {
   critical: { label: "Critique", color: "risk" },
@@ -34,18 +40,32 @@ function useCountUp(target: number, duration = 700): number {
   return val;
 }
 
-export default function ScanResultView({ result }: { result: ScanResult }) {
+export default function ScanResultView({
+  result,
+  comparison,
+}: {
+  result: ScanResult;
+  comparison?: ScanComparison | null;
+}) {
   const gc = gradeColor(result.grade);
   const s = result.summary;
   const score = useCountUp(result.score);
-  const [onlyProblems, setOnlyProblems] = useState(false);
+  const [filter, setFilter] = useState<"all" | "problems" | "new">("all");
+  const onlyProblems = filter === "problems";
+  const newIds = new Set((comparison?.diff.added || []).map((f) => f.id));
+  const compliance = complianceSummary(
+    result.findings.map((f) => ({ id: f.id, category: f.category, failing: f.state === "fail" || f.state === "warn" }))
+  );
 
   const problems = result.findings.filter(
     (f) => f.state === "fail" || f.state === "warn"
   ).length;
-  const shown = onlyProblems
-    ? result.findings.filter((f) => f.state === "fail" || f.state === "warn")
-    : result.findings;
+  const shown =
+    filter === "new"
+      ? result.findings.filter((f) => newIds.has(f.id))
+      : onlyProblems
+        ? result.findings.filter((f) => f.state === "fail" || f.state === "warn")
+        : result.findings;
 
   return (
     <div className="space-y-6">
@@ -86,40 +106,120 @@ export default function ScanResultView({ result }: { result: ScanResult }) {
         </div>
       </div>
 
+      {comparison && (
+        <section aria-labelledby="scan-diff" className="card p-5">
+          <h2 id="scan-diff" className="font-heading text-base font-semibold text-fg">
+            Depuis le scan précédent
+          </h2>
+          <p className="mt-1 text-sm text-muted">
+            Référence : scan du {formatDateTime(comparison.baselineDate)}
+            {comparison.baselineScore !== null && <> (score {comparison.baselineScore}/100)</>}.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
+            <span className="rounded-full px-2.5 py-1" data-tint="soft" data-tone={comparison.diff.added.length ? "risk" : "muted"}>
+              {comparison.diff.added.length} nouveau{comparison.diff.added.length > 1 ? "x" : ""}
+            </span>
+            <span className="rounded-full px-2.5 py-1" data-tint="soft" data-tone={comparison.diff.fixed.length ? "safe" : "muted"}>
+              {comparison.diff.fixed.length} corrigé{comparison.diff.fixed.length > 1 ? "s" : ""}
+            </span>
+            <span className="rounded-full px-2.5 py-1" data-tint="soft" data-tone="muted">
+              {comparison.diff.persisting.length} inchangé{comparison.diff.persisting.length > 1 ? "s" : ""}
+            </span>
+          </div>
+          {comparison.diff.fixed.length > 0 && (
+            <div className="mt-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-subtle">Corrigés</p>
+              <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm text-muted">
+                {comparison.diff.fixed.map((f) => (
+                  <li key={f.id}>{f.title}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
+      )}
+
+      {compliance.length > 0 && (
+        <details className="card p-5">
+          <summary className="cursor-pointer font-heading text-base font-semibold text-fg">
+            Exigences de conformité concernées ({compliance.length})
+          </summary>
+          <p className="mt-2 text-sm text-muted">
+            Repères indicatifs reliant les problèmes détectés aux exigences de trois
+            référentiels. Ils ne valent pas constat de conformité.
+          </p>
+          <div className="mt-3 grid gap-4 sm:grid-cols-3">
+            {(Object.keys(FRAMEWORK_LABELS) as (keyof typeof FRAMEWORK_LABELS)[]).map((fw) => {
+              const rows = compliance.filter((r) => r.framework === fw);
+              return (
+                <div key={fw}>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-subtle">{FRAMEWORK_LABELS[fw]}</p>
+                  {rows.length === 0 ? (
+                    <p className="mt-1 text-sm text-muted">Aucune exigence concernée.</p>
+                  ) : (
+                    <ul className="mt-1 space-y-0.5 text-sm text-fg">
+                      {rows.map((r) => (
+                        <li key={r.control} className="flex justify-between gap-3">
+                          <span className="font-mono text-[0.8rem]">{r.control}</span>
+                          <span className="tabular-nums text-muted">
+                            {r.failing} problème{r.failing > 1 ? "s" : ""}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </details>
+      )}
+
       <div className="no-print flex items-center justify-between">
         <span className="text-sm text-muted">
           {shown.length} contrôle{shown.length > 1 ? "s" : ""} affiché{shown.length > 1 ? "s" : ""}
         </span>
         <div className="flex gap-1 rounded-lg border border-border p-1">
           <button
-            onClick={() => setOnlyProblems(false)}
+            onClick={() => setFilter("all")}
             className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
-              !onlyProblems ? "bg-hover text-fg" : "text-muted hover:text-fg"
+              filter === "all" ? "bg-hover text-fg" : "text-muted hover:text-fg"
             }`}
           >
             Tous ({result.findings.length})
           </button>
           <button
-            onClick={() => setOnlyProblems(true)}
+            onClick={() => setFilter("problems")}
             className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
               onlyProblems ? "bg-hover text-fg" : "text-muted hover:text-fg"
             }`}
           >
             Problèmes ({problems})
           </button>
+          {comparison && (
+            <button
+              onClick={() => setFilter("new")}
+              className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+                filter === "new" ? "bg-hover text-fg" : "text-muted hover:text-fg"
+              }`}
+            >
+              Nouveaux ({newIds.size})
+            </button>
+          )}
         </div>
       </div>
 
       <ul className="space-y-3">
         {shown.map((f) => (
-          <FindingRow key={f.id} f={f} />
+          <FindingRow key={f.id} f={f} isNew={newIds.has(f.id)} />
         ))}
       </ul>
     </div>
   );
 }
 
-function FindingRow({ f }: { f: Finding }) {
+function FindingRow({ f, isNew }: { f: Finding; isNew?: boolean }) {
+  const controls = f.state === "pass" || f.state === "info" ? "" : controlsLabel(controlsFor(f.id, f.category));
   const [copied, setCopied] = useState(false);
   const color = f.state === "pass" ? "safe" : SEV[f.severity].color;
   const icon =
@@ -156,8 +256,19 @@ function FindingRow({ f }: { f: Finding }) {
               {f.state === "pass" ? "OK" : SEV[f.severity].label}
             </span>
             <span className="text-xs text-subtle">· {f.category}</span>
+            {isNew && (
+              <span className="rounded-full px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-wide" data-tint="soft" data-tone="risk">
+                Nouveau
+              </span>
+            )}
           </div>
           <p className="mt-1.5 break-words text-sm text-muted">{f.detail}</p>
+          {controls && (
+            <p className="mt-1.5 font-mono text-[0.72rem] text-subtle">
+              <span className="sr-only">Exigences de conformité : </span>
+              {controls}
+            </p>
+          )}
           {f.cves && f.cves.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5">
               {f.cves.map((c) => (
