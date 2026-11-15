@@ -50,7 +50,7 @@ export default function ContactForm() {
   return (
     <form onSubmit={submit} className="mx-auto mt-8 max-w-xl text-left">
       {/* Honeypot : masqué aux humains, laissé vide ; les bots le remplissent. */}
-      <div aria-hidden="true" className="absolute h-0 w-0 overflow-hidden">
+      <div inert className="absolute h-0 w-0 overflow-hidden">
         <label htmlFor="website">Ne pas remplir</label>
         <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
       </div>

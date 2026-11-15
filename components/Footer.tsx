@@ -28,6 +28,8 @@ const COLS = [
       { label: "CGU", href: "/cgu" },
       { label: "CGV", href: "/cgv" },
       { label: "Accessibilité", href: "/accessibilite" },
+      // Libellé fixé par l'art. D. 221-5 du Code de la consommation : présent sur chaque page.
+      { label: "Renoncer au contrat ici", href: "/retractation" },
     ],
   },
 ];
@@ -77,6 +79,9 @@ export default function Footer() {
                       className="text-sm text-muted transition-colors hover:text-fg"
                     >
                       {l.label}
+                      {l.href.startsWith("http") && (
+                        <span className="sr-only"> (nouvel onglet)</span>
+                      )}
                     </a>
                   </li>
                 ))}
@@ -96,7 +101,7 @@ export default function Footer() {
               className="font-medium text-fg underline decoration-brand/50 underline-offset-2 hover:text-brand-light"
             >
               Fièrement réalisé par Kayzen Web
-            </a>
+            <span className="sr-only"> (nouvel onglet)</span></a>
           </p>
           <p className="flex items-center gap-2 text-xs text-subtle">
             <span className="inline-block h-2 w-2 rounded-full bg-brand" />

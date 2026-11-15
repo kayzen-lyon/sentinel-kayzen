@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import AuthCard from "@/components/auth/AuthCard";
+import WithdrawalLink from "@/components/WithdrawalLink";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/signup" },
@@ -13,10 +14,13 @@ export const metadata: Metadata = {
 export default async function SignupPage() {
   if (await getSession()) redirect("/dashboard");
   return (
-    <main className="grid min-h-screen place-items-center bg-sunken px-6 py-16">
-      <Suspense>
-        <AuthCard mode="signup" />
-      </Suspense>
-    </main>
+    <>
+      <main id="contenu" className="grid min-h-screen place-items-center bg-sunken px-6 py-16">
+        <Suspense>
+          <AuthCard mode="signup" />
+        </Suspense>
+      </main>
+      <WithdrawalLink />
+    </>
   );
 }

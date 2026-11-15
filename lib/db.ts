@@ -21,9 +21,14 @@ export function getPool(): Pool {
     pool = new Pool({
       connectionString,
       max: 3,
+      // TLS vérifié dès que le certificat CA du fournisseur est fourni
+      // (DATABASE_CA_CERT, contenu PEM). Sans lui, comportement historique conservé
+      // pour ne pas couper la prod.
       ssl: connectionString.includes("localhost")
         ? undefined
-        : { rejectUnauthorized: false },
+        : process.env.DATABASE_CA_CERT
+          ? { ca: process.env.DATABASE_CA_CERT, rejectUnauthorized: true }
+          : { rejectUnauthorized: false },
     });
   }
   return pool;
@@ -230,6 +235,19 @@ export async function ensureSchema(): Promise<void> {
       created_at  timestamptz NOT NULL DEFAULT now()
     );
     CREATE INDEX IF NOT EXISTS audit_log_org_idx ON audit_log (org_id, created_at DESC);
+
+    -- Rétractations reçues via la fonction en ligne (C. conso L. 221-21, D. 221-5).
+    -- received_at est posé par l'horloge du serveur : c'est la preuve du délai.
+    CREATE TABLE IF NOT EXISTS withdrawals (
+      id          bigserial PRIMARY KEY,
+      reference   text NOT NULL UNIQUE,
+      name        text NOT NULL,
+      contract_id text NOT NULL,
+      email       text NOT NULL,
+      user_id     uuid,
+      ack_sent    boolean NOT NULL DEFAULT false,
+      received_at timestamptz NOT NULL DEFAULT now()
+    );
   `);
   schemaReady = true;
 }

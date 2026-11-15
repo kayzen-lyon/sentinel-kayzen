@@ -62,21 +62,16 @@ export default function Group() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            {ENTITIES.map((e) => (
-              <a
-                key={e.name}
-                href={e.href}
-                target={e.href.startsWith("http") ? "_blank" : undefined}
-                rel={e.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className={`card block p-6 ${e.current ? "border-brand/50" : ""}`}
-              >
+            {ENTITIES.map((e) => {
+              const body = (
+                <>
                 <div className="flex items-center justify-between">
                   <span
                     className="inline-block h-2.5 w-2.5 rounded-full"
                     style={{ backgroundColor: `rgb(var(--${e.color}))` }}
                   />
                   {e.current && (
-                    <span className="rounded-full bg-brand/15 px-2.5 py-0.5 text-[0.7rem] font-semibold text-brand-light">
+                    <span className="rounded-full bg-brand/15 px-2.5 py-0.5 text-[0.7rem] font-semibold text-brand-hover">
                       Vous êtes ici
                     </span>
                   )}
@@ -85,8 +80,29 @@ export default function Group() {
                   {e.name}
                 </h3>
                 <p className="mt-1 text-sm text-muted">{e.role}</p>
-              </a>
-            ))}
+                </>
+              );
+              // L'entité courante (cette page) n'est pas un lien : un href="#" ne mène nulle part.
+              if (e.current)
+                return (
+                  <div key={e.name} className="card block border-brand/50 p-6">
+                    {body}
+                  </div>
+                );
+              const external = e.href.startsWith("http");
+              return (
+                <a
+                  key={e.name}
+                  href={e.href}
+                  target={external ? "_blank" : undefined}
+                  rel={external ? "noopener noreferrer" : undefined}
+                  className="card block p-6"
+                >
+                  {body}
+                  {external && <span className="sr-only"> (nouvel onglet)</span>}
+                </a>
+              );
+            })}
           </div>
         </div>
       </div>

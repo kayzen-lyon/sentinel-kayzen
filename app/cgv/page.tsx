@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import LegalShell from "@/components/LegalShell";
 
 export const metadata: Metadata = {
@@ -128,6 +129,14 @@ export default function Page() {
         (art. L.221-28, 1°). <strong>Professionnels</strong>&nbsp;: le droit de
         rétractation ne s'applique pas.
       </p>
+      <p>
+        Le consommateur peut se rétracter en ligne grâce à la fonction{" "}
+        <Link href="/retractation">«&nbsp;Renoncer au contrat ici&nbsp;»</Link>, accessible
+        depuis le pied de chaque page du site pendant toute la durée du délai, ou par toute
+        autre déclaration dénuée d'ambiguïté adressée à contact@kayzen-lyon.fr. Un accusé de
+        réception reprenant le contenu de la déclaration, sa date et son heure lui est adressé
+        par courriel.
+      </p>
 
       <h2>11. Garanties et responsabilité</h2>
       <p>
@@ -183,7 +192,7 @@ export default function Page() {
         accessible à l'adresse{" "}
         <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">
           ec.europa.eu/consumers/odr
-        </a>
+        <span className="sr-only"> (nouvel onglet)</span></a>
         .
       </p>
 

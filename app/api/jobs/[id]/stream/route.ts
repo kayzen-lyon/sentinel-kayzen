@@ -25,17 +25,24 @@ export async function GET(
   if (!job) return new Response("Job introuvable.", { status: 404 });
 
   const encoder = new TextEncoder();
-  let lastIso = new Date(0).toISOString();
+  // Reprise : EventSource renvoie le dernier `id:` reçu → on ne renvoie que la suite.
+  const resumeFrom = req.headers.get("last-event-id");
+  const resumed = Boolean(resumeFrom && !Number.isNaN(Date.parse(resumeFrom)));
+  let lastIso = resumed ? new Date(resumeFrom as string).toISOString() : new Date(0).toISOString();
 
   const stream = new ReadableStream({
     async start(controller) {
       let closed = false;
-      const send = (event: string, data: unknown) => {
+      const send = (event: string, data: unknown, id?: string) => {
         if (closed) return;
         controller.enqueue(
-          encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
+          encoder.encode(
+            `${id ? `id: ${id}\n` : ""}event: ${event}\ndata: ${JSON.stringify(data)}\n\n`
+          )
         );
       };
+      // Reconnexion rapide après la fermeture volontaire à ~55 s (défaut navigateur ≈ 3 s).
+      controller.enqueue(encoder.encode("retry: 1000\n\n"));
       const close = () => {
         if (closed) return;
         closed = true;
@@ -60,12 +67,12 @@ export async function GET(
       // Snapshot initial (statut + findings déjà présents)
       const [initial, findings] = await Promise.all([
         getJob(id, session.id),
-        listFindings(id),
+        resumed ? listFindings(id, lastIso) : listFindings(id),
       ]);
       if (findings.length) lastIso = findings[findings.length - 1].created_at;
       send("status", { status: initial?.status, costUsd: initial?.cost_usd });
       maybeSendGraph(initial?.agents_graph);
-      for (const f of findings) send("finding", f);
+      for (const f of findings) send("finding", f, new Date(f.created_at).toISOString());
       if (initial && TERMINAL.has(initial.status)) {
         send("done", { status: initial.status });
         close();
@@ -80,7 +87,7 @@ export async function GET(
             getJob(id, session.id),
           ]);
           for (const f of fresh) {
-            send("finding", f);
+            send("finding", f, new Date(f.created_at).toISOString());
             lastIso = f.created_at;
           }
           send("status", { status: j?.status, costUsd: j?.cost_usd });

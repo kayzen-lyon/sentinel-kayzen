@@ -1,0 +1,1908 @@
+{
+  "schema_version": 1,
+  "generated": "2026-11-15",
+  "project_name": "Sentinel by Kayzen (sentinel.kayzen-lyon.com)",
+  "disclaimer": "This matrix was produced by an AI tool (the eu-web-compliance skill) from the answers listed below. It is not legal advice and it is not an audit. It says which texts appear to concern the project; it does not say that the site complies with them. Have it checked by a qualified professional before relying on it.",
+  "to_confirm_rule": "Every row marked to-confirm is handled as if it applied until the answer is confirmed.",
+  "assumptions": {
+    "assumed_answers": [
+      {
+        "field": "ai.role",
+        "value": "both",
+        "note": "Système construit sous le nom Sentinel sur un modèle tiers (Gemini) : fournisseur probable, à confirmer"
+      },
+      {
+        "field": "market.target_countries",
+        "value": [
+          "FR"
+        ],
+        "note": "Site uniquement en français, CGV de droit français ; autres pays non confirmés"
+      }
+    ],
+    "missing_answers": [
+      {
+        "field": "ai.conversational_assistant",
+        "protective_reading": true,
+        "question": 8
+      },
+      {
+        "field": "ai.decisions_about_people",
+        "protective_reading": true,
+        "question": 8
+      },
+      {
+        "field": "ai.emotion_or_biometric",
+        "protective_reading": true,
+        "question": 8
+      },
+      {
+        "field": "ai.generated_content_published",
+        "protective_reading": true,
+        "question": 8
+      },
+      {
+        "field": "audience.includes_minors",
+        "protective_reading": true,
+        "question": 7
+      },
+      {
+        "field": "content.hosts_user_content",
+        "protective_reading": true,
+        "question": 9
+      },
+      {
+        "field": "data.health_data",
+        "protective_reading": true,
+        "question": 6
+      },
+      {
+        "field": "data.processes_on_behalf_of_clients",
+        "protective_reading": true,
+        "question": 6
+      },
+      {
+        "field": "data.special_categories",
+        "protective_reading": true,
+        "question": 6
+      },
+      {
+        "field": "operator.annual_turnover_eur",
+        "protective_reading": "Not a microenterprise (no exemption relied on). No number is invented: the answer stays missing.",
+        "question": 2
+      },
+      {
+        "field": "operator.balance_sheet_total_eur",
+        "protective_reading": "Not a microenterprise (no exemption relied on). No number is invented: the answer stays missing.",
+        "question": 2
+      },
+      {
+        "field": "operator.fr_turnover_3y_average_eur",
+        "protective_reading": "Unknown: the French Article 47 turnover test stays to-confirm for a company. No number is invented.",
+        "question": 2
+      },
+      {
+        "field": "operator.headcount",
+        "protective_reading": "Not a microenterprise (no exemption relied on). No number is invented: the answer stays missing.",
+        "question": 2
+      },
+      {
+        "field": "operator.regulated_sector",
+        "protective_reading": true,
+        "question": 5
+      }
+    ]
+  },
+  "country_coverage": [],
+  "counts": {
+    "applies": 25,
+    "does-not-apply": 11,
+    "to-confirm": 26
+  },
+  "obligations": [
+    {
+      "id": "a11y-baseline-wcag22-aa",
+      "domain": "accessibility",
+      "jurisdiction": "EU",
+      "title": "Accessible website (skill target: WCAG 2.2 level AA)",
+      "requires": "Build every page and component to WCAG 2.2 level AA. This is the skill's working target: it covers the accessibility requirements of the texts below, but no text gives it presumption of conformity for a private service.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "recommended",
+      "applied_by_skill_regardless": true,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for operator.annual_turnover_eur",
+        "no answer for operator.balance_sheet_total_eur",
+        "no answer for operator.headcount"
+      ],
+      "answers_read": [
+        "eaa.sectors = [\"e-commerce\"] (inferred)",
+        "market.sells_to_consumers = true (inferred)",
+        "operator.annual_turnover_eur: no answer",
+        "operator.balance_sheet_total_eur: no answer",
+        "operator.country_of_establishment = \"FR\" (inferred)",
+        "operator.fr_turnover_3y_average_eur: no answer",
+        "operator.headcount: no answer",
+        "operator.type = \"individual\" (inferred)"
+      ],
+      "sources": [
+        "wcag-22",
+        "eaa-2019-882",
+        "fr-loi-2005-102",
+        "en-301-549-v411"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 1.1",
+      "rules_file": "references/accessibility/rules.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": "WCAG 2.2 level AA is the skill's target, not a legal requirement: it is listed as recommended. When a legal duty exists, what the law requires is stated in the rows eaa-service-accessibility and fr-rgaa-conformity; see regulatory-status sections 1.2 to 1.5 for the standard each text refers to."
+    },
+    {
+      "id": "eaa-service-accessibility",
+      "domain": "accessibility",
+      "jurisdiction": "EU",
+      "title": "European Accessibility Act: accessible service",
+      "requires": "The website, its related online applications and its mobile services are perceivable, operable, understandable and robust (Annex I, Section III of Directive (EU) 2019/882). The microenterprise exemption covers services, not products, and exempts from this directive only.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for operator.annual_turnover_eur",
+        "no answer for operator.balance_sheet_total_eur",
+        "no answer for operator.headcount"
+      ],
+      "answers_read": [
+        "eaa.sectors = [\"e-commerce\"] (inferred)",
+        "market.sells_to_consumers = true (inferred)",
+        "operator.annual_turnover_eur: no answer",
+        "operator.balance_sheet_total_eur: no answer",
+        "operator.headcount: no answer"
+      ],
+      "sources": [
+        "eaa-2019-882"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 1.3",
+      "rules_file": "references/accessibility/rules.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": "Content excluded by Article 2(4) and the transitional measures of Article 32 are listed in regulatory-status section 1.3; check them before treating a piece of content as out of scope."
+    },
+    {
+      "id": "eaa-ecommerce-functions",
+      "domain": "accessibility",
+      "jurisdiction": "EU",
+      "title": "European Accessibility Act: e-commerce functions",
+      "requires": "Identification, security and payment functions are accessible, and the accessibility information about the products and services sold is given when the responsible operator provides it (Annex I, Section IV).",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for operator.annual_turnover_eur",
+        "no answer for operator.balance_sheet_total_eur",
+        "no answer for operator.headcount"
+      ],
+      "answers_read": [
+        "eaa.sectors = [\"e-commerce\"] (inferred)",
+        "market.sells_to_consumers = true (inferred)",
+        "operator.annual_turnover_eur: no answer",
+        "operator.balance_sheet_total_eur: no answer",
+        "operator.headcount: no answer"
+      ],
+      "sources": [
+        "eaa-2019-882"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 1.3",
+      "rules_file": "references/accessibility/rules.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "eaa-banking-plain-language",
+      "domain": "accessibility",
+      "jurisdiction": "EU",
+      "title": "European Accessibility Act: understandable banking information",
+      "requires": "Information of consumer banking services does not exceed the language level set by Annex I, Section IV.",
+      "status": "does-not-apply",
+      "level": "not-applicable",
+      "level_basis": null,
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "eaa.sectors = [\"e-commerce\"] (inferred)",
+        "market.sells_to_consumers = true (inferred)",
+        "operator.annual_turnover_eur: no answer",
+        "operator.balance_sheet_total_eur: no answer",
+        "operator.headcount: no answer"
+      ],
+      "sources": [
+        "eaa-2019-882"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 1.3",
+      "rules_file": "references/accessibility/rules.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "eaa-information-duty",
+      "domain": "accessibility",
+      "jurisdiction": "EU",
+      "title": "European Accessibility Act: information on how the service meets the requirements",
+      "requires": "The provider explains, in the general terms and conditions or an equivalent document, how the service meets the accessibility requirements, makes it available in written and oral format and accessibly, and keeps it as long as the service operates (Article 13(2), Annex V).",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for operator.annual_turnover_eur",
+        "no answer for operator.balance_sheet_total_eur",
+        "no answer for operator.headcount"
+      ],
+      "answers_read": [
+        "eaa.sectors = [\"e-commerce\"] (inferred)",
+        "market.sells_to_consumers = true (inferred)",
+        "operator.annual_turnover_eur: no answer",
+        "operator.balance_sheet_total_eur: no answer",
+        "operator.headcount: no answer"
+      ],
+      "sources": [
+        "eaa-2019-882"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 1.3",
+      "rules_file": "references/accessibility/rules.md",
+      "rules_file_exists": true,
+      "template": "templates/accessibility-information-eaa.md",
+      "note": null
+    },
+    {
+      "id": "eaa-disproportionate-burden",
+      "domain": "accessibility",
+      "jurisdiction": "EU",
+      "title": "European Accessibility Act: documented assessment before relying on an exception",
+      "requires": "An operator that relies on disproportionate burden or fundamental alteration carries out and documents the assessment of Article 14 and Annex VI, keeps it, renews it and informs the authorities as the directive provides. The skill never decides that the exception applies.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for operator.annual_turnover_eur",
+        "no answer for operator.balance_sheet_total_eur",
+        "no answer for operator.headcount"
+      ],
+      "answers_read": [
+        "eaa.sectors = [\"e-commerce\"] (inferred)",
+        "market.sells_to_consumers = true (inferred)",
+        "operator.annual_turnover_eur: no answer",
+        "operator.balance_sheet_total_eur: no answer",
+        "operator.headcount: no answer"
+      ],
+      "sources": [
+        "eaa-2019-882"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 1.3",
+      "rules_file": "references/accessibility/rules.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": "Only relevant when the operator intends to leave a requirement unmet. The decision belongs to the operator and its advisers."
+    },
+    {
+      "id": "fr-eaa-service-provider-duties",
+      "domain": "accessibility",
+      "jurisdiction": "FR",
+      "title": "France: service provider duties under the code de la consommation",
+      "requires": "Services provided to consumers in France meet Article L. 412-13 and the duties of Article D. 412-57 of the code de la consommation: conformity, published information, procedures to stay conformant, corrective measures and information of the authorities, cooperation.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "market.target_countries = [\"FR\"] (assumed) is an assumption",
+        "no answer for operator.annual_turnover_eur",
+        "no answer for operator.balance_sheet_total_eur",
+        "no answer for operator.headcount"
+      ],
+      "answers_read": [
+        "eaa.sectors = [\"e-commerce\"] (inferred)",
+        "market.sells_to_consumers = true (inferred)",
+        "market.target_countries = [\"FR\"] (assumed)",
+        "operator.annual_turnover_eur: no answer",
+        "operator.balance_sheet_total_eur: no answer",
+        "operator.headcount: no answer"
+      ],
+      "sources": [
+        "fr-code-consommation",
+        "fr-loi-2023-171",
+        "fr-decret-2023-931"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 1.4",
+      "rules_file": "references/countries/fr.md",
+      "rules_file_exists": true,
+      "template": "templates/accessibility-information-eaa.md",
+      "note": null
+    },
+    {
+      "id": "fr-rgaa-conformity",
+      "domain": "accessibility",
+      "jurisdiction": "FR",
+      "title": "France: accessibility obligation of Article 47 (RGAA)",
+      "requires": "Online public communication services of the bodies covered by Article 47 of loi n° 2005-102 are accessible, assessed against the RGAA version in force.",
+      "status": "does-not-apply",
+      "level": "not-applicable",
+      "level_basis": null,
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "operator.country_of_establishment = \"FR\" (inferred)",
+        "operator.fr_turnover_3y_average_eur: no answer",
+        "operator.type = \"individual\" (inferred)"
+      ],
+      "sources": [
+        "fr-loi-2005-102",
+        "fr-decret-2019-768",
+        "rgaa-412"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 1.5",
+      "rules_file": "references/accessibility/rgaa/4.1.2/index.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "fr-accessibility-statement",
+      "domain": "accessibility",
+      "jurisdiction": "FR",
+      "title": "France: accessibility statement (déclaration d'accessibilité)",
+      "requires": "A statement in the mandatory format is published on a page reachable from the home page and from every page. Its conformity status and rate come from a real audit; the skill cannot produce them.",
+      "status": "does-not-apply",
+      "level": "not-applicable",
+      "level_basis": null,
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "operator.country_of_establishment = \"FR\" (inferred)",
+        "operator.fr_turnover_3y_average_eur: no answer",
+        "operator.type = \"individual\" (inferred)"
+      ],
+      "sources": [
+        "fr-loi-2005-102",
+        "fr-decret-2019-768",
+        "rgaa-mandatory-pages"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 1.5",
+      "rules_file": "references/countries/fr.md",
+      "rules_file_exists": true,
+      "template": "templates/accessibility-statement-fr.md",
+      "note": null
+    },
+    {
+      "id": "fr-accessibility-multiannual-plan",
+      "domain": "accessibility",
+      "jurisdiction": "FR",
+      "title": "France: multi-year accessibility plan (schéma pluriannuel)",
+      "requires": "A multi-year accessibility plan is published, within the maximum duration set by Article 47, and linked from the statement.",
+      "status": "does-not-apply",
+      "level": "not-applicable",
+      "level_basis": null,
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "operator.country_of_establishment = \"FR\" (inferred)",
+        "operator.fr_turnover_3y_average_eur: no answer",
+        "operator.type = \"individual\" (inferred)"
+      ],
+      "sources": [
+        "fr-loi-2005-102",
+        "fr-decret-2019-768"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 1.5",
+      "rules_file": "references/countries/fr.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "fr-accessibility-home-mention",
+      "domain": "accessibility",
+      "jurisdiction": "FR",
+      "title": "France: conformity mention on the home page",
+      "requires": "The home page shows the mention 'Accessibilité : totalement conforme', 'partiellement conforme' or 'non conforme', as defined by the RGAA. Without a valid audit the mention is 'non conforme'.",
+      "status": "does-not-apply",
+      "level": "not-applicable",
+      "level_basis": null,
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "operator.country_of_establishment = \"FR\" (inferred)",
+        "operator.fr_turnover_3y_average_eur: no answer",
+        "operator.type = \"individual\" (inferred)"
+      ],
+      "sources": [
+        "fr-loi-2005-102",
+        "rgaa-mandatory-pages"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 1.5",
+      "rules_file": "references/countries/fr.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "privacy-baseline-no-tracker-before-consent",
+      "domain": "privacy",
+      "jurisdiction": "EU",
+      "title": "No tracker before consent",
+      "requires": "Nothing is stored on, or read from, the visitor's device before consent, except what is strictly necessary for the transmission or for a service the visitor explicitly requested. Third-party scripts are blocked until consent is given.",
+      "status": "does-not-apply",
+      "level": "recommended",
+      "level_basis": "skill",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": true,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.non_essential_trackers = false (stated)"
+      ],
+      "sources": [
+        "eprivacy",
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.2",
+      "rules_file": "references/privacy/trackers.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": "For a site without any non-essential tracker there is nothing to consent to: the skill keeps it that way and adds no consent banner."
+    },
+    {
+      "id": "gdpr-principles-lawful-basis",
+      "domain": "privacy",
+      "jurisdiction": "EU",
+      "title": "GDPR: principles and lawful basis",
+      "requires": "Each processing of personal data has a stated purpose, a lawful basis among those of Article 6, and collects only what the purpose needs (Articles 5 and 6).",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.collects_personal_data = true (inferred)"
+      ],
+      "sources": [
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/privacy/forms-and-minimisation.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "gdpr-information-notice",
+      "domain": "privacy",
+      "jurisdiction": "EU",
+      "title": "GDPR: information of the persons concerned",
+      "requires": "Persons are informed, at the point of collection and in a privacy notice, of what Articles 12 to 14 require.",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.collects_personal_data = true (inferred)"
+      ],
+      "sources": [
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/privacy/forms-and-minimisation.md",
+      "rules_file_exists": true,
+      "template": "templates/privacy-policy.md",
+      "note": null
+    },
+    {
+      "id": "gdpr-data-subject-rights",
+      "domain": "privacy",
+      "jurisdiction": "EU",
+      "title": "GDPR: exercising rights",
+      "requires": "The site gives a working way to exercise the rights of Articles 15 to 22, and withdrawing a consent is as easy as giving it (Article 7(3)).",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.collects_personal_data = true (inferred)"
+      ],
+      "sources": [
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/privacy/data-subject-rights.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "gdpr-by-design-default",
+      "domain": "privacy",
+      "jurisdiction": "EU",
+      "title": "GDPR: data protection by design and by default",
+      "requires": "Forms, accounts and defaults are built so that only the data needed are processed (Article 25).",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.collects_personal_data = true (inferred)"
+      ],
+      "sources": [
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/privacy/forms-and-minimisation.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "gdpr-processors",
+      "domain": "privacy",
+      "jurisdiction": "EU",
+      "title": "GDPR: third-party tools acting as processors",
+      "requires": "For each third-party tool that receives personal data, the operator knows whether it acts as a processor and has the contract Article 28 requires.",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.collects_personal_data = true (inferred)",
+        "data.third_party_tool_kinds = [\"ai-api\", \"other\"] (inferred)"
+      ],
+      "sources": [
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/privacy/third-parties-and-transfers.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "gdpr-breach-notification",
+      "domain": "privacy",
+      "jurisdiction": "EU",
+      "title": "GDPR: personal data breaches",
+      "requires": "The operator can detect a personal data breach and notify it within the time limit of Article 33, and inform the persons where Article 34 requires it.",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.collects_personal_data = true (inferred)"
+      ],
+      "sources": [
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/security/README.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "gdpr-transfers",
+      "domain": "privacy",
+      "jurisdiction": "EU",
+      "title": "GDPR: transfers outside the European Union",
+      "requires": "Each transfer of personal data outside the Union rests on one of the mechanisms of Articles 44 to 49.",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.collects_personal_data = true (inferred)",
+        "data.transfers_outside_eu = true (stated)"
+      ],
+      "sources": [
+        "gdpr",
+        "cnil-transfers-analytics"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/privacy/third-parties-and-transfers.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": "Regulatory-status section 3.3 states the position on transfers to the United States."
+    },
+    {
+      "id": "gdpr-special-categories",
+      "domain": "privacy",
+      "jurisdiction": "EU",
+      "title": "GDPR: special categories of data",
+      "requires": "Processing of data of Article 9 (health among them) is prohibited unless one of the exceptions of that article applies. The skill does not choose the exception.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for data.health_data",
+        "no answer for data.special_categories"
+      ],
+      "answers_read": [
+        "data.health_data: no answer",
+        "data.special_categories: no answer"
+      ],
+      "sources": [
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/privacy/forms-and-minimisation.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "gdpr-children-consent",
+      "domain": "privacy",
+      "jurisdiction": "EU",
+      "title": "GDPR: consent of children",
+      "requires": "Where an information society service offered directly to a child relies on consent, the conditions of Article 8 apply, with the age set by each Member State.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for audience.includes_minors",
+        "Article 8 applies only where consent is the lawful basis and the service is offered directly to a child"
+      ],
+      "answers_read": [
+        "audience.includes_minors: no answer",
+        "data.collects_personal_data = true (inferred)"
+      ],
+      "sources": [
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/privacy/forms-and-minimisation.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "fr-children-consent-age",
+      "domain": "privacy",
+      "jurisdiction": "FR",
+      "title": "France: age of digital consent",
+      "requires": "In France the age below which joint consent of the minor and the holder of parental responsibility is required is set by Article 45 of loi n° 78-17.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for audience.includes_minors",
+        "Applies only where consent is the lawful basis and the service is offered directly to a child"
+      ],
+      "answers_read": [
+        "audience.includes_minors: no answer",
+        "data.collects_personal_data = true (inferred)",
+        "market.target_countries = [\"FR\"] (assumed)",
+        "operator.country_of_establishment = \"FR\" (inferred)"
+      ],
+      "sources": [
+        "fr-loi-78-17",
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/countries/fr.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "gdpr-automated-decisions",
+      "domain": "privacy",
+      "jurisdiction": "EU",
+      "title": "GDPR: automated individual decisions",
+      "requires": "Decisions about persons taken by automated means are checked against Article 22.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for ai.decisions_about_people",
+        "Whether a decision falls under Article 22 depends on how it is taken and on its effects; the profile does not say"
+      ],
+      "answers_read": [
+        "ai.decisions_about_people: no answer",
+        "data.collects_personal_data = true (inferred)"
+      ],
+      "sources": [
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/privacy/data-subject-rights.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "fr-trackers-consent",
+      "domain": "privacy",
+      "jurisdiction": "FR",
+      "title": "France: valid consent to trackers (Article 82 of loi n° 78-17, CNIL guidelines)",
+      "requires": "Refusing is as simple as accepting, consent is specific and can be withdrawn at any time through an easily reachable mechanism, and the operator can prove that valid consent was collected.",
+      "status": "does-not-apply",
+      "level": "not-applicable",
+      "level_basis": null,
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.non_essential_trackers = false (stated)",
+        "market.target_countries = [\"FR\"] (assumed)",
+        "operator.country_of_establishment = \"FR\" (inferred)"
+      ],
+      "sources": [
+        "fr-loi-78-17",
+        "cnil-cookies-guidelines"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.3",
+      "rules_file": "references/privacy/consent.md",
+      "rules_file_exists": true,
+      "template": "templates/cookie-policy.md",
+      "note": null
+    },
+    {
+      "id": "fr-trackers-cnil-recommendation",
+      "domain": "privacy",
+      "jurisdiction": "FR",
+      "title": "France: CNIL recommendation on the consent interface",
+      "requires": "A 'refuse all' control on the same screen and in the same format as 'accept all', consent asked per purpose, and the choice (consent or refusal) kept for the recommended duration.",
+      "status": "does-not-apply",
+      "level": "not-applicable",
+      "level_basis": null,
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.non_essential_trackers = false (stated)",
+        "market.target_countries = [\"FR\"] (assumed)",
+        "operator.country_of_establishment = \"FR\" (inferred)"
+      ],
+      "sources": [
+        "cnil-cookies-recommendation",
+        "cnil-cookies-guidelines"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.3",
+      "rules_file": "references/privacy/consent.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "fr-audience-measurement-exemption",
+      "domain": "privacy",
+      "jurisdiction": "FR",
+      "title": "France: audience measurement without consent only under the CNIL conditions",
+      "requires": "An audience measurement tool runs without consent only if it meets every condition of the exemption; otherwise it waits for consent. No tool is described as recognised exempt by the CNIL.",
+      "status": "does-not-apply",
+      "level": "not-applicable",
+      "level_basis": null,
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.third_party_tool_kinds = [\"ai-api\", \"other\"] (inferred)",
+        "market.target_countries = [\"FR\"] (assumed)",
+        "operator.country_of_establishment = \"FR\" (inferred)"
+      ],
+      "sources": [
+        "cnil-cookies-guidelines",
+        "cnil-cookies-recommendation",
+        "cnil-audience-measurement"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.3",
+      "rules_file": "references/privacy/trackers.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "fr-session-replay",
+      "domain": "privacy",
+      "jurisdiction": "FR",
+      "title": "France: CNIL recommendation on session replay tools",
+      "requires": "Session replay starts only after consent, with the specific information, default masking and exclusions the CNIL recommends.",
+      "status": "does-not-apply",
+      "level": "not-applicable",
+      "level_basis": null,
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.third_party_tool_kinds = [\"ai-api\", \"other\"] (inferred)",
+        "market.target_countries = [\"FR\"] (assumed)",
+        "operator.country_of_establishment = \"FR\" (inferred)"
+      ],
+      "sources": [
+        "cnil-session-replay"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.3",
+      "rules_file": "references/privacy/consent.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": "The consent itself is a legal requirement: see the row fr-trackers-consent."
+    },
+    {
+      "id": "fr-email-tracking-pixels",
+      "domain": "privacy",
+      "jurisdiction": "FR",
+      "title": "France: CNIL recommendation on tracking pixels in emails",
+      "requires": "Open tracking for campaign performance, personalisation or profiling waits for consent, and each email carries a withdrawal link.",
+      "status": "does-not-apply",
+      "level": "not-applicable",
+      "level_basis": null,
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.third_party_tool_kinds = [\"ai-api\", \"other\"] (inferred)",
+        "market.target_countries = [\"FR\"] (assumed)",
+        "operator.country_of_establishment = \"FR\" (inferred)"
+      ],
+      "sources": [
+        "cnil-email-pixels"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.3",
+      "rules_file": "references/privacy/consent.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "ai-prohibited-practices",
+      "domain": "ai",
+      "jurisdiction": "EU",
+      "title": "AI Act: prohibited practices",
+      "requires": "No feature of the site implements a practice of Article 5 of Regulation (EU) 2024/1689. When one is suspected the agent stops and says so.",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "ai.content_generation_feature = true (inferred)",
+        "ai.conversational_assistant: no answer",
+        "ai.decisions_about_people: no answer",
+        "ai.emotion_or_biometric: no answer",
+        "ai.generated_content_published: no answer"
+      ],
+      "sources": [
+        "ai-act"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 2",
+      "rules_file": "references/ai-act/prohibited-practices.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "ai-literacy",
+      "domain": "ai",
+      "jurisdiction": "EU",
+      "title": "AI Act: AI literacy",
+      "requires": "Providers and deployers take measures to support the AI literacy of their staff and of the persons operating AI systems on their behalf (Article 4).",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "ai.content_generation_feature = true (inferred)",
+        "ai.conversational_assistant: no answer",
+        "ai.decisions_about_people: no answer",
+        "ai.emotion_or_biometric: no answer",
+        "ai.generated_content_published: no answer",
+        "operator.activity_kind = \"commercial\" (inferred)"
+      ],
+      "sources": [
+        "ai-act"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 2",
+      "rules_file": "references/ai-act/ai-literacy.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": "Organisational duty: the skill mentions it in the report and writes no code for it."
+    },
+    {
+      "id": "ai-disclose-interaction",
+      "domain": "ai",
+      "jurisdiction": "EU",
+      "title": "AI Act: tell people they are interacting with an AI system",
+      "requires": "Persons are informed that they are interacting with an AI system, clearly and at the latest at the first interaction (Article 50(1), a duty of the provider).",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "ai.role = \"both\" (assumed) is an assumption",
+        "no answer for ai.conversational_assistant"
+      ],
+      "answers_read": [
+        "ai.conversational_assistant: no answer",
+        "ai.role = \"both\" (assumed)"
+      ],
+      "sources": [
+        "ai-act",
+        "ai-act-art50-guidelines"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 2",
+      "rules_file": "references/ai-act/transparency.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": "When the operator is only the deployer of an assistant supplied by someone else, the legal duty lies with the provider; the skill still makes the disclosure visible on the site. Regulatory-status section 2.1 explains why the 'obvious' exception is not relied on."
+    },
+    {
+      "id": "ai-mark-synthetic-content",
+      "domain": "ai",
+      "jurisdiction": "EU",
+      "title": "AI Act: machine-readable marking of generated content",
+      "requires": "Synthetic audio, image, video or text produced by the system is marked in a machine-readable format and detectable as artificially generated (Article 50(2), a duty of the provider).",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": "applies",
+      "to_confirm": [
+        "ai.role = \"both\" (assumed) is an assumption"
+      ],
+      "answers_read": [
+        "ai.content_generation_feature = true (inferred)",
+        "ai.role = \"both\" (assumed)"
+      ],
+      "sources": [
+        "ai-act",
+        "ai-act-art50-guidelines",
+        "ai-content-code-of-practice"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 2",
+      "rules_file": "references/ai-act/transparency.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": "The exceptions and the transition for systems already on the market are in regulatory-status sections 2 and 2.1."
+    },
+    {
+      "id": "ai-inform-emotion-biometric",
+      "domain": "ai",
+      "jurisdiction": "EU",
+      "title": "AI Act: inform people exposed to emotion recognition or biometric categorisation",
+      "requires": "Persons exposed to the system are informed of its operation (Article 50(3), a duty of the deployer). Check first that the use is not a prohibited practice.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for ai.emotion_or_biometric"
+      ],
+      "answers_read": [
+        "ai.emotion_or_biometric: no answer",
+        "operator.activity_kind = \"commercial\" (inferred)"
+      ],
+      "sources": [
+        "ai-act"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 2",
+      "rules_file": "references/ai-act/transparency.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "ai-disclose-generated-content",
+      "domain": "ai",
+      "jurisdiction": "EU",
+      "title": "AI Act: disclose deep fakes and AI-generated public-interest text",
+      "requires": "Deep fakes are disclosed as artificially generated or manipulated, and so is text published to inform the public on matters of public interest unless the editorial exception applies (Article 50(4), a duty of the deployer).",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for ai.generated_content_published",
+        "Article 50(4) only covers deep fakes and text published to inform the public on matters of public interest, with an editorial exception; whether the published content falls under it must be checked piece by piece"
+      ],
+      "answers_read": [
+        "ai.generated_content_published: no answer",
+        "operator.activity_kind = \"commercial\" (inferred)"
+      ],
+      "sources": [
+        "ai-act",
+        "ai-act-art50-guidelines"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 2",
+      "rules_file": "references/ai-act/transparency.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "ai-disclosure-form",
+      "domain": "ai",
+      "jurisdiction": "EU",
+      "title": "AI Act: disclosures are clear, timely and accessible",
+      "requires": "The information of Article 50(1) to (4) is given in a clear and distinguishable manner at the latest at the first interaction or exposure, and conforms to the applicable accessibility requirements (Article 50(5)).",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": true,
+      "leaning": "applies",
+      "to_confirm": [
+        "ai.role = \"both\" (assumed) is an assumption",
+        "no answer for ai.conversational_assistant",
+        "no answer for ai.emotion_or_biometric",
+        "no answer for ai.generated_content_published",
+        "Article 50(4) only covers deep fakes and text published to inform the public on matters of public interest, with an editorial exception; whether the published content falls under it must be checked piece by piece"
+      ],
+      "answers_read": [
+        "ai.content_generation_feature = true (inferred)",
+        "ai.conversational_assistant: no answer",
+        "ai.emotion_or_biometric: no answer",
+        "ai.generated_content_published: no answer",
+        "ai.role = \"both\" (assumed)",
+        "operator.activity_kind = \"commercial\" (inferred)"
+      ],
+      "sources": [
+        "ai-act",
+        "ai-act-art50-guidelines"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 2",
+      "rules_file": "references/ai-act/transparency.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "ai-high-risk-screening",
+      "domain": "ai",
+      "jurisdiction": "EU",
+      "title": "AI Act: check for a high-risk area",
+      "requires": "A system that takes or prepares decisions about persons is checked against the areas of Annex III. The high-risk regime itself is outside this skill.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for ai.decisions_about_people",
+        "Classification under Annex III of Regulation (EU) 2024/1689 is a legal qualification this skill does not make"
+      ],
+      "answers_read": [
+        "ai.decisions_about_people: no answer"
+      ],
+      "sources": [
+        "ai-act"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 2",
+      "rules_file": "references/ai-act/high-risk.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "ai-content-label-icon",
+      "domain": "ai",
+      "jurisdiction": "EU",
+      "title": "Code of Practice: visible label on AI-generated content",
+      "requires": "AI-generated or AI-modified content carries the EU icon or an equivalent label, visible from first exposure and detectable by assistive technologies.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "recommended",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for ai.generated_content_published"
+      ],
+      "answers_read": [
+        "ai.generated_content_published: no answer"
+      ],
+      "sources": [
+        "ai-content-code-of-practice",
+        "eu-ai-icons"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 2.2",
+      "rules_file": "references/ai-act/transparency.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "sec-baseline-https-headers",
+      "domain": "security",
+      "jurisdiction": "EU",
+      "title": "HTTPS and browser security headers",
+      "requires": "The site is served over TLS only, in the protocol versions the ANSSI guide accepts, with the browser-side security headers of the ANSSI web guide.",
+      "status": "applies",
+      "level": "recommended",
+      "level_basis": "official-recommendation",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": true,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.collects_personal_data = true (inferred)"
+      ],
+      "sources": [
+        "gdpr",
+        "anssi-web",
+        "anssi-tls"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 4",
+      "rules_file": "references/security/web-baseline.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": "The legal duty is Article 32 GDPR (row sec-security-of-processing), which requires appropriate security without naming measures. The ANSSI guides are not normative: these measures are the skill's way of meeting it, hence recommended."
+    },
+    {
+      "id": "sec-security-of-processing",
+      "domain": "security",
+      "jurisdiction": "EU",
+      "title": "GDPR: security of processing",
+      "requires": "Personal data are protected by technical and organisational measures appropriate to the risk (Article 32).",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.collects_personal_data = true (inferred)"
+      ],
+      "sources": [
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/security/web-baseline.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "sec-owasp-top10",
+      "domain": "security",
+      "jurisdiction": "EU",
+      "title": "Secure development against the OWASP Top 10",
+      "requires": "Code is written and reviewed against the categories of the OWASP Top 10 edition in regulatory-status.",
+      "status": "applies",
+      "level": "recommended",
+      "level_basis": "skill",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [],
+      "sources": [
+        "owasp-top10-2025"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 4",
+      "rules_file": "references/security/web-baseline.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "sec-authentication",
+      "domain": "security",
+      "jurisdiction": "FR",
+      "title": "Authentication and passwords (ANSSI guide)",
+      "requires": "Account creation, login, password storage and multi-factor authentication follow the ANSSI guide.",
+      "status": "applies",
+      "level": "recommended",
+      "level_basis": "official-recommendation",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "site.user_accounts = true (inferred)"
+      ],
+      "sources": [
+        "anssi-mfa",
+        "anssi-crypto"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 4",
+      "rules_file": "references/security/modules/authentication.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": "French agency guide, not normative; used by the skill for every country."
+    },
+    {
+      "id": "sec-ai-generated-code-review",
+      "domain": "security",
+      "jurisdiction": "FR",
+      "title": "Review of AI-generated code (ANSSI guide)",
+      "requires": "Source code generated by an AI is systematically reviewed, and generation is limited for critical modules.",
+      "status": "applies",
+      "level": "recommended",
+      "level_basis": "official-recommendation",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [],
+      "sources": [
+        "anssi-genai"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 4",
+      "rules_file": "references/security/modules/ai-generated-code.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": "French agency guide, not normative; used by the skill for every country."
+    },
+    {
+      "id": "con-operator-identification",
+      "domain": "consumer",
+      "jurisdiction": "EU",
+      "title": "Identification of the service provider and clear prices",
+      "requires": "The site gives the information of Article 5 of Directive 2000/31/EC about the provider, easily and permanently, and indicates prices clearly, stating whether tax and delivery costs are included.",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "operator.activity_kind = \"commercial\" (inferred)"
+      ],
+      "sources": [
+        "ecommerce-directive"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.1",
+      "rules_file": "references/consumer/operator-identification.md",
+      "rules_file_exists": true,
+      "template": "templates/consumer/legal-notice-eu.md",
+      "note": null
+    },
+    {
+      "id": "fr-legal-notice",
+      "domain": "consumer",
+      "jurisdiction": "FR",
+      "title": "France: mentions légales (Article 1-1 of the LCEN)",
+      "requires": "The site publishes the identification Article 1-1 requires of its publisher, the publication director and the host. A non-professional may publish only the host's details under the condition the article sets.",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "operator.country_of_establishment = \"FR\" (inferred)"
+      ],
+      "sources": [
+        "fr-lcen"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.1",
+      "rules_file": "references/countries/fr.md",
+      "rules_file_exists": true,
+      "template": "templates/consumer/legal-notice-fr.md",
+      "note": null
+    },
+    {
+      "id": "fr-ecommerce-identification",
+      "domain": "consumer",
+      "jurisdiction": "FR",
+      "title": "France: seller identification (Article 19 of the LCEN)",
+      "requires": "A site that sells online gives the seller information listed in Article 19.",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "market.sells_online = true (inferred)",
+        "operator.country_of_establishment = \"FR\" (inferred)"
+      ],
+      "sources": [
+        "fr-lcen"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.1",
+      "rules_file": "references/countries/fr.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "con-order-button",
+      "domain": "consumer",
+      "jurisdiction": "EU",
+      "title": "Order button with obligation to pay",
+      "requires": "The button that places the order carries only the wording of Article 8(2) of Directive 2011/83/EU or an equally unambiguous one.",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "market.sells_online = true (inferred)",
+        "market.sells_to_consumers = true (inferred)"
+      ],
+      "sources": [
+        "consumer-rights-directive"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.2",
+      "rules_file": "references/consumer/online-sales.md",
+      "rules_file_exists": true,
+      "template": "templates/consumer/order-button.html",
+      "note": null
+    },
+    {
+      "id": "fr-order-process-information",
+      "domain": "consumer",
+      "jurisdiction": "FR",
+      "title": "France: order process (Articles L. 221-5 and L. 221-14)",
+      "requires": "The French wording of the order button is used, the accepted means of payment and delivery restrictions are stated at the start of the ordering process, and the pre-contractual information is given.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": "applies",
+      "to_confirm": [
+        "market.target_countries = [\"FR\"] (assumed) is an assumption"
+      ],
+      "answers_read": [
+        "market.sells_online = true (inferred)",
+        "market.sells_to_consumers = true (inferred)",
+        "market.target_countries = [\"FR\"] (assumed)"
+      ],
+      "sources": [
+        "fr-code-consommation"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.2",
+      "rules_file": "references/countries/fr.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "con-withdrawal-function",
+      "domain": "consumer",
+      "jurisdiction": "EU",
+      "title": "Online withdrawal function",
+      "requires": "Contracts concluded through the site can be withdrawn from through a function that meets Article 11a of Directive 2011/83/EU: labels, availability, confirmation step, acknowledgement of receipt.",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "market.sells_online = true (inferred)",
+        "market.sells_to_consumers = true (inferred)",
+        "market.withdrawal_right_applies = true (inferred)"
+      ],
+      "sources": [
+        "withdrawal-function-directive"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.2",
+      "rules_file": "references/consumer/withdrawal-function.md",
+      "rules_file_exists": true,
+      "template": "templates/consumer/withdrawal-function.html",
+      "note": null
+    },
+    {
+      "id": "fr-withdrawal-function",
+      "domain": "consumer",
+      "jurisdiction": "FR",
+      "title": "France: withdrawal function (Articles L. 221-21 and D. 221-5)",
+      "requires": "The withdrawal function uses the French labels and sends the acknowledgement as the French text provides.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": "applies",
+      "to_confirm": [
+        "market.target_countries = [\"FR\"] (assumed) is an assumption"
+      ],
+      "answers_read": [
+        "market.sells_online = true (inferred)",
+        "market.sells_to_consumers = true (inferred)",
+        "market.target_countries = [\"FR\"] (assumed)",
+        "market.withdrawal_right_applies = true (inferred)"
+      ],
+      "sources": [
+        "fr-code-consommation",
+        "fr-code-consommation-d221-5"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.2",
+      "rules_file": "references/countries/fr.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "con-price-reduction",
+      "domain": "consumer",
+      "jurisdiction": "EU",
+      "title": "Price reduction announcements",
+      "requires": "Whenever a price reduction is announced, the prior price shown is the one defined by Article 6a of Directive 98/6/EC (in France, Article L. 112-1-1).",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "market.sells_to_consumers = true (inferred)"
+      ],
+      "sources": [
+        "price-reduction-directive",
+        "fr-code-consommation"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.2",
+      "rules_file": "references/consumer/prices.md",
+      "rules_file_exists": true,
+      "template": "templates/consumer/price-reduction.html",
+      "note": "Only bites when the site announces a reduction."
+    },
+    {
+      "id": "fr-consumer-mediator",
+      "domain": "consumer",
+      "jurisdiction": "FR",
+      "title": "France: consumer mediator",
+      "requires": "The contact details of the competent consumer mediator are given visibly and legibly on the site, in the general terms or on order forms.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": "applies",
+      "to_confirm": [
+        "market.target_countries = [\"FR\"] (assumed) is an assumption"
+      ],
+      "answers_read": [
+        "market.sells_to_consumers = true (inferred)",
+        "market.target_countries = [\"FR\"] (assumed)"
+      ],
+      "sources": [
+        "fr-code-consommation"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.2",
+      "rules_file": "references/countries/fr.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "con-no-odr-link",
+      "domain": "consumer",
+      "jurisdiction": "EU",
+      "title": "No link to the former European dispute resolution platform",
+      "requires": "The site does not present a link to the European online dispute resolution platform as a required mention: the platform no longer exists.",
+      "status": "applies",
+      "level": "recommended",
+      "level_basis": "skill",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "market.sells_to_consumers = true (inferred)"
+      ],
+      "sources": [
+        "odr-repeal"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.2",
+      "rules_file": "references/consumer/online-sales.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "con-no-deceptive-design",
+      "domain": "consumer",
+      "jurisdiction": "EU",
+      "title": "No deceptive interface (unfair commercial practices)",
+      "requires": "Interfaces addressed to consumers do not mislead or pressure them, within the meaning of Articles 5 to 9 of Directive 2005/29/EC.",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "market.sells_to_consumers = true (inferred)"
+      ],
+      "sources": [
+        "ucpd"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.3",
+      "rules_file": "references/consumer/deceptive-design.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "dsa-intermediary-duties",
+      "domain": "consumer",
+      "jurisdiction": "EU",
+      "title": "Digital Services Act: points of contact and terms",
+      "requires": "A service that stores user content gives a point of contact for authorities and one for users that does not rely solely on automated tools, and states its moderation rules in clear terms (Articles 11, 12 and 14).",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for content.hosts_user_content"
+      ],
+      "answers_read": [
+        "content.hosts_user_content: no answer",
+        "operator.activity_kind = \"commercial\" (inferred)"
+      ],
+      "sources": [
+        "dsa"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.3",
+      "rules_file": "references/consumer/dsa.md",
+      "rules_file_exists": true,
+      "template": "templates/documents/terms-of-use-fr.md",
+      "note": null
+    },
+    {
+      "id": "dsa-hosting-notice-action",
+      "domain": "consumer",
+      "jurisdiction": "EU",
+      "title": "Digital Services Act: notice and action",
+      "requires": "A hosting service offers a mechanism to report illegal content and gives a statement of reasons when it restricts content (Articles 16 and 17).",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for content.hosts_user_content"
+      ],
+      "answers_read": [
+        "content.hosts_user_content: no answer",
+        "operator.activity_kind = \"commercial\" (inferred)"
+      ],
+      "sources": [
+        "dsa"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.3",
+      "rules_file": "references/consumer/dsa.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "dsa-online-platform-duties",
+      "domain": "consumer",
+      "jurisdiction": "EU",
+      "title": "Digital Services Act: online platform duties",
+      "requires": "An online platform that is not a micro or small enterprise does not deceive or manipulate through its interface, is transparent about advertising and protects minors (Articles 25, 26 and 28).",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for content.hosts_user_content",
+        "Whether the service is an online platform, and whether the micro and small enterprise exclusion of Article 19 applies, cannot be decided from the profile; the size thresholds of that exclusion are not in regulatory-status"
+      ],
+      "answers_read": [
+        "content.hosts_user_content: no answer",
+        "operator.activity_kind = \"commercial\" (inferred)"
+      ],
+      "sources": [
+        "dsa"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.3",
+      "rules_file": "references/consumer/dsa.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "gdpr-records-of-processing",
+      "domain": "privacy",
+      "jurisdiction": "EU",
+      "title": "GDPR: records of processing activities",
+      "requires": "The controller keeps records of its processing activities (Article 30). The exemption of Article 30(5) for organisations with fewer than 250 persons requires the processing to be occasional, without risk and without special or criminal data; the skill reads the processing behind a running website (accounts, orders, contact requests) as not occasional, so it treats the duty as applying. This reading is listed in OPEN-QUESTIONS.md for review.",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "data.collects_personal_data = true (inferred)"
+      ],
+      "sources": [
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/privacy/third-parties-and-transfers.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "gdpr-impact-assessment",
+      "domain": "privacy",
+      "jurisdiction": "EU",
+      "title": "GDPR: data protection impact assessment",
+      "requires": "Before processing likely to result in a high risk, in particular the cases of Article 35(3), the controller carries out an impact assessment. The skill flags the triggers it can see; the assessment itself is for the controller and its DPO.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for ai.decisions_about_people",
+        "no answer for data.health_data",
+        "no answer for data.special_categories",
+        "Article 35(3) depends on scale and on the effect of the decisions, which the profile does not establish"
+      ],
+      "answers_read": [
+        "ai.decisions_about_people: no answer",
+        "data.collects_personal_data = true (inferred)",
+        "data.health_data: no answer",
+        "data.special_categories: no answer"
+      ],
+      "sources": [
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/scoping/out-of-scope.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "gdpr-data-protection-officer",
+      "domain": "privacy",
+      "jurisdiction": "EU",
+      "title": "GDPR: designation of a data protection officer",
+      "requires": "A data protection officer is designated in the cases of Article 37(1): public authorities and bodies, and organisations whose core activities consist of large-scale regular and systematic monitoring or large-scale processing of special or criminal data.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for data.health_data",
+        "no answer for data.special_categories",
+        "Article 37(1)(c) applies only when core activities involve large-scale processing of these data"
+      ],
+      "answers_read": [
+        "data.collects_personal_data = true (inferred)",
+        "data.health_data: no answer",
+        "data.special_categories: no answer",
+        "operator.type = \"individual\" (inferred)"
+      ],
+      "sources": [
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/scoping/out-of-scope.md",
+      "rules_file_exists": true,
+      "template": null,
+      "note": null
+    },
+    {
+      "id": "con-terms-of-sale",
+      "domain": "consumer",
+      "jurisdiction": "EU",
+      "title": "Terms of sale carrying the pre-contractual information",
+      "requires": "The information of Article 6(1) of Directive 2011/83/EU is given, the terms are made available in a way that allows them to be stored and reproduced (Article 10(3) of Directive 2000/31/EC, to confirm on the official text), and withdrawal exceptions are stated with their conditions.",
+      "status": "applies",
+      "level": "mandatory",
+      "level_basis": "law",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "market.sells_online = true (inferred)",
+        "market.sells_to_consumers = true (inferred)"
+      ],
+      "sources": [
+        "consumer-rights-directive",
+        "ecommerce-directive",
+        "fr-code-consommation"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.2",
+      "rules_file": "references/documents/terms-of-sale.md",
+      "rules_file_exists": true,
+      "template": "templates/documents/terms-of-sale-fr.md",
+      "note": null
+    },
+    {
+      "id": "terms-of-use",
+      "domain": "consumer",
+      "jurisdiction": "EU",
+      "title": "Terms of use for a service with accounts",
+      "requires": "Terms of use set the rules of the service; no rule read requires them outside hosted user content.",
+      "status": "applies",
+      "level": "recommended",
+      "level_basis": "skill",
+      "level_if_confirmed": null,
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [],
+      "answers_read": [
+        "site.user_accounts = true (inferred)"
+      ],
+      "sources": [
+        "dsa"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 5.3",
+      "rules_file": "references/documents/terms-of-use.md",
+      "rules_file_exists": true,
+      "template": "templates/documents/terms-of-use-fr.md",
+      "note": null
+    },
+    {
+      "id": "gdpr-processor-agreement",
+      "domain": "privacy",
+      "jurisdiction": "EU",
+      "title": "GDPR: contract when the operator acts as processor",
+      "requires": "Where the operator processes personal data on behalf of business clients, a written contract covering Article 28(3) binds it to each controller.",
+      "status": "to-confirm",
+      "level": "to-confirm",
+      "level_basis": null,
+      "level_if_confirmed": "mandatory",
+      "applied_by_skill_regardless": false,
+      "leaning": null,
+      "to_confirm": [
+        "no answer for data.processes_on_behalf_of_clients"
+      ],
+      "answers_read": [
+        "data.collects_personal_data = true (inferred)",
+        "data.processes_on_behalf_of_clients: no answer"
+      ],
+      "sources": [
+        "gdpr"
+      ],
+      "dates_and_amounts": "references/regulatory-status.md, section 3.1",
+      "rules_file": "references/documents/data-processing-agreement.md",
+      "rules_file_exists": true,
+      "template": "templates/documents/data-processing-agreement-fr.md",
+      "note": null
+    }
+  ],
+  "beyond_the_skill": [
+    {
+      "id": "esc-prohibited-ai-practice",
+      "title": "Prohibited AI practice suspected",
+      "state": "not-ruled-out",
+      "to_confirm": [
+        "no answer for ai.emotion_or_biometric"
+      ],
+      "what_to_do": "Stop work on the feature. Emotion inference and biometric categorisation are among the practices Article 5 of Regulation (EU) 2024/1689 prohibits in some contexts. Do not build it before a lawyer has confirmed in writing that the use is allowed. The same stop applies to any other practice of Article 5 the agent notices in the code or the request, whatever the profile says."
+    },
+    {
+      "id": "esc-high-risk-ai",
+      "title": "Possible high-risk AI area",
+      "state": "not-ruled-out",
+      "to_confirm": [
+        "no answer for ai.decisions_about_people"
+      ],
+      "what_to_do": "An AI system that takes or prepares decisions about persons may fall in an area of Annex III of Regulation (EU) 2024/1689. The high-risk regime is outside this skill: consult a lawyer who practises AI regulation before the feature goes live."
+    },
+    {
+      "id": "esc-health-or-special-data",
+      "title": "Health data or other special categories",
+      "state": "not-ruled-out",
+      "to_confirm": [
+        "no answer for data.health_data",
+        "no answer for data.special_categories"
+      ],
+      "what_to_do": "Processing data of Article 9 GDPR needs an exception, and health data often brings sector rules on hosting and security that this skill does not cover. Consult the data protection officer or a data protection lawyer before collecting anything."
+    },
+    {
+      "id": "esc-minors",
+      "title": "Audience includes minors",
+      "state": "not-ruled-out",
+      "to_confirm": [
+        "no answer for audience.includes_minors"
+      ],
+      "what_to_do": "Consent of children, age checks, profiling and advertising towards minors need a legal analysis this skill does not replace. Consult a data protection professional."
+    },
+    {
+      "id": "esc-regulated-sector",
+      "title": "Regulated sector",
+      "state": "not-ruled-out",
+      "to_confirm": [
+        "no answer for operator.regulated_sector"
+      ],
+      "what_to_do": "Sector rules and a sector authority apply on top of what this matrix lists. Consult the compliance function or a lawyer of the sector."
+    }
+  ],
+  "closing": "Consult a qualified professional (lawyer, data protection officer, accessibility auditor) for every case listed under \"Beyond the skill\" and before relying on this matrix. See references/scoping/out-of-scope.md."
+}

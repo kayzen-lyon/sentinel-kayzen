@@ -2,8 +2,9 @@
 
 import { useSyncExternalStore } from "react";
 
-/** Script inline (dans <head>) : applique le thème avant le premier rendu, sans flash. */
-export const THEME_INIT_SCRIPT = `try{var t=localStorage.getItem("theme");if(t==="dark"||(!t&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}`;
+/** Script inline (dans <head>) : applique le thème avant le premier rendu, sans flash.
+ *  Clair par défaut : le sombre ne s'active que si l'utilisateur l'a choisi. */
+export const THEME_INIT_SCRIPT = `try{if(localStorage.getItem("theme")==="dark")document.documentElement.classList.add("dark")}catch(e){}`;
 
 function subscribe(onChange: () => void) {
   const obs = new MutationObserver(onChange);

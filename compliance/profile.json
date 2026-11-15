@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "project_name": "Sentinel by Kayzen (sentinel.kayzen-lyon.com)",
+  "updated": "2026-11-15",
+  "operator": {
+    "type": {
+      "value": "individual",
+      "basis": "inferred",
+      "note": "app/mentions-legales/page.tsx : entrepreneur individuel (EI), SIREN 493 857 262"
+    },
+    "activity_kind": {
+      "value": "commercial",
+      "basis": "inferred",
+      "note": "Offre payante (components/Pricing.tsx, app/cgv/page.tsx), code APE 62.01Z"
+    },
+    "country_of_establishment": {
+      "value": "FR",
+      "basis": "inferred",
+      "note": "Siège et immatriculation RNE en France (app/mentions-legales/page.tsx)"
+    }
+  },
+  "market": {
+    "target_countries": {
+      "value": [
+        "FR"
+      ],
+      "basis": "assumed",
+      "note": "Site uniquement en français, CGV de droit français ; autres pays non confirmés"
+    },
+    "sells_online": {
+      "value": true,
+      "basis": "inferred",
+      "note": "Inscription en ligne à la plateforme + CGV régissant des contrats conclus à distance (app/cgv/page.tsx)"
+    },
+    "sells_to_consumers": {
+      "value": true,
+      "basis": "stated",
+      "note": "Utilisateur (2026-11-15) : « Aussi des particuliers »"
+    },
+    "sells_what": {
+      "value": [
+        "services"
+      ],
+      "basis": "inferred",
+      "note": "Audits / tests d'intrusion et plateforme d'analyse (app/cgv/page.tsx)"
+    },
+    "withdrawal_right_applies": {
+      "value": true,
+      "basis": "inferred",
+      "note": "app/cgv/page.tsx mentionne le délai de rétractation du consommateur"
+    }
+  },
+  "eaa": {
+    "sectors": {
+      "value": [
+        "e-commerce"
+      ],
+      "basis": "inferred",
+      "note": "Un consommateur peut conclure un contrat (inscription, commande) sur le site"
+    }
+  },
+  "data": {
+    "collects_personal_data": {
+      "value": true,
+      "basis": "inferred",
+      "note": "Comptes (app/signup, app/login), formulaire de contact (app/api/contact), table users"
+    },
+    "non_essential_trackers": {
+      "value": false,
+      "basis": "stated",
+      "note": "app/confidentialite/page.tsx : « pas de Google Analytics, pas de pixel » ; aucun tag trouvé dans le code"
+    },
+    "third_party_tool_kinds": {
+      "value": [
+        "ai-api",
+        "other"
+      ],
+      "basis": "inferred",
+      "note": "API Gemini (worker Strix), Resend (e-mail transactionnel), GitHub Actions (runners)"
+    },
+    "third_party_tools": {
+      "value": [
+        "Vercel (hébergement)",
+        "Resend (e-mail)",
+        "GitHub Actions (runners d'analyse)",
+        "Google Gemini API (agents Strix)",
+        "Base Postgres (DATABASE_URL)"
+      ],
+      "basis": "inferred",
+      "note": "app/confidentialite/page.tsx, lib/email.ts, lib/github.ts, worker/"
+    },
+    "transfers_outside_eu": {
+      "value": true,
+      "basis": "stated",
+      "note": "app/confidentialite/page.tsx : prestataires aux États-Unis, clauses contractuelles types"
+    }
+  },
+  "ai": {
+    "content_generation_feature": {
+      "value": true,
+      "basis": "inferred",
+      "note": "Agents Strix (LLM Gemini) qui produisent findings, PoC et rapport affichés au client (worker/, app/dashboard/pentest)"
+    },
+    "role": {
+      "value": "both",
+      "basis": "assumed",
+      "note": "Système construit sous le nom Sentinel sur un modèle tiers (Gemini) : fournisseur probable, à confirmer"
+    },
+    "features": [
+      {
+        "kind": "generator",
+        "role": "both",
+        "audience": "public",
+        "modalities": [
+          "text"
+        ],
+        "annex_iii_area": "none"
+      }
+    ]
+  },
+  "site": {
+    "user_accounts": {
+      "value": true,
+      "basis": "inferred",
+      "note": "app/signup, app/login, lib/auth.ts"
+    },
+    "languages": {
+      "value": [
+        "fr"
+      ],
+      "basis": "inferred",
+      "note": "<html lang=\"fr\"> dans app/layout.tsx, pas d'i18n"
+    },
+    "stack": {
+      "value": [
+        "Next.js",
+        "PostgreSQL",
+        "Vercel"
+      ],
+      "basis": "inferred",
+      "note": "package.json, lib/db.ts, vercel.json"
+    }
+  }
+}

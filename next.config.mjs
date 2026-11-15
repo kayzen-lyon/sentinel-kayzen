@@ -15,7 +15,11 @@ const csp = [
   // 'unsafe-inline' conservé volontairement : passer aux nonces forcerait un rendu
   // dynamique de tout le site (perte du prérendu statique/CDN) pour un gain marginal
   // — aucun script tiers, JSON-LD déjà échappé. Voir SECURITY.md.
-  "script-src 'self' 'unsafe-inline'",
+  // 'unsafe-eval' en dev uniquement : React l'utilise pour ses outils de débogage
+  // (sinon erreurs eval() dans la console). Jamais en production.
+  process.env.NODE_ENV === "development"
+    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+    : "script-src 'self' 'unsafe-inline'",
   "connect-src 'self'",
   "form-action 'self'",
   "upgrade-insecure-requests",

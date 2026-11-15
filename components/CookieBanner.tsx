@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const KEY = "sentinel_cookie_ack";
 
@@ -13,6 +13,7 @@ const KEY = "sentinel_cookie_ack";
  */
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     try {
@@ -31,10 +32,42 @@ export default function CookieBanner() {
     setVisible(false);
   }
 
+  // Tant que le bandeau (fixe, en bas) est affiché : on réserve sa hauteur sous la
+  // page (le bas du contenu reste atteignable) et on fait défiler tout élément qui
+  // reçoit le focus sous le bandeau, pour qu'il ne soit jamais masqué (WCAG 2.4.11).
+  useEffect(() => {
+    const banner = ref.current;
+    if (!visible || !banner) return;
+    const root = document.documentElement;
+    const apply = () => {
+      const h = `${banner.offsetHeight}px`;
+      root.style.scrollPaddingBottom = h;
+      document.body.style.paddingBottom = h;
+    };
+    const onFocus = (e: FocusEvent) => {
+      const t = e.target;
+      if (!(t instanceof HTMLElement) || banner.contains(t)) return;
+      const overlap = t.getBoundingClientRect().bottom - banner.getBoundingClientRect().top;
+      // "instant" : le site a scroll-behavior: smooth, l'élément serait masqué pendant l'animation.
+      if (overlap > 0) window.scrollBy({ top: overlap + 16, behavior: "instant" });
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(banner);
+    document.addEventListener("focusin", onFocus);
+    return () => {
+      ro.disconnect();
+      document.removeEventListener("focusin", onFocus);
+      root.style.scrollPaddingBottom = "";
+      document.body.style.paddingBottom = "";
+    };
+  }, [visible]);
+
   if (!visible) return null;
 
   return (
     <div
+      ref={ref}
       role="region"
       aria-label="Information sur les cookies"
       className="fixed inset-x-0 bottom-0 z-[180] border-t border-border bg-card/95 backdrop-blur"

@@ -10,7 +10,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = LAST_MODIFIED;
   return [
     { url: `${BASE}/`, lastModified: now, changeFrequency: "weekly", priority: 1 },
-    { url: `${BASE}/signup`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${BASE}/login`, lastModified: now, changeFrequency: "monthly", priority: 0.3 },
+    { url: `${BASE}/retractation`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
   ];
 }

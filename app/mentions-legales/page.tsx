@@ -39,7 +39,7 @@ export default function Page() {
       <h2>Hébergeur</h2>
       <p>
         Le site est hébergé par <strong>Vercel Inc.</strong>, 440 N Barranca Avenue
-        #4133, Covina, CA 91723, États-Unis (<a href="https://vercel.com" target="_blank" rel="noopener noreferrer">vercel.com</a>).
+        #4133, Covina, CA 91723, États-Unis (<a href="https://vercel.com" target="_blank" rel="noopener noreferrer">vercel.com<span className="sr-only"> (nouvel onglet)</span></a>).
         La base de données PostgreSQL (Neon / Supabase) est hébergée au sein de l'Union
         européenne lorsque cette région est sélectionnée.
       </p>
@@ -82,7 +82,7 @@ export default function Page() {
         Ce site a été conçu et réalisé par <strong>Kayzen Web</strong> —{" "}
         <a href="https://www.kayzen-lyon.com" target="_blank" rel="noopener noreferrer">
           www.kayzen-lyon.com
-        </a>
+        <span className="sr-only"> (nouvel onglet)</span></a>
         .
       </p>
     </LegalShell>

@@ -65,7 +65,7 @@ export default function Page() {
         Si une réponse satisfaisante ne vous est pas apportée, vous pouvez saisir le{" "}
         <a href="https://www.defenseurdesdroits.fr" target="_blank" rel="noopener noreferrer">
           Défenseur des droits
-        </a>{" "}
+        <span className="sr-only"> (nouvel onglet)</span></a>{" "}
         (formulaire en ligne, ou par courrier&nbsp;: Défenseur des droits, Libre réponse
         71120, 75342 Paris CEDEX 07).
       </p>

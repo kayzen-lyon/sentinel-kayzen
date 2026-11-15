@@ -1,5 +1,5 @@
 import { ensureSchema, query } from "./db";
-import { validateTargetUrl } from "./ssrf";
+import { safeFetch, validateTargetUrl } from "./ssrf";
 
 /** Intégrations de notification sortantes par organisation (Slack + webhook générique). */
 
@@ -45,20 +45,15 @@ export async function setIntegrations(
 }
 
 async function post(url: string, body: unknown): Promise<void> {
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), 8000);
-  try {
-    await fetch(url, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(body),
-      signal: ctrl.signal,
-    });
-  } catch {
-    /* notifications best-effort */
-  } finally {
-    clearTimeout(t);
-  }
+  // Re-validation anti-SSRF à l'envoi (le DNS a pu changer depuis l'enregistrement)
+  // et aucune redirection suivie. Notifications best-effort : un échec est ignoré.
+  await safeFetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+    redirect: "manual",
+    timeoutMs: 8000,
+  });
 }
 
 export type NotifyPayload = {

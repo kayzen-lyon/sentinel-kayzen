@@ -43,7 +43,7 @@ export default function Problem() {
               <span
                 className="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
                 style={{
-                  backgroundColor: `rgb(var(--${c.accent}) / 0.12)`,
+                  backgroundColor: `rgb(var(--${c.accent}) / 0.08)`,
                   color: `rgb(var(--${c.accent}))`,
                 }}
               >

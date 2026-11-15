@@ -8,9 +8,10 @@ export default function Hero() {
           <div>
             <p className="eyebrow reveal mb-5">Cybersécurité offensive · Groupe Kayzen</p>
 
+            {/* Pas d'animation d'entrée sur le h1 : c'est l'élément LCP, il doit être visible tout de suite. */}
             <h1
-              className="reveal leading-[1.06] text-fg"
-              style={{ fontSize: "clamp(2.25rem, 1.5rem + 3vw, 3.5rem)", animationDelay: "60ms" }}
+              className="leading-[1.06] text-fg"
+              style={{ fontSize: "clamp(2.25rem, 1.5rem + 3vw, 3.5rem)" }}
             >
               Des hackers IA qui trouvent vos failles{" "}
               <span className="gradient-text">avant les vrais.</span>

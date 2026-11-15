@@ -41,7 +41,7 @@ export default function Header() {
           <span className="flex flex-col leading-none">
             <span className="font-heading text-[1.15rem] font-bold tracking-tight text-heading">
               Sentinel
-            </span>
+            </span>{" "}
             <span className="text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-subtle">
               by Kayzen
             </span>
@@ -132,7 +132,7 @@ function Logo() {
   return (
     <Image
       src="/logo-mark.png"
-      alt="Sentinel by Kayzen"
+      alt=""
       width={40}
       height={40}
       priority

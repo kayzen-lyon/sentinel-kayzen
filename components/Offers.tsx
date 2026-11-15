@@ -36,7 +36,7 @@ export default function Offers() {
 
         <div className="mt-14 grid gap-6 lg:grid-cols-2">
           <article className="card p-8">
-            <span className="eyebrow !text-safe-light">Audit managé</span>
+            <span className="eyebrow !text-safe">Audit managé</span>
             <h3 className="mt-3 font-heading text-2xl font-semibold text-fg">
               Sentinel piloté par Kayzen
             </h3>

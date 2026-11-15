@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { resolveTxt } from "node:dns/promises";
 import { ensureSchema, query } from "./db";
+import { safeFetch } from "./ssrf";
 
 export type DomainRow = {
   id: string;
@@ -24,9 +25,18 @@ export function normalizeDomain(input: string): string | null {
   return host;
 }
 
-/** Domaine enregistrable (2 labels) pour la comparaison. */
-export function registrableDomain(host: string): string {
-  return host.replace(/^www\./, "").split(".").slice(-2).join(".");
+/**
+ * Domaines dont la vérification peut couvrir `host` : l'hôte lui-même puis
+ * chacun de ses parents (au moins 2 labels). Ex. a.b.example.co.uk →
+ * [a.b.example.co.uk, b.example.co.uk, example.co.uk, co.uk].
+ * Un suffixe public (co.uk, gouv.fr…) peut apparaître dans la liste mais ne
+ * peut jamais être vérifié : personne ne contrôle _sentinel-verify.co.uk.
+ */
+export function domainCandidates(host: string): string[] {
+  const labels = host.trim().toLowerCase().replace(/\.$/, "").replace(/^www\./, "").split(".");
+  const out: string[] = [];
+  for (let i = 0; i <= labels.length - 2; i++) out.push(labels.slice(i).join("."));
+  return out;
 }
 
 export async function listDomains(userId: string): Promise<DomainRow[]> {
@@ -84,13 +94,12 @@ export async function verifyDomain(
 
   // Méthode 2 : fichier /.well-known/sentinel-verify.txt
   try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 8000);
-    const r = await fetch(`https://${domain}/.well-known/sentinel-verify.txt`, {
-      signal: ctrl.signal,
+    // safeFetch : chaque redirection est re-validée (pas de rebond vers une IP interne).
+    const r = await safeFetch(`https://${domain}/.well-known/sentinel-verify.txt`, {
       headers: { "user-agent": "SentinelByKayzen/1.0 (domain verification)" },
-    }).finally(() => clearTimeout(t));
-    if (r.ok) {
+      timeoutMs: 8000,
+    });
+    if (r?.ok) {
       const body = await r.text();
       if (body.includes(token)) {
         await markVerified(userId, domain, "file");
@@ -115,14 +124,21 @@ async function markVerified(userId: string, domain: string, method: string) {
   );
 }
 
-/** Le domaine enregistrable de `host` est-il vérifié par cet utilisateur ? */
+/**
+ * `host` est-il vérifié par cet utilisateur ?
+ * - l'hôte exact vérifié (DNS ou fichier) → oui ;
+ * - un domaine parent vérifié → oui seulement par DNS : contrôler la zone DNS
+ *   prouve le contrôle des sous-domaines, un fichier sur le parent non.
+ */
 export async function isHostVerified(userId: string, host: string): Promise<boolean> {
+  const [exact, ...parents] = domainCandidates(host);
+  if (!exact) return false;
   await ensureSchema();
-  const reg = registrableDomain(host);
   const rows = await query<{ n: string }>(
     `SELECT count(*)::int AS n FROM verified_domains
-       WHERE user_id=$1 AND domain=$2 AND verified_at IS NOT NULL`,
-    [userId, reg]
+       WHERE user_id=$1 AND verified_at IS NOT NULL
+         AND (domain=$2 OR (domain = ANY($3::text[]) AND method='dns'))`,
+    [userId, exact, parents]
   );
   return Number(rows[0]?.n ?? 0) > 0;
 }

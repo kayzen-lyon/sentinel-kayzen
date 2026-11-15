@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { validateEmail, validatePassword } from "../lib/password";
 import { validateTargetUrl, safeFetch } from "../lib/ssrf";
-import { normalizeDomain, registrableDomain } from "../lib/domains";
+import { normalizeDomain, domainCandidates } from "../lib/domains";
 import { parseBanners } from "../lib/cve";
 import { analyzeForms } from "../lib/recon";
 import { safeInternalPath } from "../lib/redirect";
@@ -29,9 +29,21 @@ test("normalizeDomain", () => {
   assert.equal(normalizeDomain("pas un domaine"), null);
 });
 
-test("registrableDomain", () => {
-  assert.equal(registrableDomain("app.exemple.fr"), "exemple.fr");
-  assert.equal(registrableDomain("www.exemple.fr"), "exemple.fr");
+test("domainCandidates : hôte exact puis parents", () => {
+  assert.deepEqual(domainCandidates("app.exemple.fr"), ["app.exemple.fr", "exemple.fr"]);
+  assert.deepEqual(domainCandidates("www.exemple.fr"), ["exemple.fr"]);
+  assert.deepEqual(domainCandidates("exemple.fr"), ["exemple.fr"]);
+  assert.deepEqual(domainCandidates("a.mairie.gouv.fr"), [
+    "a.mairie.gouv.fr",
+    "mairie.gouv.fr",
+    "gouv.fr",
+  ]);
+  assert.deepEqual(domainCandidates("Shop.Example.CO.UK."), [
+    "shop.example.co.uk",
+    "example.co.uk",
+    "co.uk",
+  ]);
+  assert.deepEqual(domainCandidates("localhost"), []);
 });
 
 test("validateTargetUrl bloque les cibles internes", async () => {

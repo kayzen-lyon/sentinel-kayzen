@@ -28,7 +28,7 @@ export default function CtaFinal() {
               className="text-brand underline underline-offset-2"
             >
               Découvrir Kayzen Web
-            </a>
+            <span className="sr-only"> (nouvel onglet)</span></a>
           </p>
         </div>
       </div>

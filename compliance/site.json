@@ -1,0 +1,6 @@
+{
+  "language": "fr",
+  "operator": { "country": "FR", "registered": true, "vat": false },
+  "distance_selling_to_consumers": true,
+  "pages": { "legal_notice": "mentions-legales", "withdrawal": "retractation" }
+}

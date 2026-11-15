@@ -155,7 +155,7 @@ export default function ContactCard() {
                   className="text-brand hover:underline"
                 >
                   Site web
-                </a>
+                <span className="sr-only"> (nouvel onglet)</span></a>
                 <a
                   href="https://www.google.com/maps/search/?api=1&query=KAYZEN%20LYON%2C%206%20rue%20Pierre%20Termier%2C%2069009%20Lyon"
                   target="_blank"
@@ -163,7 +163,7 @@ export default function ContactCard() {
                   className="text-brand hover:underline"
                 >
                   Localisation
-                </a>
+                <span className="sr-only"> (nouvel onglet)</span></a>
                 <a
                   href="https://www.google.com/search?q=KAYZEN%20LYON%20avis"
                   target="_blank"
@@ -171,7 +171,7 @@ export default function ContactCard() {
                   className="text-brand hover:underline"
                 >
                   Avis Google
-                </a>
+                <span className="sr-only"> (nouvel onglet)</span></a>
               </div>
             </div>
           </div>

@@ -183,7 +183,7 @@ function FindingRow({ f }: { f: Finding }) {
                 >
                   {c.id}
                   {c.cvss ? ` · ${c.cvss}` : ""}
-                </a>
+                <span className="sr-only"> (nouvel onglet)</span></a>
               ))}
             </div>
           )}
