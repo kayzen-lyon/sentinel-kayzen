@@ -1,0 +1,34 @@
+name: strix-security
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  security-scan:
+    # Les PR de Dependabot n'ont pas accès aux secrets : le scan y échouerait à coup sûr.
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Strix
+        run: pip install strix-agent
+
+      - name: Run Strix on the pull request
+        env:
+          STRIX_LLM: ${{ vars.STRIX_MODEL || 'gemini/gemini-2.0-flash' }}
+          LLM_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        # Exit code 2 si des vulnérabilités sont trouvées → le check PR échoue.
+        run: strix -n -t ./ --scan-mode quick
