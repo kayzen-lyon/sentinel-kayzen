@@ -163,3 +163,29 @@ test("engineEventType — sélection du workflow runner", () => {
   assert.equal(engineEventType("strix"), "strix-scan");
   assert.equal(engineEventType(undefined), "strix-scan");
 });
+
+test("secretbox : chiffrement des secrets d'intégration", async () => {
+  const { seal, open, isEncrypted, hint } = await import("../lib/secretbox");
+  const url = "https://hooks.slack.com/services/T000/B000/abcdEFGH1234";
+  const sealed = seal(url);
+  assert.ok(sealed && isEncrypted(sealed));
+  assert.ok(!sealed.includes("hooks.slack.com"));
+  assert.notEqual(seal(url), sealed); // IV aléatoire
+  assert.equal(open(sealed), url);
+  assert.equal(seal(sealed), sealed); // pas de double chiffrement
+  assert.equal(open("valeur-historique-en-clair"), "valeur-historique-en-clair");
+  assert.equal(seal(""), null);
+  assert.equal(open(null), null);
+  const tampered = sealed.slice(0, -4) + (sealed.endsWith("AAAA") ? "BBBB" : "AAAA");
+  assert.equal(open(tampered), null); // GCM : falsification détectée
+  assert.equal(hint(url), "hooks.slack.com/…1234");
+  assert.equal(hint("lin_api_secret9876"), "…9876");
+});
+
+test("invitations : seul le hash du jeton est stocké", async () => {
+  const { hashInviteToken } = await import("../lib/invitations");
+  const h = hashInviteToken("jeton-test");
+  assert.match(h, /^[0-9a-f]{64}$/);
+  assert.equal(h, hashInviteToken("jeton-test"));
+  assert.notEqual(h, hashInviteToken("jeton-test2"));
+});

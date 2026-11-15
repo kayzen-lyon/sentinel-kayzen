@@ -1,5 +1,6 @@
 import { ensureSchema, query } from "./db";
-import { validateTargetUrl } from "./ssrf";
+import { safeFetch, validateTargetUrl } from "./ssrf";
+import { open, seal } from "./secretbox";
 
 /** Création de tickets Jira / Linear à partir des findings d'un pentest. */
 
@@ -19,6 +20,9 @@ export async function getTicketConfig(orgId: string): Promise<TicketConfig> {
      FROM org_integrations WHERE org_id = $1`,
     [orgId]
   );
+  // Secrets déchiffrés : usage serveur uniquement, jamais renvoyés au navigateur.
+  if (rows[0])
+    return { ...rows[0], jira_token: open(rows[0].jira_token), linear_key: open(rows[0].linear_key) };
   return (
     rows[0] ?? {
       jira_base_url: null,
@@ -40,7 +44,11 @@ export type TicketSettings = {
   linearTeam?: string;
 };
 
-/** Enregistre la config tickets (valide l'URL Jira anti-SSRF). Retourne une erreur ou null. */
+/**
+ * Enregistre la config tickets (valide l'URL Jira anti-SSRF). Retourne une erreur ou null.
+ * Jeton Jira / clé Linear : champ vide = conserver la valeur enregistrée (l'interface
+ * ne les réaffiche jamais), sinon nouvelle valeur chiffrée.
+ */
 export async function setTicketConfig(
   orgId: string,
   s: TicketSettings
@@ -51,6 +59,9 @@ export async function setTicketConfig(
     const check = await validateTargetUrl(s.jiraBaseUrl);
     if (!check.ok) return `URL Jira refusée : ${check.reason}`;
   }
+  const current = await getTicketConfig(orgId);
+  const jiraToken = seal(s.jiraToken || current.jira_token);
+  const linearKey = seal(s.linearKey || current.linear_key);
   await query(
     `INSERT INTO org_integrations
        (org_id, jira_base_url, jira_email, jira_token, jira_project, linear_key, linear_team, updated_at)
@@ -63,9 +74,9 @@ export async function setTicketConfig(
       orgId,
       s.jiraBaseUrl?.replace(/\/$/, "") || null,
       s.jiraEmail || null,
-      s.jiraToken || null,
+      jiraToken,
       s.jiraProject || null,
-      s.linearKey || null,
+      linearKey,
       s.linearTeam || null,
     ]
   );
@@ -83,7 +94,10 @@ async function createJira(
     return { error: "Jira non configuré." };
   const auth = Buffer.from(`${c.jira_email}:${c.jira_token}`).toString("base64");
   try {
-    const r = await fetch(`${c.jira_base_url}/rest/api/3/issue`, {
+    // URL fournie par l'utilisateur : re-validation anti-SSRF à l'envoi, sans redirection.
+    const r = await safeFetch(`${c.jira_base_url}/rest/api/3/issue`, {
+      redirect: "manual",
+      timeoutMs: 10000,
       method: "POST",
       headers: {
         authorization: `Basic ${auth}`,
@@ -105,6 +119,7 @@ async function createJira(
         },
       }),
     });
+    if (!r) return { error: "Appel Jira refusé ou échoué." };
     if (!r.ok) return { error: `Jira a répondu ${r.status}.` };
     const data = (await r.json()) as { key?: string };
     return { id: data.key, url: data.key ? `${c.jira_base_url}/browse/${data.key}` : undefined };

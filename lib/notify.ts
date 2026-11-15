@@ -1,5 +1,6 @@
 import { ensureSchema, query } from "./db";
 import { safeFetch, validateTargetUrl } from "./ssrf";
+import { open, seal } from "./secretbox";
 
 /** Intégrations de notification sortantes par organisation (Slack + webhook générique). */
 
@@ -8,13 +9,15 @@ export type OrgIntegrations = {
   webhook_url: string | null;
 };
 
+/** URLs déchiffrées — usage serveur uniquement, ne jamais les renvoyer au navigateur (voir hint()). */
 export async function getIntegrations(orgId: string): Promise<OrgIntegrations> {
   await ensureSchema();
   const rows = await query<OrgIntegrations>(
     `SELECT slack_url, webhook_url FROM org_integrations WHERE org_id = $1`,
     [orgId]
   );
-  return rows[0] ?? { slack_url: null, webhook_url: null };
+  const r = rows[0];
+  return { slack_url: open(r?.slack_url), webhook_url: open(r?.webhook_url) };
 }
 
 /** Valide une URL de webhook (https + hôte public, anti-SSRF). Retourne un message d'erreur ou null. */
@@ -26,20 +29,28 @@ async function validateWebhook(url: string): Promise<string | null> {
   return null;
 }
 
+/**
+ * Met à jour les webhooks. Pour chaque champ : `undefined` = conserver l'actuel,
+ * `""` = supprimer, sinon nouvelle URL (validée anti-SSRF puis chiffrée).
+ */
 export async function setIntegrations(
   orgId: string,
-  slackUrl: string,
-  webhookUrl: string
+  slackUrl: string | undefined,
+  webhookUrl: string | undefined
 ): Promise<string | null> {
   await ensureSchema();
-  const err = (await validateWebhook(slackUrl)) || (await validateWebhook(webhookUrl));
+  const err =
+    (await validateWebhook(slackUrl || "")) || (await validateWebhook(webhookUrl || ""));
   if (err) return err;
+  const current = await getIntegrations(orgId);
+  const slack = slackUrl === undefined ? current.slack_url : slackUrl;
+  const hook = webhookUrl === undefined ? current.webhook_url : webhookUrl;
   await query(
     `INSERT INTO org_integrations (org_id, slack_url, webhook_url, updated_at)
      VALUES ($1, $2, $3, now())
      ON CONFLICT (org_id) DO UPDATE
        SET slack_url = EXCLUDED.slack_url, webhook_url = EXCLUDED.webhook_url, updated_at = now()`,
-    [orgId, slackUrl || null, webhookUrl || null]
+    [orgId, seal(slack), seal(hook)]
   );
   return null;
 }

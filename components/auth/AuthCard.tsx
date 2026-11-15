@@ -12,7 +12,8 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
   const params = useSearchParams();
   const toast = useToast();
   const next = safeInternalPath(params.get("next"));
-  const [email, setEmail] = useState("");
+  // Pré-rempli depuis un lien d'invitation (?email=…).
+  const [email, setEmail] = useState(params.get("email") || "");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);

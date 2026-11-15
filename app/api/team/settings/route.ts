@@ -24,7 +24,8 @@ export async function POST(req: Request) {
 
   // Réglage des intégrations sortantes (si fourni)
   if (body.slackUrl !== undefined || body.webhookUrl !== undefined) {
-    const err = await setIntegrations(orgId, body.slackUrl || "", body.webhookUrl || "");
+    // undefined = conserver la valeur actuelle (l'interface n'envoie que les champs modifiés)
+    const err = await setIntegrations(orgId, body.slackUrl, body.webhookUrl);
     if (err) return NextResponse.json({ error: err }, { status: 400 });
     await logAudit({
       orgId,

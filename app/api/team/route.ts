@@ -15,6 +15,18 @@ import {
 } from "@/lib/orgs";
 import { listAudit, logAudit } from "@/lib/audit";
 import { getIntegrations } from "@/lib/notify";
+import { hint } from "@/lib/secretbox";
+import { findUserByEmail } from "@/lib/users";
+import { validateEmail } from "@/lib/password";
+import {
+  createInvitation,
+  INVITE_TTL_DAYS,
+  listPendingInvitations,
+  revokeInvitation,
+} from "@/lib/invitations";
+import { invitationEmail, sendEmail } from "@/lib/email";
+
+const ROLE_FR: Record<string, string> = { admin: "Admin", member: "Membre", viewer: "Lecteur" };
 
 export const runtime = "nodejs";
 
@@ -32,21 +44,24 @@ export async function GET() {
   if (!dbConfigured) return NextResponse.json({ error: "Base non configurée." }, { status: 503 });
 
   const orgId = await activeOrg(session);
-  const [members, audit, role, org, integ] = await Promise.all([
+  const [members, audit, role, org, integ, invitations] = await Promise.all([
     listMembers(orgId),
     listAudit(orgId, 100),
     getRole(orgId, session.id),
     getOrg(orgId),
     getIntegrations(orgId),
+    listPendingInvitations(orgId),
   ]);
   return NextResponse.json({
     orgId,
     role,
     members,
+    invitations,
     audit,
     requireApproval: Boolean(org?.require_approval),
-    slackUrl: integ.slack_url || "",
-    webhookUrl: integ.webhook_url || "",
+    // Jamais l'URL complète (elle vaut un secret) : seulement un aperçu.
+    slackHint: hint(integ.slack_url),
+    webhookHint: hint(integ.webhook_url),
   });
 }
 
@@ -64,8 +79,49 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Trop de requêtes." }, { status: 429 });
 
   const body = (await req.json().catch(() => ({}))) as { email?: string; role?: Role };
-  if (!body.email) return NextResponse.json({ error: "E-mail requis." }, { status: 400 });
-  const err = await addMemberByEmail(orgId, body.email, body.role || "member");
+  const email = (body.email || "").trim().toLowerCase();
+  if (!validateEmail(email))
+    return NextResponse.json({ error: "Adresse e-mail invalide." }, { status: 400 });
+  const role = body.role || "member";
+
+  // Pas encore de compte → invitation par lien (e-mail si Resend est configuré).
+  if (!(await findUserByEmail(email))) {
+    const inv = await createInvitation(orgId, email, role, session.id);
+    if (inv.error || !inv.token)
+      return NextResponse.json({ error: inv.error || "Échec." }, { status: 400 });
+    const origin = process.env.APP_URL || new URL(req.url).origin;
+    const inviteUrl = `${origin}/invitation/${inv.token}`;
+    const org = await getOrg(orgId);
+    const emailSent = await sendEmail(
+      email,
+      "Invitation à rejoindre une équipe sur Sentinel",
+      invitationEmail({
+        orgName: org?.name || "Sentinel",
+        inviterEmail: session.email,
+        role: ROLE_FR[role] || role,
+        url: inviteUrl,
+        days: INVITE_TTL_DAYS,
+      })
+    );
+    await logAudit({
+      orgId,
+      actorId: session.id,
+      actorEmail: session.email,
+      action: "team.invite",
+      target: email,
+      meta: { role, emailSent },
+    });
+    // Le lien n'est renvoyé qu'ici, une seule fois (seul son hash est stocké).
+    return NextResponse.json({
+      ok: true,
+      invited: true,
+      inviteUrl,
+      emailSent,
+      invitations: await listPendingInvitations(orgId),
+    });
+  }
+
+  const err = await addMemberByEmail(orgId, email, role);
   if (err) return NextResponse.json({ error: err }, { status: 400 });
 
   await logAudit({
@@ -114,7 +170,20 @@ export async function DELETE(req: Request) {
   if (!canManage(await getRole(orgId, session.id)))
     return NextResponse.json({ error: "Droits insuffisants." }, { status: 403 });
 
-  const body = (await req.json().catch(() => ({}))) as { userId?: string };
+  const body = (await req.json().catch(() => ({}))) as { userId?: string; invitationId?: string };
+
+  if (body.invitationId) {
+    await revokeInvitation(orgId, body.invitationId);
+    await logAudit({
+      orgId,
+      actorId: session.id,
+      actorEmail: session.email,
+      action: "team.invite_revoked",
+      target: body.invitationId,
+    });
+    return NextResponse.json({ ok: true, invitations: await listPendingInvitations(orgId) });
+  }
+
   if (!body.userId) return NextResponse.json({ error: "userId requis." }, { status: 400 });
   const err = await removeMember(orgId, body.userId);
   if (err) return NextResponse.json({ error: err }, { status: 400 });

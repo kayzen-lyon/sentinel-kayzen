@@ -12,6 +12,12 @@ type Member = {
   role: Role;
   created_at: string;
 };
+type Invitation = {
+  id: string;
+  email: string;
+  role: Role;
+  expires_at: string;
+};
 type Audit = {
   id: string;
   actor_email: string | null;
@@ -37,6 +43,9 @@ const ACTION_LABEL: Record<string, string> = {
   "pentest.rejected": "Pentest rejeté",
   "finding.status": "Statut de vulnérabilité modifié",
   "team.add_member": "Membre ajouté",
+  "team.invite": "Invitation envoyée",
+  "team.invite_revoked": "Invitation annulée",
+  "team.invite_accepted": "Invitation acceptée",
   "team.set_role": "Rôle modifié",
   "team.remove_member": "Membre retiré",
   "team.require_approval": "Politique d'approbation modifiée",
@@ -44,15 +53,67 @@ const ACTION_LABEL: Record<string, string> = {
   "scan.regression": "Régression de sécurité détectée",
 };
 
+/**
+ * Champ d'URL secrète : vide par défaut avec l'aperçu de la valeur enregistrée.
+ * `value === undefined` = non modifié (conservé), `""` = à supprimer.
+ */
+function SecretUrlField({
+  label,
+  placeholder,
+  hint,
+  value,
+  onChange,
+}: {
+  label: string;
+  placeholder: string;
+  hint: string;
+  value: string | undefined;
+  onChange: (v: string | undefined) => void;
+}) {
+  const removed = value === "" && Boolean(hint);
+  return (
+    <div>
+      <label className="block">
+        <span className="block text-xs text-muted">{label}</span>
+        <input
+          type="url"
+          value={value ?? ""}
+          onChange={(e) => onChange(e.target.value === "" && !hint ? undefined : e.target.value)}
+          placeholder={hint ? `Configuré : ${hint} — saisir pour remplacer` : placeholder}
+          className="input mt-1 w-full"
+        />
+      </label>
+      {hint && (
+        <button
+          type="button"
+          onClick={() => onChange(removed ? undefined : "")}
+          className="mt-1 text-xs text-muted underline-offset-2 hover:underline"
+        >
+          {removed ? "Annuler la suppression" : "Retirer ce webhook"}
+        </button>
+      )}
+      {removed && <span className="ml-2 text-xs text-risk">Sera supprimé à l'enregistrement</span>}
+    </div>
+  );
+}
+
 export default function TeamPanel() {
   const [members, setMembers] = useState<Member[]>([]);
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
+  // Lien d'invitation montré une seule fois après création (seul son hash est stocké).
+  const [lastInvite, setLastInvite] = useState<{ email: string; url: string; emailSent: boolean } | null>(null);
+  const [copied, setCopied] = useState(false);
   const [audit, setAudit] = useState<Audit[]>([]);
   const [role, setRole] = useState<Role | null>(null);
   const [email, setEmail] = useState("");
   const [newRole, setNewRole] = useState<Role>("member");
   const [requireApproval, setRequireApproval] = useState(false);
-  const [slackUrl, setSlackUrl] = useState("");
-  const [webhookUrl, setWebhookUrl] = useState("");
+  // Les URLs enregistrées ne reviennent jamais au navigateur : seulement un aperçu (hint).
+  // Un champ n'est envoyé que s'il a été modifié (sinon la valeur actuelle est conservée).
+  const [slackUrl, setSlackUrl] = useState<string | undefined>(undefined);
+  const [webhookUrl, setWebhookUrl] = useState<string | undefined>(undefined);
+  const [slackHint, setSlackHint] = useState("");
+  const [webhookHint, setWebhookHint] = useState("");
   const [integSaved, setIntegSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -65,11 +126,14 @@ export default function TeamPanel() {
     if (res.ok) {
       const d = await res.json();
       setMembers(d.members || []);
+      setInvitations(d.invitations || []);
       setAudit(d.audit || []);
       setRole(d.role || null);
       setRequireApproval(Boolean(d.requireApproval));
-      setSlackUrl(d.slackUrl || "");
-      setWebhookUrl(d.webhookUrl || "");
+      setSlackHint(d.slackHint || "");
+      setWebhookHint(d.webhookHint || "");
+      setSlackUrl(undefined);
+      setWebhookUrl(undefined);
     }
     setLoading(false);
   }
@@ -89,6 +153,7 @@ export default function TeamPanel() {
       if (res.ok) {
         setIntegSaved(true);
         setTimeout(() => setIntegSaved(false), 2000);
+        await load();
       } else {
         const d = await res.json();
         setError(d.error || "Échec.");
@@ -133,7 +198,13 @@ export default function TeamPanel() {
         setError(d.error || "Échec.");
         return;
       }
-      setMembers(d.members || []);
+      if (d.invited) {
+        setLastInvite({ email, url: d.inviteUrl, emailSent: Boolean(d.emailSent) });
+        setCopied(false);
+      } else {
+        setLastInvite(null);
+        setMembers(d.members || []);
+      }
       setEmail("");
       await load();
     } finally {
@@ -155,6 +226,33 @@ export default function TeamPanel() {
       else setError(d.error || "Échec.");
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function revokeInvite(id: string) {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const res = await fetch("/api/team", {
+        method: "DELETE",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ invitationId: id }),
+      });
+      const d = await res.json();
+      if (res.ok) setInvitations(d.invitations || []);
+      else setError(d.error || "Échec.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function copyInvite() {
+    if (!lastInvite) return;
+    try {
+      await navigator.clipboard.writeText(lastInvite.url);
+      setCopied(true);
+    } catch {
+      /* presse-papiers indisponible : le lien reste sélectionnable */
     }
   }
 
@@ -182,8 +280,9 @@ export default function TeamPanel() {
       <main className="container-x py-10">
         <h1 className="font-heading text-3xl font-bold text-fg">Équipe & audit</h1>
         <p className="mt-2 max-w-2xl text-muted">
-          Invitez des coéquipiers (comptes Sentinel existants) à partager vos pentests, et
-          consultez le journal d'audit de votre organisation.
+          Invitez des coéquipiers à partager vos pentests (un lien d&apos;invitation est créé
+          s&apos;ils n&apos;ont pas encore de compte), et consultez le journal d&apos;audit de votre
+          organisation.
         </p>
 
         {error && (
@@ -211,26 +310,20 @@ export default function TeamPanel() {
             <h2 className="font-heading text-sm font-semibold text-subtle">
               Notifications sortantes
             </h2>
-            <label className="block">
-              <span className="block text-xs text-muted">Webhook Slack (Incoming Webhook)</span>
-              <input
-                type="url"
-                value={slackUrl}
-                onChange={(e) => setSlackUrl(e.target.value)}
-                placeholder="https://hooks.slack.com/services/…"
-                className="input mt-1 w-full"
-              />
-            </label>
-            <label className="block">
-              <span className="block text-xs text-muted">Webhook générique (JSON)</span>
-              <input
-                type="url"
-                value={webhookUrl}
-                onChange={(e) => setWebhookUrl(e.target.value)}
-                placeholder="https://exemple.fr/webhook"
-                className="input mt-1 w-full"
-              />
-            </label>
+            <SecretUrlField
+              label="Webhook Slack (Incoming Webhook)"
+              placeholder="https://hooks.slack.com/services/…"
+              hint={slackHint}
+              value={slackUrl}
+              onChange={setSlackUrl}
+            />
+            <SecretUrlField
+              label="Webhook générique (JSON)"
+              placeholder="https://exemple.fr/webhook"
+              hint={webhookHint}
+              value={webhookUrl}
+              onChange={setWebhookUrl}
+            />
             <div className="flex items-center gap-3">
               <button type="submit" disabled={busy} className="btn btn-primary !py-2 text-sm disabled:opacity-60">
                 Enregistrer
@@ -269,6 +362,54 @@ export default function TeamPanel() {
                   Inviter
                 </button>
               </form>
+            )}
+            {lastInvite && (
+              <div role="status" className="mt-3 card space-y-2 p-3 text-sm">
+                <p className="text-fg">
+                  {lastInvite.email} n&apos;a pas encore de compte : invitation créée
+                  {lastInvite.emailSent ? " et envoyée par e-mail." : "."}{" "}
+                  {!lastInvite.emailSent && "Envoyez-lui ce lien (valable 7 jours, affiché une seule fois) :"}
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    readOnly
+                    value={lastInvite.url}
+                    onFocus={(e) => e.currentTarget.select()}
+                    className="input flex-1 !text-xs"
+                    aria-label="Lien d'invitation"
+                  />
+                  <button type="button" onClick={copyInvite} className="btn !py-2 text-sm">
+                    {copied ? "Copié ✓" : "Copier"}
+                  </button>
+                </div>
+              </div>
+            )}
+            {invitations.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-subtle">
+                  Invitations en attente
+                </h3>
+                <ul className="mt-2 space-y-2">
+                  {invitations.map((i) => (
+                    <li key={i.id} className="card flex items-center justify-between gap-3 p-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm text-fg">{i.email}</p>
+                        <p className="text-xs text-subtle">
+                          {ROLE_LABEL[i.role]} · expire le {formatDateTime(i.expires_at)}
+                        </p>
+                      </div>
+                      {canManage && (
+                        <button
+                          onClick={() => revokeInvite(i.id)}
+                          className="flex-none rounded-md px-2 py-1 text-xs text-risk transition-colors hover:bg-hover"
+                        >
+                          Annuler
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
             <ul className="mt-4 space-y-2">
               {loading &&

@@ -82,3 +82,24 @@ export function pentestReportEmail(opts: {
     <p style="margin-top:24px;color:#666;font-size:12px">Envoyé par Sentinel by Kayzen.</p>
   </div>`;
 }
+
+/** Gabarit HTML d'une invitation d'équipe. */
+export function invitationEmail(opts: {
+  orgName: string;
+  inviterEmail: string;
+  role: string;
+  url: string;
+  days: number;
+}): string {
+  return `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:auto;color:#111">
+    <h2 style="color:#b7481f">Invitation à rejoindre « ${esc(opts.orgName)} » sur Sentinel</h2>
+    <p>${esc(opts.inviterEmail)} vous invite à rejoindre son équipe sur Sentinel by Kayzen
+       avec le rôle <strong>${esc(opts.role)}</strong>.</p>
+    <p style="margin:24px 0">
+      <a href="${esc(opts.url)}" style="background:#b7481f;color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:600">Accepter l'invitation</a>
+    </p>
+    <p style="color:#666;font-size:13px">Ce lien est valable ${opts.days} jours et ne fonctionne qu'avec cette adresse e-mail.
+       Si vous n'attendiez pas cette invitation, ignorez ce message.</p>
+    <p style="margin-top:24px;color:#666;font-size:12px">Envoyé par Sentinel by Kayzen.</p>
+  </div>`;
+}
