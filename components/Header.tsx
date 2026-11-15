@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import ContactCard from "@/components/ContactCard";
+import { useEffect, useRef, useState } from "react";
+import DigitalContactCard from "@/components/DigitalContactCard";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
 const NAV = [
@@ -12,155 +12,190 @@ const NAV = [
   { label: "Couverture", href: "/#couverture" },
   { label: "Tarifs", href: "/#tarifs" },
   { label: "FAQ", href: "/#faq" },
+  { label: "Contact", href: "/#contact" },
 ];
 
+/**
+ * En-tête, même comportement que kayzen-lyon.com :
+ * - matériau translucide (.site-chrome), filet inférieur seulement quand du contenu passe dessous ;
+ * - « intelligent » : s'efface en descendant, revient dès qu'on remonte (jamais tant
+ *   qu'un menu est ouvert ou que le focus clavier est dedans) ;
+ * - cibles de 44 px, carte de contact (QR codes) et thème en icônes ;
+ * - panneau mobile avec piège de focus et fermeture à Échap.
+ */
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const burgerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
+    let lastY = window.scrollY;
+    let downStreak = 0;
+    let ticking = false;
+    const DELTA = 8;
+    const TOP_ZONE = 96;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const delta = y - lastY;
+        setScrolled(y > 8);
+        if (y <= TOP_ZONE) {
+          downStreak = 0;
+          setHidden(false);
+        } else if (delta > DELTA) {
+          // Deux lectures consécutives vers le bas : filtre les sauts d'ancrage du navigateur.
+          downStreak += 1;
+          if (downStreak >= 2) setHidden(true);
+        } else if (delta < -DELTA) {
+          downStreak = 0;
+          setHidden(false);
+        }
+        lastY = y;
+        ticking = false;
+      });
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Menu mobile : défilement verrouillé, Échap, piège de focus, retour du focus au bouton.
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    if (!open) return;
+    const burger = burgerRef.current;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        return;
+      }
+      if (e.key !== "Tab" || !panelRef.current) return;
+      const focusables = [
+        burger,
+        ...panelRef.current.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"),
+      ].filter(Boolean) as HTMLElement[];
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+      burger?.focus();
+    };
   }, [open]);
 
   return (
     <header
-      className={`site-chrome fixed inset-x-0 top-0 z-50 border-b transition-[border-color,box-shadow] duration-300 ${
-        scrolled ? "border-border shadow-[var(--shadow-sm)]" : "border-border"
+      data-scrolled={scrolled ? "true" : undefined}
+      className={`site-chrome site-chrome--smart fixed inset-x-0 top-0 z-50 ${
+        hidden && !open ? "-translate-y-full" : "translate-y-0"
       }`}
+      onFocusCapture={() => setHidden(false)}
     >
-      <div className="container-x flex h-20 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5" aria-label="Sentinel by Kayzen, accueil">
-          <Logo />
+      <nav
+        className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-4 sm:px-6"
+        aria-label="Navigation principale"
+      >
+        <Link href="/" className="relative z-50 flex items-center gap-2.5" aria-label="Sentinel by Kayzen, accueil" onClick={() => setOpen(false)}>
+          <Image src="/logo-mark.png" alt="" width={44} height={44} priority className="h-11 w-auto shrink-0" />
           <span className="flex flex-col leading-none">
-            <span className="font-heading text-[1.15rem] font-bold tracking-tight text-heading">
+            <span className="font-heading text-lg font-bold uppercase tracking-tight text-heading sm:text-xl">
               Sentinel
-            </span>{" "}
+            </span>
             <span className="text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-subtle">
               by Kayzen
             </span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex" aria-label="Navigation principale">
+        <div className="hidden items-center gap-4 lg:flex xl:gap-6">
           {NAV.map((n) => (
             <a
               key={n.href}
               href={n.href}
-              className="border-b-2 border-transparent py-2 font-heading text-sm font-semibold whitespace-nowrap text-fg transition-colors duration-150 hover:text-brand"
+              className="border-b-2 border-transparent py-2 font-heading text-sm font-semibold whitespace-nowrap text-fg transition-colors duration-150 hover:border-brand hover:text-brand"
             >
               {n.label}
             </a>
           ))}
-        </nav>
-
-        <div className="hidden items-center gap-2 md:flex">
-          <ContactCard />
-          <ThemeToggle />
           <Link
             href="/login"
-            className="px-3 py-2 font-heading text-sm font-semibold text-fg transition-colors duration-150 hover:text-brand"
+            className="border-b-2 border-transparent py-2 font-heading text-sm font-semibold whitespace-nowrap text-fg transition-colors duration-150 hover:border-brand hover:text-brand"
           >
             Connexion
           </Link>
-          <Link href="/signup" className="btn btn-primary">
+          <Link
+            href="/signup"
+            className="group flex h-11 items-center justify-center gap-1.5 rounded-full bg-brand px-5 font-heading text-sm font-bold whitespace-nowrap text-white transition-colors duration-150 hover:bg-brand-hover"
+          >
             Scanner mon site
-            <IconArrow />
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </Link>
         </div>
 
-        <div className="flex items-center gap-1 md:hidden">
+        <div className="relative z-50 flex items-center gap-1 sm:gap-2">
+          <DigitalContactCard />
           <ThemeToggle />
           <button
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-fg"
+            ref={burgerRef}
+            type="button"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-fg transition-colors duration-150 hover:bg-hover lg:hidden"
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
             aria-expanded={open}
+            aria-controls="mobile-menu-panel"
           >
-            <span className="sr-only">Menu</span>
-            {open ? <IconClose /> : <IconMenu />}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d={open ? "M6 6l12 12M18 6 6 18" : "M4 7h16M4 12h16M4 17h16"} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
           </button>
         </div>
-      </div>
+      </nav>
 
       {open && (
-        <div className="border-t border-border bg-bg px-6 pb-8 pt-4 md:hidden">
-          <nav className="flex flex-col gap-1" aria-label="Navigation mobile">
+        <div
+          id="mobile-menu-panel"
+          ref={panelRef}
+          className="max-h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-border bg-bg px-4 pb-8 pt-3 sm:px-6 lg:hidden"
+        >
+          <ul className="flex flex-col">
             {NAV.map((n) => (
-              <a
-                key={n.href}
-                href={n.href}
-                onClick={() => setOpen(false)}
-                className="rounded-xl px-3 py-3 font-heading text-base font-semibold text-fg hover:bg-bg-elev hover:text-brand"
-              >
-                {n.label}
-              </a>
+              <li key={n.href}>
+                <a
+                  href={n.href}
+                  onClick={() => setOpen(false)}
+                  className="flex min-h-12 items-center rounded-xl px-3 font-heading text-base font-semibold text-fg hover:bg-hover hover:text-brand"
+                >
+                  {n.label}
+                </a>
+              </li>
             ))}
-          </nav>
+          </ul>
           <div className="mt-4 flex flex-col gap-2">
-            <div className="flex justify-center pb-1">
-              <ContactCard />
-            </div>
-            <Link
-              href="/signup"
-              onClick={() => setOpen(false)}
-              className="btn btn-primary w-full"
-            >
+            <Link href="/signup" onClick={() => setOpen(false)} className="btn btn-primary w-full">
               Scanner mon site
             </Link>
-            <Link
-              href="/login"
-              onClick={() => setOpen(false)}
-              className="btn btn-ghost w-full"
-            >
+            <Link href="/login" onClick={() => setOpen(false)} className="btn btn-ghost w-full">
               Connexion
             </Link>
           </div>
         </div>
       )}
     </header>
-  );
-}
-
-function Logo() {
-  return (
-    <Image
-      src="/logo-mark.png"
-      alt=""
-      width={40}
-      height={40}
-      priority
-      className="h-10 w-auto"
-    />
-  );
-}
-
-function IconArrow() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function IconMenu() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function IconClose() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-    </svg>
   );
 }

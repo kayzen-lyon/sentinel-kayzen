@@ -191,17 +191,35 @@ export async function runScan(
 
   // 4. Content-Security-Policy
   const csp = get("content-security-policy");
+  // Ce qui compte est la directive qui gouverne les SCRIPTS (script-src, sinon default-src).
+  // 'unsafe-inline' y est neutralisé par les navigateurs dès qu'un nonce ou un hash est présent.
+  const cspDirective = (name: string) =>
+    (csp || "")
+      .split(";")
+      .map((d) => d.trim())
+      .find((d) => d.toLowerCase().startsWith(name + " ")) || "";
+  const cspScript = cspDirective("script-src") || cspDirective("default-src");
+  const cspHasNonceOrHash = /'(nonce-|sha(256|384|512)-)/i.test(cspScript);
+  const cspWeak =
+    /'unsafe-eval'/i.test(cspScript) || (/'unsafe-inline'/i.test(cspScript) && !cspHasNonceOrHash);
+  const cspStyleInline = /'unsafe-inline'/i.test(cspDirective("style-src"));
   add(
     csp
       ? {
           id: "csp",
           category: "En-têtes",
           title: "Content-Security-Policy présente",
-          severity: /unsafe-inline|unsafe-eval/i.test(csp) ? "low" : "info",
-          state: /unsafe-inline|unsafe-eval/i.test(csp) ? "warn" : "pass",
-          detail: `CSP définie${/unsafe-inline|unsafe-eval/i.test(csp) ? " (contient unsafe-inline/eval)" : ""}.`,
-          recommendation: /unsafe-inline|unsafe-eval/i.test(csp)
-            ? "Éliminez 'unsafe-inline' et 'unsafe-eval' au profit de nonces/hashes."
+          severity: cspWeak ? "low" : "info",
+          state: cspWeak ? "warn" : "pass",
+          detail: `CSP définie${
+            cspWeak
+              ? " (les scripts autorisent unsafe-inline/eval)"
+              : cspStyleInline
+                ? " — scripts protégés ; les styles en ligne restent autorisés (risque faible)"
+                : ""
+          }.`,
+          recommendation: cspWeak
+            ? "Éliminez 'unsafe-inline' et 'unsafe-eval' des scripts au profit de nonces/hashes."
             : undefined,
         }
       : {

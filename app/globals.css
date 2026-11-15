@@ -656,3 +656,232 @@ img, svg, video, canvas {
   --bg-hover: 36 53 77;
   --border: 45 62 86;
 }
+
+/* ============================================================
+   Elements repris de kayzen-lyon.com : en-tete intelligent, carte de contact
+   (QR codes), pied de page, panneau accessibilite, retour en haut.
+   ============================================================ */
+
+/* En-tete du site public : filet seulement quand du contenu passe dessous,
+   et glissement hors champ a la descente (transform seul, aucune remise en page). */
+.site-chrome--smart {
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.site-chrome--smart[data-scrolled="true"] {
+  border-bottom-color: rgb(var(--border));
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .site-chrome { background-color: rgb(var(--bg) / 0.96); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .site-chrome { background-color: rgb(var(--bg)); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (prefers-contrast: more) {
+  .site-chrome { background-color: rgb(var(--bg)); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .site-chrome--smart { border-bottom-color: rgb(var(--border-strong)); }
+}
+
+/* Carte de contact numerique */
+@keyframes qr-card-enter-kf {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+.qr-card-enter { animation: qr-card-enter-kf 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes css-scale-in-kf {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+.css-scale-in { animation: css-scale-in-kf 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; transform-origin: bottom left; }
+
+.vcard-shell {
+  background: rgb(var(--bg-card));
+  border: 1px solid rgb(var(--border));
+  box-shadow: 0 24px 56px -16px rgb(36 49 66 / 0.28);
+}
+.vcard-monogram,
+.vcard-close {
+  background: rgb(var(--bg-hover));
+  border: 1px solid rgb(var(--border));
+}
+.vcard-monogram { color: rgb(var(--fg)); }
+.vcard-close { color: rgb(var(--fg-muted)); }
+.vcard-close:hover { background: rgb(var(--bg-elev)); color: rgb(var(--fg)); }
+.vcard-divider { height: 1px; background: rgb(var(--border)); }
+.vcard-tabs {
+  background: rgb(var(--bg-hover));
+  border: 1px solid rgb(var(--border));
+  border-radius: 14px;
+  padding: 3px;
+}
+.vcard-tab { font-family: var(--font-heading); border-radius: 10px; border: 1px solid transparent; }
+.vcard-tab--active {
+  background: rgb(var(--bg-card));
+  color: rgb(var(--fg));
+  box-shadow: 0 1px 3px rgb(36 49 66 / 0.1);
+  border-color: rgb(var(--border));
+}
+.vcard-tab--idle { color: rgb(var(--fg-muted)); background: transparent; }
+.vcard-tab--idle:hover { color: rgb(var(--fg)); }
+/* Cadre du QR : toujours blanc, code noir, quel que soit le theme. */
+.vcard-qr-frame { background: #ffffff; border: 1px solid rgb(var(--border)); border-radius: 20px; }
+.qr-corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: rgb(17 24 39 / 0.25);
+  border-style: solid;
+  border-radius: 2px;
+}
+.qr-corner--tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+.qr-corner--tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
+.qr-corner--bl { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
+.qr-corner--br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+.vcard-info-row:hover { background: rgb(var(--bg-hover)); }
+.vcard-download-btn { background: rgb(var(--brand)); color: #fff; font-family: var(--font-heading); }
+.vcard-download-btn:hover { background: rgb(var(--brand-hover)); }
+
+/* Pied de page : halo dore discret au survol, liens soulignes qui se deploient. */
+.spot-dark { position: relative; overflow: hidden; isolation: isolate; }
+.spot-dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(520px circle at 50% 0%, rgb(var(--gold) / 0.12), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.spot-dark:hover::before { opacity: 1; }
+.link-grow { position: relative; }
+.link-grow::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+a:hover .link-grow::after,
+a:focus-visible .link-grow::after { transform: scaleX(1); }
+
+/* Boutons flottants : memes emplacements que kayzen-lyon.com (au-dessus du bandeau cookies). */
+.a11y-fab {
+  bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
+  left: max(1rem, env(safe-area-inset-left));
+}
+.cookie-fab {
+  bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+  left: max(1rem, env(safe-area-inset-left));
+}
+@media (min-width: 768px) {
+  .cookie-fab { left: max(1.5rem, env(safe-area-inset-left)); }
+}
+.back-to-top {
+  bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
+  right: max(1rem, env(safe-area-inset-right));
+}
+@media (min-width: 768px) {
+  .a11y-fab { left: max(1.5rem, env(safe-area-inset-left)); }
+  .back-to-top { right: max(1.5rem, env(safe-area-inset-right)); }
+}
+
+/* Reglages du panneau accessibilite */
+/* Contraste renforce (WCAG AAA) : texte, bordures, couleur des actions. */
+.high-contrast {
+  --fg: 0 0 0;
+  --fg-muted: 38 38 38;
+  --fg-subtle: 38 38 38;
+  --heading: 0 0 0;
+  --border: 89 89 89;
+  --border-strong: 51 51 51;
+  --brand: 157 61 27;
+  --brand-hover: 128 50 22;
+  --brand-light: 157 61 27;
+}
+.dark.high-contrast {
+  --fg: 255 255 255;
+  --fg-muted: 240 240 240;
+  --fg-subtle: 240 240 240;
+  --heading: 255 255 255;
+  --border: 179 179 179;
+  --border-strong: 217 217 217;
+  --brand: 243 138 104;
+  --brand-hover: 247 165 138;
+  --brand-light: 243 138 104;
+}
+/* Noir pur OLED : uniquement sous le theme sombre. */
+.dark.oled {
+  --bg: 0 0 0;
+  --bg-sunken: 10 10 10;
+  --bg-card: 10 10 10;
+  --bg-elev: 15 15 15;
+  --bg-hover: 20 20 20;
+  --border: 41 41 41;
+  --border-strong: 143 143 143;
+}
+/* Police lisible : Atkinson Hyperlegible (Braille Institute), sur tout le document. */
+.dyslexic-font,
+.dyslexic-font * {
+  font-family: var(--font-atkinson), Verdana, system-ui, sans-serif !important;
+}
+.dyslexic-font body { letter-spacing: 0.03em; word-spacing: 0.1em; line-height: 1.75; }
+
+@media (prefers-reduced-motion: reduce) {
+  .qr-card-enter, .css-scale-in { animation: none; }
+  .site-chrome--smart, .link-grow::after, .spot-dark::before { transition: none; }
+}
+
+/* ── Animation du hero (HeroMotion), reprise de Nexus : boucle CSS de 10 s ─── */
+.hm-cycle { --d: 10s; }
+@keyframes hm-type { 0%, 4% { width: 0 } 16%, 100% { width: 10ch } }
+@keyframes hm-caret { 0%, 49% { opacity: 1 } 50%, 100% { opacity: 0 } }
+@keyframes hm-bar { 0%, 16% { transform: scaleX(0) } 52%, 100% { transform: scaleX(1) } }
+@keyframes hm-label-run { 0%, 15% { opacity: 0 } 18%, 50% { opacity: 1 } 53%, 100% { opacity: 0 } }
+@keyframes hm-label-done { 0%, 52% { opacity: 0 } 56%, 94% { opacity: 1 } 100% { opacity: 0 } }
+/* Anneau : circonference 2*pi*34 = 213.63 ; note 82/100 -> reste 18 % = 38.45 */
+@keyframes hm-ring { 0%, 50% { stroke-dashoffset: 213.63 } 66%, 94% { stroke-dashoffset: 38.45 } 100% { stroke-dashoffset: 213.63 } }
+@keyframes hm-score { 0%, 58% { opacity: 0; transform: scale(0.85) } 66%, 94% { opacity: 1; transform: none } 100% { opacity: 0 } }
+@keyframes hm-float { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
+@keyframes hm-flow { to { background-position: 12px 0 } }
+@keyframes hm-row-0 { 0%, 20% { opacity: 0; transform: translateY(6px) } 24%, 94% { opacity: 1; transform: none } 100% { opacity: 0 } }
+@keyframes hm-row-1 { 0%, 26% { opacity: 0; transform: translateY(6px) } 30%, 94% { opacity: 1; transform: none } 100% { opacity: 0 } }
+@keyframes hm-row-2 { 0%, 32% { opacity: 0; transform: translateY(6px) } 36%, 94% { opacity: 1; transform: none } 100% { opacity: 0 } }
+@keyframes hm-row-3 { 0%, 38% { opacity: 0; transform: translateY(6px) } 42%, 94% { opacity: 1; transform: none } 100% { opacity: 0 } }
+@keyframes hm-row-4 { 0%, 44% { opacity: 0; transform: translateY(6px) } 48%, 94% { opacity: 1; transform: none } 100% { opacity: 0 } }
+
+.hm-type { animation: hm-type var(--d) steps(10, end) infinite; }
+.hm-caret { animation: hm-caret 1s step-end infinite; }
+.hm-bar { transform-origin: left; animation: hm-bar var(--d) cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+.hm-label-run { animation: hm-label-run var(--d) linear infinite; }
+.hm-label-done { animation: hm-label-done var(--d) linear infinite; }
+.hm-row { opacity: 0; animation-duration: var(--d); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); animation-iteration-count: infinite; }
+.hm-row-0 { animation-name: hm-row-0; }
+.hm-row-1 { animation-name: hm-row-1; }
+.hm-row-2 { animation-name: hm-row-2; }
+.hm-row-3 { animation-name: hm-row-3; }
+.hm-row-4 { animation-name: hm-row-4; }
+.hm-ring { stroke-dasharray: 213.63; animation: hm-ring var(--d) cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hm-score { animation: hm-score var(--d) ease-out infinite; }
+.hm-float { animation: hm-float 5s ease-in-out infinite; }
+.hm-float-2 { animation: hm-float 6s ease-in-out 1s infinite; }
+.hm-flow {
+  background: repeating-linear-gradient(90deg, rgb(var(--brand)) 0 6px, transparent 6px 12px);
+  animation: hm-flow 0.8s linear infinite;
+}
+
+/* Animations reduites (reglage systeme) : etat final fixe, rien ne bouge. */
+@media (prefers-reduced-motion: reduce) {
+  .hm-type, .hm-caret, .hm-bar, .hm-label-run, .hm-label-done, .hm-row,
+  .hm-ring, .hm-score, .hm-float, .hm-float-2, .hm-flow { animation: none !important; }
+  .hm-type { width: 10ch; }
+  .hm-caret, .hm-label-run { opacity: 0; }
+  .hm-bar { transform: none; }
+  .hm-label-done, .hm-row, .hm-score { opacity: 1; transform: none; }
+  .hm-ring { stroke-dashoffset: 38.45; }
+}

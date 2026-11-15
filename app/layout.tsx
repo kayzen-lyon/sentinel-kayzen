@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { jakarta, outfit } from "./fonts";
+import { headers } from "next/headers";
+import { atkinson, jakarta, outfit } from "./fonts";
 import { ToastProvider } from "@/components/ui/Toast";
 import CookieBanner from "@/components/CookieBanner";
-import { THEME_INIT_SCRIPT } from "@/components/ui/ThemeToggle";
+import { INIT_SCRIPT } from "@/lib/initScripts";
+import AccessibilityToggle from "@/components/AccessibilityToggle";
+import BackToTop from "@/components/BackToTop";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -58,15 +61,17 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Nonce CSP de la requête (posé par proxy.ts) pour le script d'initialisation en ligne.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
-    <html lang="fr" className={`${jakarta.variable} ${outfit.variable}`} suppressHydrationWarning>
+    <html lang="fr" className={`${jakarta.variable} ${outfit.variable} ${atkinson.variable}`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: INIT_SCRIPT }} />
       </head>
       <body>
         <a
@@ -76,6 +81,8 @@ export default function RootLayout({
           Aller au contenu principal
         </a>
         <ToastProvider>{children}</ToastProvider>
+        <AccessibilityToggle />
+        <BackToTop />
         <CookieBanner />
       </body>
     </html>

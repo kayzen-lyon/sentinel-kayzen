@@ -13,6 +13,7 @@ const KEY = "sentinel_cookie_ack";
  */
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false);
+  const [ready, setReady] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -21,6 +22,7 @@ export default function CookieBanner() {
     } catch {
       /* localStorage indisponible : on n'affiche rien plutôt que de gêner */
     }
+    setReady(true);
   }, []);
 
   function ack() {
@@ -63,7 +65,24 @@ export default function CookieBanner() {
     };
   }, [visible]);
 
-  if (!visible) return null;
+  // Bandeau refermé : un bouton flottant permanent permet de le rouvrir à tout moment
+  // (l'information reste aussi accessible qu'à la première visite). Rien n'est rendu
+  // avant la lecture du stockage, pour éviter un bouton qui clignote au chargement.
+  if (!visible)
+    return ready ? (
+      <button
+        type="button"
+        onClick={() => setVisible(true)}
+        aria-label="Cookies et vie privée (RGPD)"
+        title="Cookies et vie privée"
+        className="cookie-fab no-print fixed z-[60] flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-muted shadow-[var(--shadow-md)] transition-colors hover:text-fg"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+          <path d="M12 3a9 9 0 109 9 4 4 0 01-4-4 4 4 0 01-4-4 3 3 0 01-1-1z" />
+          <path d="M9 10h.01M8 15h.01M13 16h.01M14 11h.01" />
+        </svg>
+      </button>
+    ) : null;
 
   return (
     <div

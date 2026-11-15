@@ -1,11 +1,13 @@
 BEGIN:VCARD
 VERSION:3.0
-N:BELHADJ;Tarek;;;
-FN:Tarek BELHADJ — Kayzen Web
-ORG:Kayzen Web
-TITLE:Création web, SEO & cybersécurité
+FN:KAYZEN — Sentinel
+N:KAYZEN;;;;
+ORG:KAYZEN
+TITLE:Sentinel by Kayzen — pentest IA autonome & cybersécurité offensive
 TEL;TYPE=WORK,VOICE:+33487776861
 EMAIL;TYPE=WORK:contact@kayzen-lyon.fr
-ADR;TYPE=WORK:;;6 rue Pierre Termier;Lyon;;69009;France
 URL:https://sentinel.kayzen-lyon.com
+ADR;TYPE=WORK:;;6 Rue de Bourgogne;Lyon;;69009;France
+GEO:45.7758039;4.8051837
+NOTE:Sentinel by Kayzen — pentest IA autonome\, audit de sécurité et plateforme self-service. Lun–Ven 9h–19h.
 END:VCARD

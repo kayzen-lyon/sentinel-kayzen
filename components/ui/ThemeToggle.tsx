@@ -2,10 +2,6 @@
 
 import { useSyncExternalStore } from "react";
 
-/** Script inline (dans <head>) : applique le thème avant le premier rendu, sans flash.
- *  Clair par défaut : le sombre ne s'active que si l'utilisateur l'a choisi. */
-export const THEME_INIT_SCRIPT = `try{if(localStorage.getItem("theme")==="dark")document.documentElement.classList.add("dark")}catch(e){}`;
-
 function subscribe(onChange: () => void) {
   const obs = new MutationObserver(onChange);
   obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
@@ -38,7 +34,7 @@ export default function ThemeToggle() {
       onClick={toggle}
       aria-label={dark ? "Activer le mode clair" : "Activer le mode sombre"}
       title={dark ? "Mode clair" : "Mode sombre"}
-      className="inline-flex h-10 w-10 items-center justify-center rounded-full text-fg transition-[background-color,color,transform] duration-150 hover:bg-bg-elev hover:text-brand active:scale-[0.97]"
+      className="inline-flex h-11 w-11 items-center justify-center rounded-full text-fg transition-[background-color,color,transform] duration-150 hover:bg-bg-elev hover:text-brand active:scale-[0.97]"
     >
       {dark ? (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

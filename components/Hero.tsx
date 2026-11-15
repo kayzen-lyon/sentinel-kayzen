@@ -1,4 +1,5 @@
 import Link from "next/link";
+import HeroMotion from "@/components/HeroMotion";
 
 export default function Hero() {
   return (
@@ -55,7 +56,7 @@ export default function Hero() {
             </ul>
           </div>
 
-          <TerminalPreview />
+          <HeroMotion />
         </div>
 
         <dl className="band-dark stat-band mt-16 grid grid-cols-2 gap-6 px-6 py-8 md:grid-cols-4 md:px-10">
@@ -73,44 +74,6 @@ export default function Hero() {
         </dl>
       </div>
     </section>
-  );
-}
-
-function TerminalPreview() {
-  return (
-    <div
-      className="reveal w-full min-w-0"
-      style={{ animationDelay: "260ms" }}
-    >
-      <div className="band-dark overflow-hidden rounded-3xl shadow-[var(--shadow-section)]">
-        <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-          <span className="h-3 w-3 rounded-full bg-risk/70" />
-          <span className="h-3 w-3 rounded-full bg-warn/70" />
-          <span className="h-3 w-3 rounded-full bg-safe/70" />
-          <span className="ml-3 font-mono text-xs text-subtle">
-            sentinel — audit https://app.client.fr
-          </span>
-        </div>
-        <pre className="overflow-x-auto px-5 py-5 font-mono text-[0.8rem] leading-relaxed text-muted">
-          <code>
-            <span className="text-brand-light">$</span> sentinel --target https://app.client.fr{"\n"}
-            <span className="text-subtle">›</span> Reconnaissance : cartographie de 38 endpoints…{"  "}
-            <span className="text-safe">ok</span>
-            {"\n"}
-            <span className="text-subtle">›</span> Orchestration : 4 agents red-team lancés{"  "}
-            <span className="text-safe">ok</span>
-            {"\n"}
-            <span className="text-risk">✗ CRITIQUE</span> IDOR — accès aux commandes d'autres comptes{"\n"}
-            {"  "}<span className="text-subtle">PoC validé · GET /api/orders/1042 → 200 (compte tiers)</span>
-            {"\n"}
-            <span className="text-warn">✗ ÉLEVÉ</span> Injection SQL — /search?q={"\n"}
-            <span className="text-safe">✓</span> 12 endpoints authentifiés sans faille{"\n"}
-            <span className="text-brand-light">→</span> Rapport + correctifs générés{" "}
-            <span className="text-fg">strix_runs/audit-app-client</span>
-          </code>
-        </pre>
-      </div>
-    </div>
   );
 }
 
