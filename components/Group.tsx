@@ -35,7 +35,7 @@ export default function Group() {
             <span className="eyebrow">L'écosystème Kayzen</span>
             <h2
               className="mt-4 font-heading font-bold text-fg"
-              style={{ fontSize: "var(--text-4xl)" }}
+              data-size="4xl"
             >
               Une nouvelle brique du groupe Kayzen
             </h2>
@@ -68,7 +68,7 @@ export default function Group() {
                 <div className="flex items-center justify-between">
                   <span
                     className="inline-block h-2.5 w-2.5 rounded-full"
-                    style={{ backgroundColor: `rgb(var(--${e.color}))` }}
+                    data-tint="dot" data-tone={e.color}
                   />
                   {e.current && (
                     <span className="rounded-full bg-brand/15 px-2.5 py-0.5 text-[0.7rem] font-semibold text-brand-hover">

@@ -29,7 +29,7 @@ export default function HowItWorks() {
           <span className="eyebrow">Le déroulé</span>
           <h2
             className="mt-4 font-heading font-bold text-fg"
-            style={{ fontSize: "var(--text-4xl)" }}
+            data-size="4xl"
           >
             Opérationnel en moins de 10 minutes
           </h2>
@@ -38,7 +38,7 @@ export default function HowItWorks() {
         <ol className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((s) => (
             <li key={s.n} className="card relative p-7">
-              <span aria-hidden="true" className="font-heading text-4xl font-bold text-brand/25">
+              <span aria-hidden="true" className="font-heading text-4xl font-bold text-brand/75">
                 {s.n}
               </span>
               <h3 className="mt-3 font-heading text-lg font-semibold text-fg">

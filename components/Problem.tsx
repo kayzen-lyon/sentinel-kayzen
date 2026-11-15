@@ -27,7 +27,7 @@ export default function Problem() {
           <span className="eyebrow">Le constat</span>
           <h2
             className="mt-4 font-heading font-bold text-fg"
-            style={{ fontSize: "var(--text-4xl)" }}
+            data-size="4xl"
           >
             La sécurité applicative ne suit plus la vitesse du code
           </h2>
@@ -42,10 +42,7 @@ export default function Problem() {
             <article key={c.title} className="card p-7">
               <span
                 className="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
-                style={{
-                  backgroundColor: `rgb(var(--${c.accent}) / 0.08)`,
-                  color: `rgb(var(--${c.accent}))`,
-                }}
+                data-tint="soft" data-tone={c.accent}
               >
                 {c.tag}
               </span>

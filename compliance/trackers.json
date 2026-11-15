@@ -1,0 +1,62 @@
+{
+  "about": "Déclaration des traceurs de Sentinel, lue par scripts/check-privacy.mjs du skill eu-web-compliance. Seules les entrées « exempt » peuvent exister avant tout choix. Le site ne charge aucun script tiers et ne dépose aucun traceur soumis à consentement.",
+  "exempt": [
+    {
+      "name": "sentinel_session",
+      "kind": "cookie",
+      "match": "exact",
+      "purpose": "authentication",
+      "justification": "Cookie de session posé à la connexion (HttpOnly, Secure, SameSite=Lax). Strictement nécessaire au compte demandé par l'utilisateur."
+    },
+    {
+      "name": "sentinel_org",
+      "kind": "cookie",
+      "match": "exact",
+      "purpose": "user-preference",
+      "justification": "Organisation active choisie par l'utilisateur connecté dans la console. Fonction demandée, aucun identifiant de suivi."
+    },
+    {
+      "name": "sentinel-cookie-prefs",
+      "kind": "localStorage",
+      "match": "exact",
+      "purpose": "consent-choice",
+      "justification": "Choix par finalité du bandeau de consentement. Aucun identifiant."
+    },
+    {
+      "name": "sentinel-cookie-date",
+      "kind": "localStorage",
+      "match": "exact",
+      "purpose": "consent-choice",
+      "justification": "Date du choix, pour le redemander après la durée recommandée."
+    },
+    {
+      "name": "sentinel-cookie-version",
+      "kind": "localStorage",
+      "match": "exact",
+      "purpose": "consent-choice",
+      "justification": "Version de la configuration du bandeau, pour redemander le choix si une finalité change."
+    },
+    {
+      "name": "theme",
+      "kind": "localStorage",
+      "match": "exact",
+      "purpose": "user-preference",
+      "justification": "Thème clair ou sombre choisi par le visiteur. Préférence d'affichage, aucun identifiant."
+    },
+    {
+      "name": "kayzen-a11y",
+      "kind": "localStorage",
+      "match": "exact",
+      "purpose": "user-preference",
+      "justification": "Réglages d'accessibilité choisis par le visiteur (taille du texte, contraste, police). Aucun identifiant."
+    },
+    {
+      "name": "sentinel_sidebar_collapsed",
+      "kind": "localStorage",
+      "match": "exact",
+      "purpose": "user-preference",
+      "justification": "État replié ou déplié de la barre latérale de la console."
+    }
+  ],
+  "third_parties": []
+}

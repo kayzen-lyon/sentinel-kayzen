@@ -12,7 +12,7 @@ export default function Hero() {
             {/* Pas d'animation d'entrée sur le h1 : c'est l'élément LCP, il doit être visible tout de suite. */}
             <h1
               className="leading-[1.06] text-fg"
-              style={{ fontSize: "clamp(2.25rem, 1.5rem + 3vw, 3.5rem)" }}
+              data-size="hero"
             >
               Des hackers IA qui trouvent vos failles{" "}
               <span className="gradient-text">avant les vrais.</span>
@@ -20,7 +20,7 @@ export default function Hero() {
 
             <p
               className="reveal mt-6 max-w-xl text-fg"
-              style={{ fontSize: "var(--text-lg)", animationDelay: "120ms" }}
+              data-size="lg" data-delay="120"
             >
               Sentinel déploie des agents autonomes qui exécutent réellement votre
               application, exploitent les vulnérabilités et les prouvent par des{" "}
@@ -30,7 +30,7 @@ export default function Hero() {
 
             <div
               className="reveal mt-8 flex flex-col gap-3 sm:flex-row"
-              style={{ animationDelay: "180ms" }}
+              data-delay="180"
             >
               <Link href="/signup" className="btn btn-primary btn-lg w-full sm:w-auto">
                 Scanner mon site gratuitement
@@ -43,7 +43,7 @@ export default function Hero() {
 
             <ul
               className="reveal mt-6 flex flex-wrap gap-2"
-              style={{ animationDelay: "220ms" }}
+              data-delay="220"
             >
               {["Moteur open-source Strix", "PoC validés", "Rapports prêts pour la conformité"].map(
                 (t) => (

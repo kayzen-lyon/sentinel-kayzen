@@ -7,8 +7,8 @@ import { useEffect, useState } from "react";
  * se remplit à mesure que l'on descend dans la page.
  *
  * Cible de 44 px, écouteur de défilement sous requestAnimationFrame, défilement
- * respectant prefers-reduced-motion. Le bouton sort de l'ordre de tabulation quand
- * il est invisible, et rend le focus au contenu principal après le retour en haut.
+ * respectant prefers-reduced-motion. Invisible, le bouton est retiré du rendu
+ * (visibility: hidden) : ni tabulation ni lecteur d'écran, et rend le focus au contenu principal après le retour en haut.
  */
 const R = 20;
 const CIRC = 2 * Math.PI * R;
@@ -54,11 +54,9 @@ export default function BackToTop() {
     <button
       type="button"
       onClick={toTop}
-      tabIndex={visible ? 0 : -1}
-      aria-hidden={!visible}
       aria-label={`Retour en haut de page — ${pct} % de la page parcourus`}
       className={`back-to-top no-print fixed z-[55] flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card text-muted shadow-[var(--shadow-md)] transition-[opacity,transform,color] duration-200 hover:text-fg ${
-        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-2 opacity-0"
+        visible ? "translate-y-0 opacity-100" : "invisible translate-y-2 opacity-0"
       }`}
     >
       <svg viewBox="0 0 48 48" className="absolute inset-0 h-full w-full -rotate-90" aria-hidden="true">

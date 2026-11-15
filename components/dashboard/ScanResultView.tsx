@@ -53,11 +53,8 @@ export default function ScanResultView({ result }: { result: ScanResult }) {
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
           <div
             className="flex h-24 w-24 flex-none items-center justify-center rounded-2xl border-2 font-heading text-5xl font-bold"
-            style={{
-              color: `rgb(var(--${gc}))`,
-              borderColor: `rgb(var(--${gc}) / 0.4)`,
-              backgroundColor: `rgb(var(--${gc}) / 0.08)`,
-            }}
+            data-tint="outline"
+            data-tone={gc}
           >
             {result.grade}
           </div>
@@ -75,10 +72,7 @@ export default function ScanResultView({ result }: { result: ScanResult }) {
                   <span
                     key={sev}
                     className="rounded-full px-2.5 py-1 text-xs font-semibold"
-                    style={{
-                      backgroundColor: `rgb(var(--${SEV[sev].color}) / 0.14)`,
-                      color: `rgb(var(--${SEV[sev].color}))`,
-                    }}
+                    data-tint="soft" data-tone={SEV[sev].color}
                   >
                     {s.counts[sev]} {SEV[sev].label.toLowerCase()}
                   </span>
@@ -147,10 +141,7 @@ function FindingRow({ f }: { f: Finding }) {
       <div className="flex items-start gap-3">
         <span
           className="mt-0.5 inline-flex h-6 w-6 flex-none items-center justify-center rounded-full text-sm font-bold"
-          style={{
-            backgroundColor: `rgb(var(--${color}) / 0.15)`,
-            color: `rgb(var(--${color}))`,
-          }}
+          data-tint="soft" data-tone={color}
           aria-hidden="true"
         >
           {icon}
@@ -160,10 +151,7 @@ function FindingRow({ f }: { f: Finding }) {
             <h3 className="font-heading text-base font-semibold text-fg">{f.title}</h3>
             <span
               className="rounded-full px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-wide"
-              style={{
-                backgroundColor: `rgb(var(--${color}) / 0.14)`,
-                color: `rgb(var(--${color}))`,
-              }}
+              data-tint="soft" data-tone={color}
             >
               {f.state === "pass" ? "OK" : SEV[f.severity].label}
             </span>

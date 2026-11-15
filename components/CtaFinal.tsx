@@ -10,7 +10,7 @@ export default function CtaFinal() {
           </span>
           <h2
             className="mx-auto mt-5 max-w-2xl font-heading font-bold text-fg"
-            style={{ fontSize: "var(--text-4xl)" }}
+            data-size="4xl"
           >
             Découvrez ce qu'un attaquant verrait sur votre application
           </h2>

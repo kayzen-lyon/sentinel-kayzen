@@ -18,14 +18,14 @@ export default function ThemeToggle() {
     const next = !dark;
     // Coupe les transitions le temps du basculement : sinon chaque élément
     // anime sa couleur à son propre rythme et le changement paraît décousu.
-    const style = document.createElement("style");
-    style.textContent = "*,*::before,*::after{transition:none!important}";
-    document.head.appendChild(style);
+    // Classe plutôt que <style> injecté : la CSP interdit les styles en ligne.
+    const root = document.documentElement;
+    root.classList.add("theme-switching");
     document.documentElement.classList.toggle("dark", next);
     try {
       localStorage.setItem("theme", next ? "dark" : "light");
     } catch {}
-    requestAnimationFrame(() => requestAnimationFrame(() => style.remove()));
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("theme-switching")));
   }
 
   return (

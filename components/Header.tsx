@@ -1,6 +1,6 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- petit logo local ; next/image impose un style en ligne que la CSP interdit */
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import DigitalContactCard from "@/components/DigitalContactCard";
@@ -109,15 +109,16 @@ export default function Header() {
         className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-4 sm:px-6"
         aria-label="Navigation principale"
       >
-        <Link href="/" className="relative z-50 flex items-center gap-2.5" aria-label="Sentinel by Kayzen, accueil" onClick={() => setOpen(false)}>
-          <Image src="/logo-mark.png" alt="" width={44} height={44} priority className="h-11 w-auto shrink-0" />
+        <Link href="/" className="relative z-50 flex items-center gap-2.5" onClick={() => setOpen(false)}>
+          <img src="/logo-mark.png" decoding="async" alt="" width={44} height={44} className="h-11 w-auto shrink-0" />
           <span className="flex flex-col leading-none">
             <span className="font-heading text-lg font-bold uppercase tracking-tight text-heading sm:text-xl">
               Sentinel
-            </span>
+            </span>{" "}
             <span className="text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-subtle">
               by Kayzen
             </span>
+            <span className="sr-only"> — accueil</span>
           </span>
         </Link>
 

@@ -1,12 +1,12 @@
+/* eslint-disable @next/next/no-img-element -- petit logo local ; next/image impose un style en ligne que la CSP interdit */
 import Link from "next/link";
-import Image from "next/image";
 
 export default function NotFound() {
   return (
     <main className="grid min-h-screen place-items-center px-6 text-center">
       <div>
-        <Image
-          src="/logo-mark.png"
+        <img
+          src="/logo-mark.png" decoding="async"
           alt=""
           width={72}
           height={72}

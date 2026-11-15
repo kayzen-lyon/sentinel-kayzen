@@ -1,4 +1,4 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element -- petit logo local ; next/image impose un style en ligne que la CSP interdit */
 import Link from "next/link";
 import { COMPANY, KAYZEN_APPS } from "@/lib/company";
 import DigitalContactCard from "@/components/DigitalContactCard";
@@ -67,11 +67,12 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-6 py-16">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
-            <Link href="/" className="group mb-6 flex items-center gap-2.5" aria-label="Sentinel by Kayzen, accueil">
-              <Image src="/logo-mark.png" alt="" width={48} height={48} className="h-12 w-auto transition-transform duration-500 group-hover:scale-105" />
+            <Link href="/" className="group mb-6 flex items-center gap-2.5">
+              <img src="/logo-mark.png" decoding="async" alt="" width={48} height={48} className="h-12 w-auto transition-transform duration-500 group-hover:scale-105" />
               <span className="flex flex-col leading-none">
-                <span className="font-heading text-xl font-bold uppercase tracking-tight text-white">Sentinel</span>
+                <span className="font-heading text-xl font-bold uppercase tracking-tight text-white">Sentinel</span>{" "}
                 <span className="mt-1 text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-white/70">by Kayzen</span>
+                <span className="sr-only"> — accueil</span>
               </span>
             </Link>
             <p className="mb-6 max-w-xs text-sm leading-relaxed text-white/70">

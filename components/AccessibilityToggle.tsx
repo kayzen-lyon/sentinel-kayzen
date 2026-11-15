@@ -63,7 +63,10 @@ export default function AccessibilityToggle() {
   useEffect(() => {
     if (!loaded) return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+      // Rien n'est écrit tant que le visiteur n'a rien réglé (minimisation).
+      const untouched = (Object.keys(DEFAULTS) as (keyof A11ySettings)[]).every((k) => settings[k] === DEFAULTS[k]);
+      if (untouched) localStorage.removeItem(STORAGE_KEY);
+      else localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
     } catch {
       /* stockage indisponible */
     }
@@ -104,7 +107,7 @@ export default function AccessibilityToggle() {
     "flex h-11 w-11 items-center justify-center rounded-xl border border-border text-fg transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-40";
 
   return (
-    <div ref={rootRef} className="a11y-fab no-print fixed z-[60]">
+    <div ref={rootRef} className="a11y-fab no-print fixed z-[75]">
       <button
         ref={btnRef}
         type="button"

@@ -1,6 +1,6 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- petit logo local ; next/image impose un style en ligne que la CSP interdit */
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -49,8 +49,8 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
   return (
     <div className="w-full max-w-md">
       <Link href="/" className="mb-8 flex items-center justify-center gap-2.5">
-        <Image
-          src="/logo-mark.png"
+        <img
+          src="/logo-mark.png" decoding="async"
           alt="Sentinel by Kayzen"
           width={44}
           height={44}

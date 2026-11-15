@@ -47,15 +47,17 @@ function Meter({ used, limit, unit }: { used: number; limit: number | null; unit
   const full = used >= limit;
   return (
     <div className="flex items-center gap-3">
-      <div
-        className="h-2 w-40 overflow-hidden rounded-full bg-hover"
+      <svg
+        className="h-2 w-40 flex-none overflow-hidden rounded-full bg-hover"
+        viewBox="0 0 100 2"
+        preserveAspectRatio="none"
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={limit}
         aria-valuenow={Math.min(used, limit)}
       >
-        <div className={`h-full ${full ? "bg-risk" : "bg-brand"}`} style={{ width: `${pct}%` }} />
-      </div>
+        <rect x="0" y="0" height="2" width={pct} data-tint="fill" data-tone={full ? "risk" : "brand"} />
+      </svg>
       <span className={`text-sm tabular-nums ${full ? "font-semibold text-risk" : "text-fg"}`}>
         {fmt(used)} / {fmt(limit)}
         {full && " — limite atteinte"}

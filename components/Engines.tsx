@@ -22,7 +22,7 @@ export default function Engines() {
           <span className="eyebrow">Le moteur</span>
           <h2
             className="mt-4 font-heading font-bold text-fg"
-            style={{ fontSize: "var(--text-4xl)" }}
+            data-size="4xl"
           >
             Deux moteurs, un même pipeline
           </h2>
@@ -98,10 +98,7 @@ function Item({
     <li className="flex items-start gap-3">
       <span
         className="mt-0.5 inline-flex h-5 w-5 flex-none items-center justify-center rounded-full"
-        style={{
-          backgroundColor: `rgb(var(--${accent}) / 0.15)`,
-          color: `rgb(var(--${accent}))`,
-        }}
+        data-tint="soft" data-tone={accent}
       >
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="m5 12 4 4 10-10" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />

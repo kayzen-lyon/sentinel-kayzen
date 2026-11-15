@@ -81,6 +81,8 @@ export default async function RootLayout({
           Aller au contenu principal
         </a>
         <ToastProvider>{children}</ToastProvider>
+        {/* Barre de progression de lecture (décorative, CSS pur). */}
+        <div className="scroll-progress-bar no-print fixed inset-x-0 top-0 z-[80] h-0.5 bg-brand" aria-hidden="true" />
         <AccessibilityToggle />
         <BackToTop />
         <CookieBanner />

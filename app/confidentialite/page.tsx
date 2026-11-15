@@ -71,14 +71,38 @@ export default function Page() {
         également introduire une réclamation auprès de la CNIL (www.cnil.fr).
       </p>
 
-      <h2>Cookies</h2>
+      <h2>Cookies et stockage local</h2>
       <p>
-        Sentinel utilise un unique cookie <strong>strictement nécessaire</strong>,{" "}
-        <code>sentinel_session</code>, qui maintient votre session authentifiée. Il est{" "}
-        <code>httpOnly</code>, <code>Secure</code> et <code>SameSite=Lax</code>, et n'a
-        aucune finalité publicitaire ou de suivi. Étant indispensable au service, il ne
-        requiert pas de consentement préalable (article 82 de la loi Informatique et
-        Libertés). Aucun cookie tiers n'est déposé.
+        Sentinel ne dépose <strong>aucun cookie de mesure d'audience ni de publicité</strong>{" "}
+        et ne charge aucun script tiers. Seuls des éléments strictement nécessaires au
+        service, ou enregistrant un réglage que vous avez vous-même choisi, sont utilisés ;
+        ils ne requièrent pas de consentement préalable (article 82 de la loi Informatique
+        et Libertés).
+      </p>
+      <ul>
+        <li>
+          <code>sentinel_session</code> (cookie) — maintient votre session authentifiée ;{" "}
+          <code>httpOnly</code>, <code>Secure</code>, <code>SameSite=Lax</code>.
+        </li>
+        <li>
+          <code>sentinel_org</code> (cookie) — organisation active choisie dans la console.
+        </li>
+        <li>
+          <code>sentinel-cookie-prefs</code>, <code>sentinel-cookie-date</code>,{" "}
+          <code>sentinel-cookie-version</code> (stockage local) — votre choix dans le bandeau
+          cookies, sa date et la version du bandeau.
+        </li>
+        <li>
+          <code>theme</code>, <code>kayzen-a11y</code>, <code>sentinel_sidebar_collapsed</code>{" "}
+          (stockage local) — vos préférences d'affichage : thème clair ou sombre, réglages
+          d'accessibilité, barre latérale de la console.
+        </li>
+      </ul>
+      <p>
+        Ces éléments de stockage local restent dans votre navigateur et ne nous sont pas
+        transmis. Vous pouvez modifier votre choix à tout moment avec l'icône « cookies » en
+        bas à gauche de chaque page. Si un outil de mesure d'audience était ajouté un jour,
+        il ne serait activé qu'après votre accord.
       </p>
 
       <h2>Sous-traitants</h2>

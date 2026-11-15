@@ -39,7 +39,7 @@ export default function Integrations() {
           <span className="eyebrow">L'écosystème</span>
           <h2
             className="mt-4 font-heading font-bold text-fg"
-            style={{ fontSize: "var(--text-4xl)" }}
+            data-size="4xl"
           >
             Sentinel s'intègre dans votre chaîne, pas l'inverse
           </h2>

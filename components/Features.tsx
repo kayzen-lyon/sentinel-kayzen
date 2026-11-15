@@ -45,7 +45,7 @@ export default function Features() {
           <span className="eyebrow">La plateforme</span>
           <h2
             className="mt-4 font-heading font-bold text-fg"
-            style={{ fontSize: "var(--text-4xl)" }}
+            data-size="4xl"
           >
             L'arsenal complet d'un pentester, opérationnel en continu
           </h2>
@@ -64,10 +64,7 @@ export default function Features() {
             >
               <span
                 className="inline-flex h-12 w-12 items-center justify-center rounded-xl transition-colors"
-                style={{
-                  backgroundColor: `rgb(var(--${f.accent}) / 0.12)`,
-                  color: `rgb(var(--${f.accent}))`,
-                }}
+                data-tint="soft" data-tone={f.accent}
               >
                 <Icon name={f.icon} />
               </span>

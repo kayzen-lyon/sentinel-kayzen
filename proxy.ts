@@ -6,8 +6,8 @@ import { SESSION_COOKIE, verifySessionToken } from "@/lib/jwt";
  *    ne sont plus autorisés par 'unsafe-inline' mais par ce nonce ('strict-dynamic' étend
  *    la confiance aux scripts que Next charge lui-même). Contrepartie assumée : les pages
  *    sont rendues à la demande (le nonce change à chaque requête).
- *    'unsafe-inline' reste sur les STYLES uniquement (attributs style du design system) :
- *    risque faible, sans exécution de code.
+ *    Les styles en ligne sont interdits eux aussi (plus aucun 'unsafe-inline' dans la CSP,
+ *    hors mode développement où Next en injecte pour le rechargement à chaud).
  * 2. Protection des routes /dashboard (session requise).
  */
 function buildCsp(nonce: string): string {
@@ -22,9 +22,11 @@ function buildCsp(nonce: string): string {
     "worker-src 'self' blob:",
     "manifest-src 'self'",
     "media-src 'self'",
-    "img-src 'self' data: blob:",
+    // Images servies comme fichiers : ni data: ni blob: (ANSSI WEB R15).
+    "img-src 'self'",
     "font-src 'self'",
-    "style-src 'self' 'unsafe-inline'",
+    // Styles : feuilles du site uniquement, aucun style en ligne (ni balise, ni attribut).
+    dev ? "style-src 'self' 'unsafe-inline'" : "style-src 'self'",
     // 'unsafe-eval' en développement uniquement (outils de débogage de React).
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${dev ? " 'unsafe-eval'" : ""}`,
     "connect-src 'self'",

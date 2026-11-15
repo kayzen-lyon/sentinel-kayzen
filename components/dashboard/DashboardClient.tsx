@@ -1,6 +1,6 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- petit logo local ; next/image impose un style en ligne que la CSP interdit */
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { ScanResult } from "@/lib/scanner";
@@ -281,7 +281,7 @@ export default function DashboardClient({
 
                 {!scanning && !result && (
                   <div className="card grid place-items-center p-12 text-center">
-                    <Image src="/logo-mark.png" alt="" width={64} height={64} className="h-16 w-auto opacity-40" />
+                    <img src="/logo-mark.png" decoding="async" alt="" width={64} height={64} className="h-16 w-auto opacity-40" />
                     <p className="mt-4 font-heading text-lg font-semibold text-fg">
                       Aucun scan pour le moment
                     </p>
@@ -352,7 +352,7 @@ function GradeChip({ grade }: { grade: string | null }) {
   return (
     <span
       className="inline-flex h-8 w-8 flex-none items-center justify-center rounded-lg font-heading text-sm font-bold"
-      style={{ backgroundColor: `rgb(var(--${c}) / 0.14)`, color: `rgb(var(--${c}))` }}
+      data-tint="soft" data-tone={c}
     >
       {grade ?? "—"}
     </span>

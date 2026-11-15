@@ -1,7 +1,7 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- petit logo local ; next/image impose un style en ligne que la CSP interdit */
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import ThemeToggle from "@/components/ui/ThemeToggle";
@@ -168,7 +168,7 @@ export default function DashboardShell({
       >
         <div className="flex h-16 flex-none items-center justify-between border-b border-border px-4">
           <Link href="/dashboard" className="flex min-w-0 items-center gap-2.5" title="Vue d'ensemble">
-            <Image src="/logo-mark.png" alt="" width={30} height={30} className="h-[30px] w-auto flex-none" />
+            <img src="/logo-mark.png" decoding="async" alt="" width={30} height={30} className="h-[30px] w-auto flex-none" />
             <span className={`font-heading text-base font-bold text-heading ${collapsed ? "lg:hidden" : ""}`}>
               Sentinel
             </span>

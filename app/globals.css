@@ -403,9 +403,10 @@ h1 {
   }
 }
 
+/* Glissement seul, sans transparence : le texte reste lisible (et mesurable) a tout instant. */
 @keyframes float-up {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { transform: translateY(16px); }
+  to { transform: translateY(0); }
 }
 
 .reveal {
@@ -772,7 +773,7 @@ a:focus-visible .link-grow::after { transform: scaleX(1); }
 
 /* Boutons flottants : memes emplacements que kayzen-lyon.com (au-dessus du bandeau cookies). */
 .a11y-fab {
-  bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(7rem + var(--banner-h, 0px) + env(safe-area-inset-bottom, 0px));
   left: max(1rem, env(safe-area-inset-left));
 }
 .cookie-fab {
@@ -783,7 +784,7 @@ a:focus-visible .link-grow::after { transform: scaleX(1); }
   .cookie-fab { left: max(1.5rem, env(safe-area-inset-left)); }
 }
 .back-to-top {
-  bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(7rem + var(--banner-h, 0px) + env(safe-area-inset-bottom, 0px));
   right: max(1rem, env(safe-area-inset-right));
 }
 @media (min-width: 768px) {
@@ -884,4 +885,62 @@ a:focus-visible .link-grow::after { transform: scaleX(1); }
   .hm-bar { transform: none; }
   .hm-label-done, .hm-row, .hm-score { opacity: 1; transform: none; }
   .hm-ring { stroke-dashoffset: 38.45; }
+}
+
+/* -- Remplacants des styles en ligne (la CSP interdit desormais unsafe-inline) -- */
+[data-tone="safe"] { --tone: var(--safe); }
+[data-tone="safe-light"] { --tone: var(--safe-light); }
+[data-tone="warn"] { --tone: var(--warn); }
+[data-tone="risk"] { --tone: var(--risk); }
+[data-tone="brand"] { --tone: var(--brand); }
+[data-tone="brand-light"] { --tone: var(--brand-light); }
+[data-tone="secondary"] { --tone: var(--secondary); }
+[data-tone="violet"] { --tone: var(--violet); }
+[data-tone="gold"] { --tone: var(--gold); }
+[data-tone="border-strong"] { --tone: var(--border-strong); }
+[data-tone="muted"] { --tone: var(--fg-muted); }
+[data-tone="subtle"] { --tone: var(--fg-subtle); }
+[data-tint="soft"] { background-color: rgb(var(--tone) / 0.08); color: rgb(var(--tone)); }
+[data-tint="soft"][data-tone="muted"] { background-color: rgb(var(--bg-hover)); }
+[data-tint="outline"] { color: rgb(var(--tone)); border-color: rgb(var(--tone) / 0.4); background-color: rgb(var(--tone) / 0.08); }
+[data-tint="fg"] { color: rgb(var(--tone)); }
+[data-tint="dot"] { background-color: rgb(var(--tone)); }
+[data-tint="fill"] { fill: rgb(var(--tone)); }
+[data-size="4xl"] { font-size: var(--text-4xl); }
+[data-size="lg"] { font-size: var(--text-lg); }
+[data-size="hero"] { font-size: clamp(2.25rem, 1.5rem + 3vw, 3.5rem); }
+[data-delay="120"] { animation-delay: 120ms; }
+[data-delay="180"] { animation-delay: 180ms; }
+[data-delay="220"] { animation-delay: 220ms; }
+[data-delay="260"] { animation-delay: 260ms; }
+[data-depth="1"] { margin-left: 16px; }
+[data-depth="2"] { margin-left: 32px; }
+[data-depth="3"] { margin-left: 48px; }
+[data-depth="4"] { margin-left: 64px; }
+[data-depth="5"] { margin-left: 80px; }
+[data-depth="6"] { margin-left: 96px; }
+[data-depth="7"] { margin-left: 112px; }
+[data-depth="8"] { margin-left: 128px; }
+
+/* Bascule de theme : coupe les transitions le temps du changement (classe posee par ThemeToggle). */
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after { transition: none !important; }
+
+/* Bandeau de consentement */
+@keyframes slide-up-kf { from { transform: translateY(16px); } to { transform: none; } }
+.animate-slide-up { animation: slide-up-kf 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.cookie-banner { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+
+/* Barre de progression de lecture en haut de page (CSS pur, comme kayzen-lyon.com). */
+.scroll-progress-bar {
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  animation: scroll-progress linear;
+  animation-timeline: scroll();
+}
+@keyframes scroll-progress { to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-up { animation: none; }
+  .scroll-progress-bar { display: none; }
 }

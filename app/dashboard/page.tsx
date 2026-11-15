@@ -36,12 +36,12 @@ const JOB_STATUS: Record<string, { label: string; tone: string }> = {
   cancelled: { label: "Annulé", tone: "muted" },
 };
 
-const SEVERITIES: { key: keyof SeverityCounts; label: string; color: string }[] = [
-  { key: "critical", label: "Critiques", color: "rgb(var(--risk))" },
-  { key: "high", label: "Élevées", color: "rgb(var(--brand))" },
-  { key: "medium", label: "Moyennes", color: "rgb(var(--warn))" },
-  { key: "low", label: "Faibles", color: "rgb(var(--secondary))" },
-  { key: "info", label: "Informations", color: "rgb(var(--border-strong))" },
+const SEVERITIES: { key: keyof SeverityCounts; label: string; tone: string }[] = [
+  { key: "critical", label: "Critiques", tone: "risk" },
+  { key: "high", label: "Élevées", tone: "brand" },
+  { key: "medium", label: "Moyennes", tone: "warn" },
+  { key: "low", label: "Faibles", tone: "secondary" },
+  { key: "info", label: "Informations", tone: "border-strong" },
 ];
 
 function Kpi({
@@ -62,7 +62,8 @@ function Kpi({
       <p className="text-xs font-semibold uppercase tracking-wide text-subtle">{label}</p>
       <p
         className="mt-2 font-heading text-3xl font-bold tabular-nums text-fg"
-        style={tone ? { color: `rgb(var(--${tone}))` } : undefined}
+        data-tint={tone ? "fg" : undefined}
+        data-tone={tone}
       >
         {value}
       </p>
@@ -72,12 +73,8 @@ function Kpi({
 }
 
 function Pill({ tone, children }: { tone: string; children: React.ReactNode }) {
-  const style =
-    tone === "muted"
-      ? { backgroundColor: "rgb(var(--bg-hover))", color: "rgb(var(--fg-muted))" }
-      : { backgroundColor: `rgb(var(--${tone}) / 0.12)`, color: `rgb(var(--${tone}))` };
   return (
-    <span className="inline-flex flex-none items-center rounded-full px-2.5 py-1 text-xs font-semibold" style={style}>
+    <span className="inline-flex flex-none items-center rounded-full px-2.5 py-1 text-xs font-semibold" data-tint="soft" data-tone={tone}>
       {children}
     </span>
   );
@@ -152,11 +149,8 @@ export default async function OverviewPage() {
               <li key={s.label} className="flex items-start gap-3 rounded-lg border border-border bg-sunken p-3.5">
                 <span
                   className="mt-0.5 flex h-6 w-6 flex-none items-center justify-center rounded-full text-xs font-bold"
-                  style={
-                    s.done
-                      ? { backgroundColor: "rgb(var(--safe) / 0.14)", color: "rgb(var(--safe))" }
-                      : { backgroundColor: "rgb(var(--bg-hover))", color: "rgb(var(--fg-muted))" }
-                  }
+                  data-tint="soft"
+                  data-tone={s.done ? "safe" : "muted"}
                   aria-hidden="true"
                 >
                   {s.done ? "✓" : i + 1}
@@ -187,7 +181,7 @@ export default async function OverviewPage() {
               <>
                 {host(last.target_url)}
                 {delta !== null && delta !== 0 && (
-                  <span style={{ color: `rgb(var(--${delta > 0 ? "safe" : "risk"}))` }}>
+                  <span data-tint="fg" data-tone={delta > 0 ? "safe" : "risk"}>
                     {" "}
                     ({delta > 0 ? "+" : ""}
                     {delta} pts)
@@ -239,15 +233,19 @@ export default async function OverviewPage() {
           </p>
         ) : (
           <>
-            <div className="mt-4 flex h-3 overflow-hidden rounded-full bg-hover" aria-hidden="true">
-              {SEVERITIES.filter((s) => findings[s.key] > 0).map((s) => (
-                <div key={s.key} style={{ width: `${(findings[s.key] / openTotal) * 100}%`, backgroundColor: s.color }} />
-              ))}
-            </div>
+            {/* Barre empilée en SVG : les largeurs sont des attributs, pas des styles en ligne (CSP). */}
+            <svg className="mt-4 block h-3 w-full overflow-hidden rounded-full bg-hover" viewBox="0 0 100 3" preserveAspectRatio="none" aria-hidden="true">
+              {SEVERITIES.map((s, i) => {
+                const before = SEVERITIES.slice(0, i).reduce((n, p) => n + findings[p.key], 0);
+                return findings[s.key] > 0 ? (
+                  <rect key={s.key} x={(before / openTotal) * 100} y="0" height="3" width={(findings[s.key] / openTotal) * 100} data-tint="fill" data-tone={s.tone} />
+                ) : null;
+              })}
+            </svg>
             <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-5">
               {SEVERITIES.map((s) => (
                 <li key={s.key} className="flex items-center gap-2 text-sm">
-                  <span className="h-2.5 w-2.5 flex-none rounded-full" style={{ backgroundColor: s.color }} aria-hidden="true" />
+                  <span className="h-2.5 w-2.5 flex-none rounded-full" data-tint="dot" data-tone={s.tone} aria-hidden="true" />
                   <span className="text-muted">{s.label}</span>
                   <span className="ml-auto font-semibold tabular-nums text-fg">{findings[s.key]}</span>
                 </li>
@@ -273,10 +271,7 @@ export default async function OverviewPage() {
                 <li key={s.id} className="flex items-center gap-3 py-2.5">
                   <span
                     className="inline-flex h-8 w-8 flex-none items-center justify-center rounded-lg font-heading text-sm font-bold"
-                    style={{
-                      backgroundColor: `rgb(var(--${gradeTone(s.grade)}) / 0.14)`,
-                      color: `rgb(var(--${gradeTone(s.grade)}))`,
-                    }}
+                    data-tint="soft" data-tone={gradeTone(s.grade)}
                   >
                     {s.grade ?? "—"}
                   </span>

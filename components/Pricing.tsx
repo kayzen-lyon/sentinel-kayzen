@@ -55,7 +55,7 @@ export default function Pricing() {
           <span className="eyebrow">Les offres</span>
           <h2
             className="mt-4 font-heading font-bold text-fg"
-            style={{ fontSize: "var(--text-4xl)" }}
+            data-size="4xl"
           >
             Un tarif pour chaque maturité sécurité
           </h2>

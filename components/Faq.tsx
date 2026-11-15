@@ -13,7 +13,7 @@ export default function Faq() {
           <span className="eyebrow">Questions fréquentes</span>
           <h2
             className="mt-4 font-heading font-bold text-fg"
-            style={{ fontSize: "var(--text-4xl)" }}
+            data-size="4xl"
           >
             Tout ce que vous devez savoir
           </h2>
@@ -43,8 +43,7 @@ export default function Faq() {
                   </span>
                 </button>
                 <div
-                  className="grid transition-[grid-template-rows] duration-300 ease-out"
-                  style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
+                  className={`grid transition-[grid-template-rows] duration-300 ease-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
                 >
                   <div className="overflow-hidden">
                     <p className="px-6 pb-5 text-[0.95rem] leading-relaxed text-muted">

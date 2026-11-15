@@ -41,7 +41,7 @@ export default function Coverage() {
           <span className="eyebrow">La couverture</span>
           <h2
             className="mt-4 font-heading font-bold text-fg"
-            style={{ fontSize: "var(--text-4xl)" }}
+            data-size="4xl"
           >
             L'OWASP Top 10 — et bien au-delà
           </h2>
