@@ -21,7 +21,8 @@ export function getPool(): Pool {
   if (!pool) {
     pool = new Pool({
       connectionString,
-      max: 3,
+      // 3 par défaut (serverless) ; réglable, ex. PG_POOL_MAX=1 pour une base de test mono-connexion.
+      max: Number(process.env.PG_POOL_MAX) || 3,
       // TLS vérifié dès que le certificat CA du fournisseur est fourni
       // (DATABASE_CA_CERT, contenu PEM). Sans lui, comportement historique conservé
       // pour ne pas couper la prod.

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ConsoleHeader from "@/components/dashboard/ConsoleHeader";
 import { useToast } from "@/components/ui/Toast";
 import { formatDate } from "@/lib/format";
 
@@ -81,8 +80,6 @@ export default function MonitoringPanel() {
 
   return (
     <div className="min-h-screen">
-      <ConsoleHeader active="monitoring" />
-
       <main className="container-x py-10">
         <h1 className="font-heading text-3xl font-bold text-fg">Surveillance planifiée</h1>
         <p className="mt-2 max-w-2xl text-muted">
@@ -105,7 +102,7 @@ export default function MonitoringPanel() {
           <select
             value={frequency}
             onChange={(e) => setFrequency(e.target.value as "daily" | "weekly")}
-            className="input sm:w-44"
+            className="input sm:!w-44 sm:flex-none"
             aria-label="Fréquence"
           >
             <option value="daily">Quotidien</option>

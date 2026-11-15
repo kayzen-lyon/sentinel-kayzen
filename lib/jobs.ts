@@ -240,3 +240,23 @@ export async function upsertFindingsSystem(
   }
   return inserted;
 }
+
+export type SeverityCounts = { critical: number; high: number; medium: number; low: number; info: number };
+
+/** Vulnérabilités encore ouvertes de l'organisation, par gravité (vue d'ensemble). */
+export async function openFindingsBySeverity(orgId: string): Promise<SeverityCounts> {
+  await ensureSchema();
+  const rows = await query<{ sev: string; n: number }>(
+    `SELECT lower(coalesce(f.severity, 'info')) AS sev, count(*)::int AS n
+       FROM job_findings f JOIN jobs j ON j.id = f.job_id
+      WHERE j.org_id = $1 AND f.status = 'open'
+      GROUP BY 1`,
+    [orgId]
+  );
+  const out: SeverityCounts = { critical: 0, high: 0, medium: 0, low: 0, info: 0 };
+  for (const r of rows) {
+    if (r.sev in out) out[r.sev as keyof SeverityCounts] += r.n;
+    else out.info += r.n; // gravité inconnue : comptée en information
+  }
+  return out;
+}

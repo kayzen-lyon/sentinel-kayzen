@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ConsoleHeader from "@/components/dashboard/ConsoleHeader";
 import { formatDateTime } from "@/lib/format";
 
 type Role = "owner" | "admin" | "member" | "viewer";
@@ -275,8 +274,6 @@ export default function TeamPanel() {
 
   return (
     <div className="min-h-screen">
-      <ConsoleHeader active="team" />
-
       <main className="container-x py-10">
         <h1 className="font-heading text-3xl font-bold text-fg">Équipe & audit</h1>
         <p className="mt-2 max-w-2xl text-muted">
@@ -351,7 +348,7 @@ export default function TeamPanel() {
                 <select
                   value={newRole}
                   onChange={(e) => setNewRole(e.target.value as Role)}
-                  className="input sm:w-36"
+                  className="input sm:!w-36 sm:flex-none"
                   aria-label="Rôle"
                 >
                   <option value="admin">Admin</option>

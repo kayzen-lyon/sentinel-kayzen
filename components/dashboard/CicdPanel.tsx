@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import ConsoleHeader from "@/components/dashboard/ConsoleHeader";
 import Link from "next/link";
 
 // Assemblé ligne par ligne pour garder les `${{ ... }}` littéraux (pas d'interpolation JS).
@@ -55,8 +54,6 @@ export default function CicdPanel() {
 
   return (
     <div className="min-h-screen">
-      <ConsoleHeader active="cicd" />
-
       <main className="container-x py-10">
         <h1 className="font-heading text-3xl font-bold text-fg">
           Scan de sécurité sur les Pull Requests

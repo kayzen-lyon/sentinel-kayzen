@@ -3,16 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import type { ScanResult } from "@/lib/scanner";
-import dynamic from "next/dynamic";
 import ScanResultView from "./ScanResultView";
-
-// Chargé à la demande : le JS du panneau Domaines n'est téléchargé qu'à
-// l'ouverture de l'onglet, pas au premier rendu du tableau de bord.
-const DomainsPanel = dynamic(() => import("./DomainsPanel"), {
-  loading: () => <div className="skeleton h-40 w-full" />,
-});
 
 type HistoryItem = {
   id: string | null;
@@ -35,16 +27,12 @@ const PROGRESS = [
 ];
 
 export default function DashboardClient({
-  user,
   dbConfigured,
   initialScans,
 }: {
-  user: { email: string; name?: string | null };
   dbConfigured: boolean;
   initialScans: HistoryItem[];
 }) {
-  const router = useRouter();
-  const [view, setView] = useState<"scan" | "domains">("scan");
   const [url, setUrl] = useState("");
   const [scanning, setScanning] = useState(false);
   const [step, setStep] = useState(0);
@@ -58,7 +46,6 @@ export default function DashboardClient({
 
   async function performScan(target: string) {
     if (!target.trim() || scanning) return;
-    setView("scan");
     setError(null);
     setResult(null);
     setScanning(true);
@@ -107,7 +94,6 @@ export default function DashboardClient({
     if (item.result) {
       setResult(item.result);
       setResultDeep(Boolean(item.deep));
-      setView("scan");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -125,7 +111,6 @@ export default function DashboardClient({
           findings: data.scan.findings,
         });
         setResultDeep(Boolean(data.scan.deep));
-        setView("scan");
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     } catch {
@@ -169,90 +154,9 @@ export default function DashboardClient({
         .reverse()
     : [];
 
-  async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
-    router.refresh();
-  }
-
   return (
     <div className="min-h-screen">
-      <header className="no-print sticky top-0 z-40 border-b border-border bg-bg/85 backdrop-blur-xl">
-        <div className="container-x flex h-[64px] items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2.5">
-              <Image src="/logo-mark.png" alt="Sentinel by Kayzen" width={32} height={32} className="h-8 w-auto" />
-              <span className="font-heading text-base font-semibold text-fg">
-                Sentinel <span className="text-subtle">Console</span>
-              </span>
-            </Link>
-            <nav className="hidden gap-1 sm:flex">
-              <button
-                onClick={() => setView("scan")}
-                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                  view === "scan" ? "bg-hover text-fg" : "text-muted hover:text-fg"
-                }`}
-              >
-                Scanner
-              </button>
-              <button
-                onClick={() => setView("domains")}
-                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                  view === "domains" ? "bg-hover text-fg" : "text-muted hover:text-fg"
-                }`}
-              >
-                Domaines
-              </button>
-              <Link
-                href="/dashboard/pentest"
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg"
-              >
-                Pentest autonome
-              </Link>
-              <Link
-                href="/dashboard/monitoring"
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg"
-              >
-                Surveillance
-              </Link>
-              <Link
-                href="/dashboard/cicd"
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg"
-              >
-                CI/CD
-              </Link>
-              <Link
-                href="/dashboard/integrations"
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg"
-              >
-                Intégrations
-              </Link>
-              <Link
-                href="/dashboard/team"
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-fg"
-              >
-                Équipe
-              </Link>
-            </nav>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/dashboard/account"
-              className="hidden text-sm text-muted transition-colors hover:text-fg sm:inline"
-            >
-              {user.name || user.email}
-            </Link>
-            <button onClick={logout} className="btn btn-ghost !px-3.5 !py-2 text-sm">
-              Déconnexion
-            </button>
-          </div>
-        </div>
-      </header>
-
       <main className="container-x py-10">
-        {view === "domains" ? (
-          <DomainsPanel />
-        ) : (
           <>
             <h1 className="font-heading text-3xl font-bold text-fg">Scanner de sécurité</h1>
             <p className="mt-2 text-muted">
@@ -365,9 +269,9 @@ export default function DashboardClient({
                     {!resultDeep && (
                       <p className="no-print mb-4 rounded-lg border border-border bg-bg-elev/60 px-4 py-2.5 text-sm text-muted">
                         Astuce : vérifiez la propriété de ce domaine dans l'onglet{" "}
-                        <button onClick={() => setView("domains")} className="font-medium text-brand-light hover:underline">
+                        <Link href="/dashboard/domaines" className="font-medium text-brand-light hover:underline">
                           Domaines
-                        </button>{" "}
+                        </Link>{" "}
                         pour débloquer le scan approfondi (TLS, SPF/DMARC, contenu mixte…).
                       </p>
                     )}
@@ -437,7 +341,6 @@ export default function DashboardClient({
               </aside>
             </div>
           </>
-        )}
       </main>
     </div>
   );
