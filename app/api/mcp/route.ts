@@ -6,6 +6,7 @@ import { validateTargetUrl } from "@/lib/ssrf";
 import { runScan } from "@/lib/scanner";
 import { createScanRecord, completeScan, listScans } from "@/lib/scans";
 import { isHostVerified } from "@/lib/domains";
+import { pentestEmailBlock } from "@/lib/emailgate";
 import { createJob, getJob, listFindings } from "@/lib/jobs";
 import { canManage, ensurePersonalOrg, getOrg, getRole } from "@/lib/orgs";
 import { getPlaybook, PLAYBOOKS } from "@/lib/playbooks";
@@ -121,6 +122,8 @@ async function callTool(
     case "launch_pentest": {
       const check = await validateTargetUrl(String(args.url || ""));
       if (!check.ok) return { ...text(`Erreur : ${check.reason}`), isError: true };
+      const emailBlock = await pentestEmailBlock(userId);
+      if (emailBlock) return { ...text(`Refusé : ${emailBlock}`), isError: true };
       const verified = await isHostVerified(userId, check.url.hostname).catch(() => false);
       if (!verified)
         return {

@@ -46,3 +46,21 @@ export async function createUser(
   );
   return rows[0];
 }
+
+/** L'adresse e-mail du compte a-t-elle été confirmée ? */
+export async function isEmailVerified(userId: string): Promise<boolean> {
+  await ensureSchema();
+  const rows = await query<{ v: boolean }>(
+    `SELECT email_verified_at IS NOT NULL AS v FROM users WHERE id=$1`,
+    [userId]
+  );
+  return Boolean(rows[0]?.v);
+}
+
+export async function markEmailVerified(userId: string): Promise<void> {
+  await ensureSchema();
+  await query(
+    `UPDATE users SET email_verified_at = COALESCE(email_verified_at, now()) WHERE id=$1`,
+    [userId]
+  );
+}

@@ -189,3 +189,16 @@ test("invitations : seul le hash du jeton est stocké", async () => {
   assert.equal(h, hashInviteToken("jeton-test"));
   assert.notEqual(h, hashInviteToken("jeton-test2"));
 });
+
+test("authtokens : hash stable et distinct par jeton", async () => {
+  const { hashAuthToken, TOKEN_TTL_MINUTES } = await import("../lib/authtokens");
+  assert.match(hashAuthToken("t"), /^[0-9a-f]{64}$/);
+  assert.notEqual(hashAuthToken("t"), hashAuthToken("t2"));
+  assert.equal(TOKEN_TTL_MINUTES.reset, 30);
+});
+
+test("pentestEmailBlock : pas de blocage si l'envoi d'e-mails est désactivé", async () => {
+  const { pentestEmailBlock } = await import("../lib/emailgate");
+  // RESEND_API_KEY absente en test → jamais bloquant (sinon comptes neufs bloqués à vie).
+  assert.equal(await pentestEmailBlock("00000000-0000-0000-0000-000000000000"), null);
+});

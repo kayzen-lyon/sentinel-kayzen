@@ -9,6 +9,7 @@ import { appBaseUrl, dispatchWorkerRun, githubConfigured, type ScanEngine } from
 import { canManage, ensurePersonalOrg, getOrg, getRole } from "@/lib/orgs";
 import { logAudit } from "@/lib/audit";
 import { getPlaybook } from "@/lib/playbooks";
+import { pentestEmailBlock } from "@/lib/emailgate";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -48,6 +49,10 @@ export async function POST(req: Request) {
 
   const check = await validateTargetUrl(body.url || "");
   if (!check.ok) return NextResponse.json({ error: check.reason }, { status: 400 });
+
+  // Adresse e-mail confirmée exigée avant toute action offensive.
+  const emailBlock = await pentestEmailBlock(session.id);
+  if (emailBlock) return NextResponse.json({ error: emailBlock }, { status: 403 });
 
   // VERROU LÉGAL : un run offensif exige la vérification de propriété du domaine.
   const verified = await isHostVerified(session.id, check.url.hostname).catch(() => false);

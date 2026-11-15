@@ -237,4 +237,26 @@ export const MIGRATIONS: Migration[] = [
     CREATE INDEX IF NOT EXISTS org_invitations_org_idx ON org_invitations (org_id, created_at DESC);
   `,
   },
+  {
+    id: "003_auth_tokens_email_verification",
+    sql: `
+    -- Vérification d'e-mail. Les comptes existants sont considérés comme vérifiés
+    -- (ils ont été créés avant l'obligation) ; seuls les nouveaux comptes doivent confirmer.
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at timestamptz;
+    UPDATE users SET email_verified_at = created_at WHERE email_verified_at IS NULL;
+
+    -- Jetons à usage unique (réinitialisation de mot de passe, vérification d'e-mail).
+    -- Seul le SHA-256 du jeton est stocké.
+    CREATE TABLE IF NOT EXISTS auth_tokens (
+      id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id     uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      kind        text NOT NULL CHECK (kind IN ('reset', 'verify')),
+      token_hash  text NOT NULL UNIQUE,
+      created_at  timestamptz NOT NULL DEFAULT now(),
+      expires_at  timestamptz NOT NULL,
+      used_at     timestamptz
+    );
+    CREATE INDEX IF NOT EXISTS auth_tokens_user_idx ON auth_tokens (user_id, kind);
+  `,
+  },
 ];

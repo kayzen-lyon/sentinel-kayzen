@@ -14,6 +14,8 @@ import {
 import { checkRateLimit, clientIp } from "@/lib/ratelimit";
 import { ensurePersonalOrg } from "@/lib/orgs";
 import { logAudit } from "@/lib/audit";
+import { sendVerificationEmail } from "@/lib/emailgate";
+import { publicOrigin } from "@/lib/origin";
 
 export const runtime = "nodejs";
 
@@ -63,6 +65,9 @@ export async function POST(req: Request) {
     });
     res.cookies.set(SESSION_COOKIE, token, sessionCookieOptions());
     const orgId = await ensurePersonalOrg(user.id, user.name || user.email).catch(() => null);
+    // E-mail de confirmation (best-effort : un échec d'envoi ne bloque pas l'inscription,
+    // l'utilisateur peut le redemander depuis la console).
+    await sendVerificationEmail(user.id, user.email, publicOrigin(req)).catch(() => false);
     await logAudit({
       orgId,
       actorId: user.id,

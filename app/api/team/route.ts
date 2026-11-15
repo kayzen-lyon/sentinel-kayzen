@@ -25,6 +25,7 @@ import {
   revokeInvitation,
 } from "@/lib/invitations";
 import { invitationEmail, sendEmail } from "@/lib/email";
+import { publicOrigin } from "@/lib/origin";
 
 const ROLE_FR: Record<string, string> = { admin: "Admin", member: "Membre", viewer: "Lecteur" };
 
@@ -89,8 +90,7 @@ export async function POST(req: Request) {
     const inv = await createInvitation(orgId, email, role, session.id);
     if (inv.error || !inv.token)
       return NextResponse.json({ error: inv.error || "Échec." }, { status: 400 });
-    const origin = process.env.APP_URL || new URL(req.url).origin;
-    const inviteUrl = `${origin}/invitation/${inv.token}`;
+    const inviteUrl = `${publicOrigin(req)}/invitation/${inv.token}`;
     const org = await getOrg(orgId);
     const emailSent = await sendEmail(
       email,

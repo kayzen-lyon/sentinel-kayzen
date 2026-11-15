@@ -74,6 +74,12 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
             : "Ravi de vous revoir. Connectez-vous pour lancer un scan."}
         </p>
 
+        {!isSignup && params.get("reinitialise") === "1" && (
+          <p role="status" className="mt-4 rounded-lg border border-safe/30 bg-safe/10 px-4 py-2.5 text-sm text-fg">
+            Mot de passe modifié. Vous pouvez vous connecter.
+          </p>
+        )}
+
         <form onSubmit={submit} className="mt-6 space-y-4">
           {isSignup && (
             <Field
@@ -104,6 +110,13 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
             placeholder="••••••••"
             hint={isSignup ? "8+ caractères, majuscule, minuscule et chiffre." : undefined}
           />
+          {!isSignup && (
+            <p className="-mt-2 text-right text-xs">
+              <Link href="/mot-de-passe-oublie" className="text-muted hover:text-fg hover:underline">
+                Mot de passe oublié ?
+              </Link>
+            </p>
+          )}
 
           <button
             type="submit"
@@ -122,7 +135,8 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
         <p className="mt-6 text-center text-sm text-muted">
           {isSignup ? "Déjà un compte ? " : "Pas encore de compte ? "}
           <Link
-            href={isSignup ? "/login" : "/signup"}
+            // Conserve ?next= et ?email= (ex. lien d'invitation) en changeant de formulaire.
+            href={`${isSignup ? "/login" : "/signup"}${params.toString() ? `?${params.toString()}` : ""}`}
             className="font-medium text-brand-light hover:underline"
           >
             {isSignup ? "Se connecter" : "Créer un compte"}

@@ -103,3 +103,35 @@ export function invitationEmail(opts: {
     <p style="margin-top:24px;color:#666;font-size:12px">Envoyé par Sentinel by Kayzen.</p>
   </div>`;
 }
+
+function actionEmail(title: string, intro: string, cta: string, url: string, footer: string): string {
+  return `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:auto;color:#111">
+    <h2 style="color:#b7481f">${esc(title)}</h2>
+    <p>${esc(intro)}</p>
+    <p style="margin:24px 0">
+      <a href="${esc(url)}" style="background:#b7481f;color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:600">${esc(cta)}</a>
+    </p>
+    <p style="color:#666;font-size:13px">${esc(footer)}</p>
+    <p style="margin-top:24px;color:#666;font-size:12px">Envoyé par Sentinel by Kayzen.</p>
+  </div>`;
+}
+
+export function resetPasswordEmail(url: string, minutes: number): string {
+  return actionEmail(
+    "Réinitialisation de votre mot de passe",
+    "Une demande de réinitialisation du mot de passe de votre compte Sentinel a été faite.",
+    "Choisir un nouveau mot de passe",
+    url,
+    `Ce lien est valable ${minutes} minutes et ne fonctionne qu'une fois. Si vous n'êtes pas à l'origine de cette demande, ignorez ce message : votre mot de passe reste inchangé.`
+  );
+}
+
+export function verifyEmailEmail(url: string): string {
+  return actionEmail(
+    "Confirmez votre adresse e-mail",
+    "Bienvenue sur Sentinel by Kayzen. Confirmez votre adresse pour pouvoir lancer des pentests.",
+    "Confirmer mon adresse",
+    url,
+    "Ce lien est valable 48 heures. Si vous n'avez pas créé de compte Sentinel, ignorez ce message."
+  );
+}
