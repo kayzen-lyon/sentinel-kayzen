@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import AccountForm from "@/components/dashboard/AccountForm";
 import ApiKeysPanel from "@/components/dashboard/ApiKeysPanel";
+import AccountData from "@/components/dashboard/AccountData";
 
 export const metadata: Metadata = {
   title: "Compte",
@@ -22,6 +23,9 @@ export default async function AccountPage() {
         </div>
         <div className="mt-10">
           <ApiKeysPanel />
+        </div>
+        <div className="mt-10">
+          <AccountData />
         </div>
       </main>
     </div>

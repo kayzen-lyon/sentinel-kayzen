@@ -26,6 +26,12 @@ export async function runMaintenance(): Promise<{
         AND COALESCE(started_at, created_at) < now() - interval '3 hours'
       RETURNING id`
   );
+  // Durées annoncées dans la politique de confidentialité : journal d'audit 12 mois,
+  // jetons à usage unique et invitations expirés depuis plus de 30 jours.
+  await query(`DELETE FROM audit_log WHERE created_at < now() - interval '12 months'`);
+  await query(`DELETE FROM auth_tokens WHERE expires_at < now() - interval '30 days'`);
+  await query(`DELETE FROM org_invitations WHERE expires_at < now() - interval '30 days'`);
+
   const resealed = await resealLegacySecrets();
   return { rateEventsPurged: purged.length, jobsTimedOut: stuck.length, secretsResealed: resealed };
 }

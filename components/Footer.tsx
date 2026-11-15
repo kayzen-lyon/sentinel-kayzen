@@ -68,7 +68,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <Link href="/" className="group mb-6 flex items-center gap-2.5">
-              <img src="/logo-mark.png" decoding="async" alt="" width={48} height={48} className="h-12 w-auto transition-transform duration-500 group-hover:scale-105" />
+              <img src="/logo-mark.png" decoding="async" alt="" width={48} height={48} className="w-12 transition-transform duration-500 group-hover:scale-105" />
               <span className="flex flex-col leading-none">
                 <span className="font-heading text-xl font-bold uppercase tracking-tight text-white">Sentinel</span>{" "}
                 <span className="mt-1 text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-white/70">by Kayzen</span>

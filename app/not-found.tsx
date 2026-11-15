@@ -10,7 +10,7 @@ export default function NotFound() {
           alt=""
           width={72}
           height={72}
-          className="mx-auto h-18 w-auto opacity-60"
+          className="mx-auto w-[72px] opacity-60"
         />
         <p className="mt-6 font-heading text-6xl font-bold text-fg">404</p>
         <h1 className="mt-2 font-heading text-xl font-semibold text-fg">

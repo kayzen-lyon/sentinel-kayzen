@@ -110,7 +110,7 @@ export default function Header() {
         aria-label="Navigation principale"
       >
         <Link href="/" className="relative z-50 flex items-center gap-2.5" onClick={() => setOpen(false)}>
-          <img src="/logo-mark.png" decoding="async" alt="" width={44} height={44} className="h-11 w-auto shrink-0" />
+          <img src="/logo-mark.png" decoding="async" alt="" width={44} height={44} className="w-11 shrink-0" />
           <span className="flex flex-col leading-none">
             <span className="font-heading text-lg font-bold uppercase tracking-tight text-heading sm:text-xl">
               Sentinel

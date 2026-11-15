@@ -54,7 +54,7 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
           alt="Sentinel by Kayzen"
           width={44}
           height={44}
-          className="h-11 w-auto"
+          className="w-11"
         />
         <span className="flex flex-col leading-none">
           <span className="font-heading text-xl font-bold text-heading">Sentinel</span>

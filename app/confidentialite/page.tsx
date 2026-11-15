@@ -28,6 +28,10 @@ export default function Page() {
       <h2>Données collectées</h2>
       <ul>
         <li>
+          <strong>Compte</strong> : adresse e-mail, nom (facultatif) et mot de passe,
+          conservé uniquement sous forme d'empreinte chiffrée.
+        </li>
+        <li>
           <strong>Formulaire de contact / demande d'audit</strong> : nom, adresse
           e-mail, société, message.
         </li>
@@ -57,16 +61,36 @@ export default function Page() {
       </p>
 
       <h2>Durée de conservation</h2>
-      <p>
-        Les données de prospection sont conservées <strong>3 ans</strong>{" "}
-        après le dernier contact. Les données contractuelles sont conservées selon les
-        durées légales en vigueur.
-      </p>
+      <ul>
+        <li>
+          <strong>Compte et contenus associés</strong> (scans, pentests et rapports, domaines
+          vérifiés, clés API, surveillances) : conservés tant que votre compte existe, puis
+          effacés dès que vous le supprimez.
+        </li>
+        <li>
+          <strong>Journal d'audit</strong> de votre organisation : 12 mois, puis suppression
+          automatique.
+        </li>
+        <li>
+          <strong>Liens à usage unique</strong> (réinitialisation de mot de passe, confirmation
+          d'e-mail, invitations) : supprimés au plus tard 30 jours après leur expiration.
+        </li>
+        <li>
+          <strong>Données de prospection</strong> (formulaire de contact) : 3 ans après le
+          dernier contact.
+        </li>
+        <li>
+          <strong>Données contractuelles et de facturation</strong> : durées légales en vigueur.
+        </li>
+      </ul>
 
       <h2>Vos droits</h2>
       <p>
         Vous disposez d'un droit d'accès, de rectification, d'effacement, d'opposition,
-        de limitation et de portabilité de vos données. Pour les exercer, écrivez à{" "}
+        de limitation et de portabilité de vos données. Deux de ces droits s'exercent
+        directement depuis la console, rubrique « Mon compte » : télécharger une copie de
+        vos données, et supprimer votre compte. Pour les autres, ou si vous n'avez pas de
+        compte, écrivez à{" "}
         <a href="mailto:contact@kayzen-lyon.fr">contact@kayzen-lyon.fr</a>. Vous pouvez
         également introduire une réclamation auprès de la CNIL (www.cnil.fr).
       </p>
@@ -124,11 +148,6 @@ export default function Page() {
         Certains prestataires sont situés hors UE (notamment aux États-Unis) ; les
         transferts sont encadrés par les clauses contractuelles types de la Commission
         européenne.
-      </p>
-
-      <p className="todo">
-        ⚠️ Seules les durées de conservation ci-dessus restent à confirmer selon vos
-        pratiques réelles ; faites relire l'ensemble par un juriste avant publication.
       </p>
     </LegalShell>
   );

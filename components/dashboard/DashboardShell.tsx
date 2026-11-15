@@ -168,7 +168,7 @@ export default function DashboardShell({
       >
         <div className="flex h-16 flex-none items-center justify-between border-b border-border px-4">
           <Link href="/dashboard" className="flex min-w-0 items-center gap-2.5" title="Vue d'ensemble">
-            <img src="/logo-mark.png" decoding="async" alt="" width={30} height={30} className="h-[30px] w-auto flex-none" />
+            <img src="/logo-mark.png" decoding="async" alt="" width={30} height={30} className="w-[30px] flex-none" />
             <span className={`font-heading text-base font-bold text-heading ${collapsed ? "lg:hidden" : ""}`}>
               Sentinel
             </span>
@@ -196,7 +196,19 @@ export default function DashboardShell({
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-2.5 py-4">
+        {/* En haut de la barre : le bas est occupé par les boutons flottants (accessibilité, cookies). */}
+        {planLabel && (
+          <Link
+            href="/dashboard/abonnement"
+            className={`mx-2.5 mt-3 flex-none rounded-lg border border-border bg-sunken px-3 py-2.5 text-xs transition-colors hover:border-border-strong ${
+              collapsed ? "lg:hidden" : ""
+            }`}
+          >
+            <span className="block text-subtle">Offre actuelle</span>
+            <span className="mt-0.5 block font-heading text-sm font-semibold text-fg">{planLabel}</span>
+          </Link>
+        )}
+        <nav className="flex-1 overflow-y-auto px-2.5 pb-44 pt-4">
           {NAV.map((group) => (
             <div key={group.title} className="mb-5 last:mb-0">
               <p
@@ -235,17 +247,6 @@ export default function DashboardShell({
           ))}
         </nav>
 
-        {planLabel && (
-          <Link
-            href="/dashboard/abonnement"
-            className={`m-2.5 flex-none rounded-lg border border-border bg-sunken px-3 py-2.5 text-xs transition-colors hover:border-border-strong ${
-              collapsed ? "lg:hidden" : ""
-            }`}
-          >
-            <span className="block text-subtle">Offre actuelle</span>
-            <span className="mt-0.5 block font-heading text-sm font-semibold text-fg">{planLabel}</span>
-          </Link>
-        )}
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">

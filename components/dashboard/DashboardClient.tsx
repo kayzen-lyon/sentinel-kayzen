@@ -281,7 +281,7 @@ export default function DashboardClient({
 
                 {!scanning && !result && (
                   <div className="card grid place-items-center p-12 text-center">
-                    <img src="/logo-mark.png" decoding="async" alt="" width={64} height={64} className="h-16 w-auto opacity-40" />
+                    <img src="/logo-mark.png" decoding="async" alt="" width={64} height={64} className="w-16 opacity-40" />
                     <p className="mt-4 font-heading text-lg font-semibold text-fg">
                       Aucun scan pour le moment
                     </p>
