@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import OrgSwitcher from "@/components/dashboard/OrgSwitcher";
 
 export type ConsoleTab =
   | "scan"
@@ -58,6 +59,7 @@ export default function ConsoleHeader({ active }: { active: ConsoleTab }) {
           </nav>
         </div>
         <div className="flex items-center gap-2">
+          <OrgSwitcher />
           <ThemeToggle />
           <button onClick={logout} className="btn btn-ghost !px-3.5 !py-2 text-sm">
             Déconnexion

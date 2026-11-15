@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
-import { canManage, ensurePersonalOrg, getRole, setRequireApproval } from "@/lib/orgs";
+import { canManage, getRole, setRequireApproval } from "@/lib/orgs";
 import { setIntegrations } from "@/lib/notify";
 import { logAudit } from "@/lib/audit";
+import { getActiveOrg } from "@/lib/activeorg";
 
 export const runtime = "nodejs";
 
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
   if (!session) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
   if (!dbConfigured) return NextResponse.json({ error: "Base non configurée." }, { status: 503 });
 
-  const orgId = await ensurePersonalOrg(session.id, session.name || session.email);
+  const orgId = (await getActiveOrg(session)).orgId;
   if (!canManage(await getRole(orgId, session.id)))
     return NextResponse.json({ error: "Droits insuffisants." }, { status: 403 });
 

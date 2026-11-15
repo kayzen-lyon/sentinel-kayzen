@@ -80,11 +80,12 @@ export default function DomainsPanel() {
 
   return (
     <div>
-      <h2 className="font-heading text-xl font-semibold text-fg">Mes domaines</h2>
+      <h2 className="font-heading text-xl font-semibold text-fg">Domaines vérifiés</h2>
       <p className="mt-1.5 text-sm text-muted">
         Vérifiez la propriété d'un domaine pour débloquer le{" "}
         <strong className="text-fg">scan approfondi</strong> (certificat TLS, SPF/DMARC,
-        contenu mixte, robots.txt…).
+        contenu mixte, robots.txt…) et le pentest autonome. Les domaines sont partagés avec
+        tous les membres de l&apos;organisation active.
       </p>
 
       <form onSubmit={addDomain} className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-end">

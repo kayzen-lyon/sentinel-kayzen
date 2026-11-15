@@ -88,7 +88,9 @@ async function callTool(
     case "passive_scan": {
       const check = await validateTargetUrl(String(args.url || ""));
       if (!check.ok) return { ...text(`Erreur : ${check.reason}`), isError: true };
-      const deep = await isHostVerified(userId, check.url.hostname).catch(() => false);
+      // Clé API = utilisateur, sans sélecteur : on travaille dans son espace personnel.
+      const personalOrg = await ensurePersonalOrg(userId, userEmail).catch(() => null);
+      const deep = await isHostVerified(personalOrg, check.url.hostname).catch(() => false);
       const scanId = await createScanRecord(userId, check.url.toString(), deep).catch(
         () => null
       );
@@ -124,12 +126,14 @@ async function callTool(
       if (!check.ok) return { ...text(`Erreur : ${check.reason}`), isError: true };
       const emailBlock = await pentestEmailBlock(userId);
       if (emailBlock) return { ...text(`Refusé : ${emailBlock}`), isError: true };
-      const verified = await isHostVerified(userId, check.url.hostname).catch(() => false);
+      // Clé API = utilisateur, sans sélecteur : pentests lancés dans son espace personnel.
+      const orgId = await ensurePersonalOrg(userId, userEmail).catch(() => null);
+      const verified = await isHostVerified(orgId, check.url.hostname).catch(() => false);
       if (!verified)
         return {
           ...text(
             "Refusé : le pentest autonome n'est autorisé que sur un domaine dont la propriété " +
-              "est vérifiée dans Sentinel."
+              "est vérifiée dans votre espace personnel Sentinel."
           ),
           isError: true,
         };
@@ -146,7 +150,6 @@ async function callTool(
       const playbook = getPlaybook(args.playbook ? String(args.playbook) : null);
       const mode = playbook ? playbook.mode : "standard";
       const instruction = playbook?.instruction ?? null;
-      const orgId = await ensurePersonalOrg(userId, userEmail).catch(() => null);
 
       // Même verrou de gouvernance que la voie web : si l'organisation exige une approbation et
       // que le demandeur n'est pas gestionnaire, le run attend une validation (pas de dispatch).

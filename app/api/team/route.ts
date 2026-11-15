@@ -5,7 +5,6 @@ import { checkRateLimit } from "@/lib/ratelimit";
 import {
   addMemberByEmail,
   canManage,
-  ensurePersonalOrg,
   getOrg,
   getRole,
   listMembers,
@@ -26,6 +25,7 @@ import {
 } from "@/lib/invitations";
 import { invitationEmail, sendEmail } from "@/lib/email";
 import { publicOrigin } from "@/lib/origin";
+import { getActiveOrg } from "@/lib/activeorg";
 
 const ROLE_FR: Record<string, string> = { admin: "Admin", member: "Membre", viewer: "Lecteur" };
 
@@ -36,7 +36,7 @@ async function activeOrg(session: {
   email: string;
   name?: string | null;
 }) {
-  return ensurePersonalOrg(session.id, session.name || session.email);
+  return (await getActiveOrg(session)).orgId;
 }
 
 export async function GET() {

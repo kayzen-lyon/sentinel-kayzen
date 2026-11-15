@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
-import { ensurePersonalOrg } from "@/lib/orgs";
+import { canManage, ensurePersonalOrg } from "@/lib/orgs";
+import { getActiveOrg } from "@/lib/activeorg";
 import { linkInstallationToUser } from "@/lib/ghinstall";
 import { logAudit } from "@/lib/audit";
 
@@ -23,9 +24,13 @@ export async function GET(req: Request) {
   if (!dbConfigured || !installationId)
     return NextResponse.redirect(new URL(`/dashboard/integrations`, url.origin));
 
-  const orgId = await ensurePersonalOrg(session.id, session.name || session.email).catch(
-    () => null
-  );
+  // Rattachée à l'organisation active seulement si l'on peut la gérer ; sinon espace personnel.
+  const active = await getActiveOrg(session).catch(() => null);
+  const orgId = active
+    ? canManage(active.role)
+      ? active.orgId
+      : await ensurePersonalOrg(session.id, session.name || session.email).catch(() => null)
+    : null;
   // Liaison non usurpable : une installation déjà rattachée à un autre compte n'est pas volée.
   const linked = await linkInstallationToUser(installationId, orgId, session.id).catch(
     () => false

@@ -6,6 +6,8 @@ import { runScan } from "@/lib/scanner";
 import { createScanRecord, completeScan, failScan, listScans } from "@/lib/scans";
 import { isHostVerified } from "@/lib/domains";
 import { checkRateLimit } from "@/lib/ratelimit";
+import { canLaunch } from "@/lib/orgs";
+import { getActiveOrg } from "@/lib/activeorg";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -45,10 +47,16 @@ export async function POST(req: Request) {
   if (!check.ok)
     return NextResponse.json({ error: check.reason }, { status: 400 });
 
-  // Scan approfondi uniquement si le domaine est vérifié par l'utilisateur
-  const deep = dbConfigured
-    ? await isHostVerified(session.id, check.url.hostname).catch(() => false)
-    : false;
+  // Scan approfondi uniquement si le domaine est vérifié dans l'organisation active
+  // (et pas pour un Lecteur : les contrôles approfondis sondent activement la cible).
+  let deep = false;
+  if (dbConfigured) {
+    const active = await getActiveOrg(session).catch(() => null);
+    deep = active
+      ? canLaunch(active.role) &&
+        (await isHostVerified(active.orgId, check.url.hostname).catch(() => false))
+      : false;
+  }
 
   const persist = dbConfigured;
   let scanId: string | null = null;

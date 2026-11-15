@@ -1,6 +1,7 @@
 import { ensureSchema, query } from "./db";
 import { validateTargetUrl } from "./ssrf";
 import { isHostVerified } from "./domains";
+import { canLaunch, getRole } from "./orgs";
 import { runScan } from "./scanner";
 import { createScanRecord, completeScan, failScan } from "./scans";
 import { notifyOrg } from "./notify";
@@ -89,7 +90,11 @@ export async function runDueScheduledScans(): Promise<{ ran: number; alerts: num
       continue;
     }
 
-    const deep = await isHostVerified(s.user_id, check.url.hostname).catch(() => false);
+    // Approfondi seulement si le domaine est vérifié dans l'organisation de la surveillance
+    // ET que son auteur y a toujours un rôle autorisé à lancer (sinon : passif simple).
+    const role = s.org_id ? await getRole(s.org_id, s.user_id).catch(() => null) : null;
+    const deep =
+      canLaunch(role) && (await isHostVerified(s.org_id, check.url.hostname).catch(() => false));
     const scanId = await createScanRecord(s.user_id, check.url.toString(), deep).catch(
       () => null
     );

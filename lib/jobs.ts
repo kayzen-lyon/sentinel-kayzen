@@ -93,8 +93,19 @@ export async function createGithubJob(
 }
 
 /** Jobs visibles par l'utilisateur : les siens + ceux des organisations dont il est membre. */
-export async function listJobs(userId: string): Promise<JobRow[]> {
+/**
+ * Jobs visibles. Avec `orgId` : ceux de l'organisation active (sélecteur de la console),
+ * plus les anciens jobs de l'utilisateur sans organisation. Sans : tous ceux de ses organisations.
+ */
+export async function listJobs(userId: string, orgId?: string): Promise<JobRow[]> {
   await ensureSchema();
+  if (orgId)
+    return query<JobRow>(
+      `SELECT * FROM jobs
+        WHERE org_id = $2 OR (org_id IS NULL AND user_id = $1)
+        ORDER BY created_at DESC LIMIT 50`,
+      [userId, orgId]
+    );
   return query<JobRow>(
     `SELECT * FROM jobs
      WHERE user_id = $1

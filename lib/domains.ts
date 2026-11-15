@@ -39,16 +39,22 @@ export function domainCandidates(host: string): string[] {
   return out;
 }
 
-export async function listDomains(userId: string): Promise<DomainRow[]> {
+/**
+ * Les domaines vérifiés appartiennent à une ORGANISATION : la preuve de propriété faite
+ * par un membre sert à toute l'organisation, et uniquement dans celle-ci (les pentests
+ * lancés dans une autre organisation ne peuvent pas s'en prévaloir).
+ */
+export async function listDomains(orgId: string): Promise<DomainRow[]> {
   await ensureSchema();
   return query<DomainRow>(
     `SELECT id, domain, token, method, verified_at, created_at
-       FROM verified_domains WHERE user_id=$1 ORDER BY created_at DESC`,
-    [userId]
+       FROM verified_domains WHERE org_id=$1 ORDER BY created_at DESC`,
+    [orgId]
   );
 }
 
 export async function requestVerification(
+  orgId: string,
   userId: string,
   domainInput: string
 ): Promise<{ domain: string; token: string }> {
@@ -57,25 +63,26 @@ export async function requestVerification(
   await ensureSchema();
   const token = "sentinel-verify=" + crypto.randomBytes(16).toString("hex");
   await query(
-    `INSERT INTO verified_domains (user_id, domain, token)
-       VALUES ($1, $2, $3)
-     ON CONFLICT (user_id, domain)
-       DO UPDATE SET token = EXCLUDED.token, verified_at = NULL, method = NULL`,
-    [userId, domain, token]
+    `INSERT INTO verified_domains (org_id, user_id, domain, token)
+       VALUES ($1, $2, $3, $4)
+     ON CONFLICT (org_id, domain)
+       DO UPDATE SET token = EXCLUDED.token, user_id = EXCLUDED.user_id,
+                     verified_at = NULL, method = NULL`,
+    [orgId, userId, domain, token]
   );
   return { domain, token };
 }
 
 export async function verifyDomain(
-  userId: string,
+  orgId: string,
   domainInput: string
 ): Promise<{ verified: boolean; method?: string; reason?: string }> {
   const domain = normalizeDomain(domainInput);
   if (!domain) return { verified: false, reason: "Domaine invalide." };
   await ensureSchema();
   const rows = await query<DomainRow>(
-    `SELECT token FROM verified_domains WHERE user_id=$1 AND domain=$2`,
-    [userId, domain]
+    `SELECT token FROM verified_domains WHERE org_id=$1 AND domain=$2`,
+    [orgId, domain]
   );
   if (!rows.length)
     return { verified: false, reason: "Demandez d'abord un jeton de vérification." };
@@ -85,7 +92,7 @@ export async function verifyDomain(
   try {
     const txt = await resolveTxt(`_sentinel-verify.${domain}`);
     if (txt.some((r) => r.join("").includes(token))) {
-      await markVerified(userId, domain, "dns");
+      await markVerified(orgId, domain, "dns");
       return { verified: true, method: "dns" };
     }
   } catch {
@@ -102,7 +109,7 @@ export async function verifyDomain(
     if (r?.ok) {
       const body = await r.text();
       if (body.includes(token)) {
-        await markVerified(userId, domain, "file");
+        await markVerified(orgId, domain, "file");
         return { verified: true, method: "file" };
       }
     }
@@ -117,28 +124,29 @@ export async function verifyDomain(
   };
 }
 
-async function markVerified(userId: string, domain: string, method: string) {
+async function markVerified(orgId: string, domain: string, method: string) {
   await query(
-    `UPDATE verified_domains SET verified_at=now(), method=$3 WHERE user_id=$1 AND domain=$2`,
-    [userId, domain, method]
+    `UPDATE verified_domains SET verified_at=now(), method=$3 WHERE org_id=$1 AND domain=$2`,
+    [orgId, domain, method]
   );
 }
 
 /**
- * `host` est-il vérifié par cet utilisateur ?
+ * `host` est-il vérifié dans cette organisation ?
  * - l'hôte exact vérifié (DNS ou fichier) → oui ;
  * - un domaine parent vérifié → oui seulement par DNS : contrôler la zone DNS
  *   prouve le contrôle des sous-domaines, un fichier sur le parent non.
  */
-export async function isHostVerified(userId: string, host: string): Promise<boolean> {
+export async function isHostVerified(orgId: string | null, host: string): Promise<boolean> {
+  if (!orgId) return false;
   const [exact, ...parents] = domainCandidates(host);
   if (!exact) return false;
   await ensureSchema();
   const rows = await query<{ n: string }>(
     `SELECT count(*)::int AS n FROM verified_domains
-       WHERE user_id=$1 AND verified_at IS NOT NULL
+       WHERE org_id=$1 AND verified_at IS NOT NULL
          AND (domain=$2 OR (domain = ANY($3::text[]) AND method='dns'))`,
-    [userId, exact, parents]
+    [orgId, exact, parents]
   );
   return Number(rows[0]?.n ?? 0) > 0;
 }

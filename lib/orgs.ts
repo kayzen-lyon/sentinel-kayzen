@@ -53,6 +53,11 @@ export async function ensurePersonalOrg(
      ON CONFLICT (org_id, user_id) DO NOTHING`,
     [orgId, userId]
   );
+  // Domaines vérifiés avant l'existence de cet espace (migration 004) : on les y rattache.
+  await query(
+    `UPDATE verified_domains SET org_id = $1 WHERE user_id = $2 AND org_id IS NULL`,
+    [orgId, userId]
+  );
   return orgId;
 }
 
@@ -155,4 +160,18 @@ export async function removeMember(orgId: string, userId: string): Promise<strin
   if (org[0]?.owner_id === userId) return "Le propriétaire ne peut pas être retiré.";
   await query(`DELETE FROM org_members WHERE org_id = $1 AND user_id = $2`, [orgId, userId]);
   return null;
+}
+
+export type UserOrg = { id: string; name: string; personal: boolean; role: Role };
+
+/** Organisations dont l'utilisateur est membre (la personnelle en premier). */
+export async function listUserOrgs(userId: string): Promise<UserOrg[]> {
+  await ensureSchema();
+  return query<UserOrg>(
+    `SELECT o.id, o.name, (o.personal AND o.owner_id = $1) AS personal, m.role
+       FROM org_members m JOIN organizations o ON o.id = m.org_id
+      WHERE m.user_id = $1
+      ORDER BY (o.personal AND o.owner_id = $1) DESC, o.name ASC`,
+    [userId]
+  );
 }

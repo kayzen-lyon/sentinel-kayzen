@@ -5,6 +5,7 @@ import { getJob, listFindings } from "@/lib/jobs";
 import { createTicket } from "@/lib/tickets";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { logAudit } from "@/lib/audit";
+import { canLaunch, getRole } from "@/lib/orgs";
 
 export const runtime = "nodejs";
 
@@ -21,6 +22,9 @@ export async function POST(
   if (!job) return NextResponse.json({ error: "Job introuvable." }, { status: 404 });
   if (!job.org_id)
     return NextResponse.json({ error: "Aucune organisation associée." }, { status: 400 });
+  // Créer un ticket chez Jira/Linear avec les identifiants de l'organisation : pas pour un Lecteur.
+  if (!canLaunch(await getRole(job.org_id, session.id).catch(() => null)))
+    return NextResponse.json({ error: "Droits insuffisants (Lecteur)." }, { status: 403 });
 
   const rl = await checkRateLimit(`ticket:${session.id}`, 30, 3600);
   if (!rl.allowed) return NextResponse.json({ error: "Trop de requêtes." }, { status: 429 });

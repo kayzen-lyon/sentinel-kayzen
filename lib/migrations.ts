@@ -259,4 +259,21 @@ export const MIGRATIONS: Migration[] = [
     CREATE INDEX IF NOT EXISTS auth_tokens_user_idx ON auth_tokens (user_id, kind);
   `,
   },
+  {
+    id: "004_org_domains",
+    sql: `
+    -- Domaines vérifiés rattachés à une organisation (et non plus à un utilisateur) :
+    -- tout membre autorisé de l'organisation peut s'en servir, dans CETTE organisation.
+    ALTER TABLE verified_domains
+      ADD COLUMN IF NOT EXISTS org_id uuid REFERENCES organizations(id) ON DELETE CASCADE;
+    -- Reprise : les domaines existants vont dans l'espace personnel de leur auteur.
+    UPDATE verified_domains d SET org_id = o.id
+      FROM organizations o
+     WHERE d.org_id IS NULL AND o.owner_id = d.user_id AND o.personal = true;
+    -- Unicité par organisation (deux organisations peuvent vérifier le même domaine).
+    ALTER TABLE verified_domains DROP CONSTRAINT IF EXISTS verified_domains_user_id_domain_key;
+    CREATE UNIQUE INDEX IF NOT EXISTS verified_domains_org_domain_uq
+      ON verified_domains (org_id, domain);
+  `,
+  },
 ];

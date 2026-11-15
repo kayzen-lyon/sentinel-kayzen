@@ -6,7 +6,8 @@ import { isHostVerified } from "@/lib/domains";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { createJob, listJobs, updateJobSystem, type JobMode } from "@/lib/jobs";
 import { appBaseUrl, dispatchWorkerRun, githubConfigured, type ScanEngine } from "@/lib/github";
-import { canManage, ensurePersonalOrg, getOrg, getRole } from "@/lib/orgs";
+import { canLaunch, canManage, getOrg } from "@/lib/orgs";
+import { getActiveOrg } from "@/lib/activeorg";
 import { logAudit } from "@/lib/audit";
 import { getPlaybook } from "@/lib/playbooks";
 import { pentestEmailBlock } from "@/lib/emailgate";
@@ -18,7 +19,8 @@ export async function GET() {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
   if (!dbConfigured) return NextResponse.json({ jobs: [] });
-  const jobs = await listJobs(session.id);
+  const { orgId } = await getActiveOrg(session);
+  const jobs = await listJobs(session.id, orgId);
   return NextResponse.json({ jobs });
 }
 
@@ -54,14 +56,24 @@ export async function POST(req: Request) {
   const emailBlock = await pentestEmailBlock(session.id);
   if (emailBlock) return NextResponse.json({ error: emailBlock }, { status: 403 });
 
-  // VERROU LÉGAL : un run offensif exige la vérification de propriété du domaine.
-  const verified = await isHostVerified(session.id, check.url.hostname).catch(() => false);
+  // Le pentest est lancé DANS l'organisation active : son rôle, ses domaines vérifiés
+  // et sa politique d'approbation s'appliquent.
+  const { orgId, role } = await getActiveOrg(session);
+  if (!canLaunch(role))
+    return NextResponse.json(
+      { error: "Votre rôle (Lecteur) ne permet pas de lancer un pentest dans cette organisation." },
+      { status: 403 }
+    );
+
+  // VERROU LÉGAL : un run offensif exige la vérification de propriété du domaine
+  // dans cette organisation.
+  const verified = await isHostVerified(orgId, check.url.hostname).catch(() => false);
   if (!verified)
     return NextResponse.json(
       {
         error:
-          "Domaine non vérifié. Le pentest autonome n'est autorisé que sur un domaine dont " +
-          "vous avez prouvé la propriété (onglet Domaines).",
+          "Domaine non vérifié dans cette organisation. Le pentest autonome n'est autorisé que " +
+          "sur un domaine dont la propriété a été prouvée (onglet Domaines).",
       },
       { status: 403 }
     );
@@ -74,14 +86,10 @@ export async function POST(req: Request) {
       : "standard";
   const instruction = playbook?.instruction ?? null;
   const engine: ScanEngine = body.engine === "oss" ? "oss" : "strix";
-  const orgId = await ensurePersonalOrg(session.id, session.name || session.email).catch(
-    () => null
-  );
 
   // Approbation human-in-the-loop : si l'organisation l'exige et que le demandeur n'est pas
   // gestionnaire (owner/admin), le run attend une validation avant d'être déclenché.
-  const org = orgId ? await getOrg(orgId).catch(() => null) : null;
-  const role = orgId ? await getRole(orgId, session.id).catch(() => null) : null;
+  const org = await getOrg(orgId).catch(() => null);
   const needsApproval = Boolean(org?.require_approval) && !canManage(role);
 
   const jobId = await createJob(

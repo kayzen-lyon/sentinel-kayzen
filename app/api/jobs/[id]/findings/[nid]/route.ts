@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
 import { getJob, setFindingStatus, type FindingStatus } from "@/lib/jobs";
 import { logAudit } from "@/lib/audit";
+import { canLaunch, getRole } from "@/lib/orgs";
 
 export const runtime = "nodejs";
 
@@ -19,6 +20,9 @@ export async function PATCH(
   const { id, nid } = await params;
   const job = await getJob(id, session.id);
   if (!job) return NextResponse.json({ error: "Job introuvable." }, { status: 404 });
+  // Trier les vulnérabilités est une action d'écriture : pas pour un Lecteur.
+  if (job.org_id && !canLaunch(await getRole(job.org_id, session.id).catch(() => null)))
+    return NextResponse.json({ error: "Droits insuffisants (Lecteur)." }, { status: 403 });
 
   let body: { status?: string };
   try {

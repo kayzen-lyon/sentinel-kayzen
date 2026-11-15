@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
 import { validateTargetUrl } from "@/lib/ssrf";
-import { ensurePersonalOrg } from "@/lib/orgs";
+import { canLaunch, ensurePersonalOrg } from "@/lib/orgs";
+import { getActiveOrg } from "@/lib/activeorg";
 import { checkRateLimit } from "@/lib/ratelimit";
 import {
   createSchedule,
@@ -33,9 +34,13 @@ export async function POST(req: Request) {
   if (!check.ok) return NextResponse.json({ error: check.reason }, { status: 400 });
   const frequency: Frequency = body.frequency === "weekly" ? "weekly" : "daily";
 
-  const orgId = await ensurePersonalOrg(session.id, session.name || session.email).catch(
-    () => null
-  );
+  // Alertes envoyées à l'organisation active (Lecteur : à son espace personnel).
+  const active = await getActiveOrg(session).catch(() => null);
+  const orgId = active
+    ? canLaunch(active.role)
+      ? active.orgId
+      : await ensurePersonalOrg(session.id, session.name || session.email).catch(() => null)
+    : null;
   const id = await createSchedule(session.id, orgId, check.url.toString(), frequency);
   return NextResponse.json({ id, schedules: await listSchedules(session.id) });
 }
