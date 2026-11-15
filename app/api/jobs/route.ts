@@ -8,6 +8,7 @@ import { createJob, listJobs, updateJobSystem, type JobMode } from "@/lib/jobs";
 import { appBaseUrl, dispatchWorkerRun, githubConfigured, type ScanEngine } from "@/lib/github";
 import { canLaunch, canManage, getOrg } from "@/lib/orgs";
 import { getActiveOrg } from "@/lib/activeorg";
+import { checkQuota } from "@/lib/plans";
 import { logAudit } from "@/lib/audit";
 import { getPlaybook } from "@/lib/playbooks";
 import { pentestEmailBlock } from "@/lib/emailgate";
@@ -64,6 +65,10 @@ export async function POST(req: Request) {
       { error: "Votre rôle (Lecteur) ne permet pas de lancer un pentest dans cette organisation." },
       { status: 403 }
     );
+
+  // Offre : le pentest autonome et son budget IA dépendent du plan de l'organisation.
+  const quota = await checkQuota(orgId, "pentests");
+  if (quota) return NextResponse.json({ error: quota }, { status: 402 });
 
   // VERROU LÉGAL : un run offensif exige la vérification de propriété du domaine
   // dans cette organisation.

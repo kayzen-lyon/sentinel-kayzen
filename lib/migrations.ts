@@ -276,4 +276,25 @@ export const MIGRATIONS: Migration[] = [
       ON verified_domains (org_id, domain);
   `,
   },
+  {
+    id: "005_plans_billing",
+    sql: `
+    -- Offres : free (par défaut, sans pentest) | platform | enterprise.
+    -- Abonnement géré par Stripe ; le webhook tient ces colonnes à jour.
+    ALTER TABLE organizations ADD COLUMN IF NOT EXISTS plan text NOT NULL DEFAULT 'free';
+    ALTER TABLE organizations DROP CONSTRAINT IF EXISTS organizations_plan_check;
+    ALTER TABLE organizations ADD CONSTRAINT organizations_plan_check
+      CHECK (plan IN ('free', 'platform', 'enterprise'));
+    ALTER TABLE organizations ADD COLUMN IF NOT EXISTS stripe_customer_id text;
+    ALTER TABLE organizations ADD COLUMN IF NOT EXISTS stripe_subscription_id text;
+    ALTER TABLE organizations ADD COLUMN IF NOT EXISTS plan_status text;
+    ALTER TABLE organizations ADD COLUMN IF NOT EXISTS plan_period_end timestamptz;
+    CREATE UNIQUE INDEX IF NOT EXISTS organizations_stripe_customer_uq
+      ON organizations (stripe_customer_id) WHERE stripe_customer_id IS NOT NULL;
+
+    -- Scans passifs rattachés à l'organisation qui les consomme (quota mensuel).
+    ALTER TABLE scans ADD COLUMN IF NOT EXISTS org_id uuid REFERENCES organizations(id) ON DELETE SET NULL;
+    CREATE INDEX IF NOT EXISTS scans_org_created_idx ON scans (org_id, created_at DESC);
+  `,
+  },
 ];

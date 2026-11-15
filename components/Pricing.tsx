@@ -19,7 +19,7 @@ const PLANS = [
     tagline: "Scan de sécurité continu en self-service",
     price: "à partir de 290 €",
     unit: "/ mois",
-    cta: "Démarrer un essai",
+    cta: "Commencer gratuitement",
     href: "/signup",
     highlight: true,
     features: [
@@ -116,7 +116,7 @@ export default function Pricing() {
           ))}
         </div>
         <p className="mt-8 text-center text-xs text-subtle">
-          * Selon l'offre. Tarifs indicatifs HT — un devis précis est établi après
+          * Selon l'offre. Le compte gratuit inclut 30 scans passifs par mois et 1 domaine ; le pentest autonome fait partie de l'offre Plateforme. Tarifs indicatifs HT — un devis précis est établi après
           cadrage du périmètre.
         </p>
       </div>

@@ -7,6 +7,7 @@ import {
   upsertInstallation,
 } from "@/lib/ghinstall";
 import { createGithubJob } from "@/lib/jobs";
+import { checkQuota } from "@/lib/plans";
 import { appBaseUrl, dispatchWorkerRun, githubConfigured } from "@/lib/github";
 import { logAudit } from "@/lib/audit";
 
@@ -68,6 +69,22 @@ export async function POST(req: Request) {
         "Installez et reliez Sentinel à votre compte pour activer le scan.",
       );
       return NextResponse.json({ ok: true, unlinked: true });
+    }
+
+    // Offre : pas de pentest sur PR si le plan ou le quota de l'organisation ne le permet pas.
+    const quota = link.org_id
+      ? await checkQuota(link.org_id, "pentests").catch(() => null)
+      : "Aucune organisation liée.";
+    if (quota) {
+      await postCommitStatus(
+        inst.id,
+        repo.owner.login,
+        repo.name,
+        pr.head.sha,
+        "error",
+        "Pentest Sentinel non lancé : offre ou quota."
+      ).catch(() => {});
+      return NextResponse.json({ ok: true, skipped: "quota" });
     }
 
     await postCommitStatus(

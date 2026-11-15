@@ -202,3 +202,38 @@ test("pentestEmailBlock : pas de blocage si l'envoi d'e-mails est désactivé", 
   // RESEND_API_KEY absente en test → jamais bloquant (sinon comptes neufs bloqués à vie).
   assert.equal(await pentestEmailBlock("00000000-0000-0000-0000-000000000000"), null);
 });
+
+test("plans : quotas par offre", async () => {
+  const { quotaError, budgetError, PLANS } = await import("../lib/plans");
+  const u = { passiveScans: 30, domains: 1, pentests: 0, members: 1, schedules: 0, aiBudgetUsd: 0 };
+  assert.ok(quotaError("free", "passiveScans", u)); // 30/30 atteint
+  assert.equal(quotaError("free", "passiveScans", { ...u, passiveScans: 29 }), null);
+  assert.match(quotaError("free", "pentests", u) || "", /offre Plateforme/); // pas de pentest en gratuit
+  assert.equal(quotaError("free", "members", u), null);
+  assert.equal(quotaError("platform", "passiveScans", { ...u, passiveScans: 99999 }), null); // illimité
+  assert.equal(quotaError("platform", "pentests", { ...u, pentests: 19 }), null);
+  assert.ok(quotaError("platform", "pentests", { ...u, pentests: 20 }));
+  assert.ok(budgetError("platform", { ...u, aiBudgetUsd: 30 }));
+  assert.equal(budgetError("platform", { ...u, aiBudgetUsd: 29.99 }), null);
+  assert.equal(budgetError("enterprise", { ...u, aiBudgetUsd: 1e6 }), null);
+  assert.equal(PLANS.free.limits.pentests, 0);
+});
+
+test("stripe : signature de webhook et offre du prix", async () => {
+  const { createHmac } = await import("node:crypto");
+  const { verifyStripeSignature, planFromPrice } = await import("../lib/stripe");
+  const secret = "whsec_test";
+  const payload = '{"type":"x"}';
+  const now = 1_800_000_000;
+  const sig = (t: number, p = payload, s = secret) =>
+    `t=${t},v1=${createHmac("sha256", s).update(`${t}.${p}`).digest("hex")}`;
+  assert.equal(verifyStripeSignature(payload, sig(now), secret, now), true);
+  assert.equal(verifyStripeSignature(payload + " ", sig(now), secret, now), false); // corps modifié
+  assert.equal(verifyStripeSignature(payload, sig(now, payload, "autre"), secret, now), false);
+  assert.equal(verifyStripeSignature(payload, sig(now - 301), secret, now), false); // rejeu tardif
+  assert.equal(verifyStripeSignature(payload, null, secret, now), false);
+  assert.equal(verifyStripeSignature(payload, "t=abc,v1=00", secret, now), false);
+  assert.equal(planFromPrice({ id: "price_x" }), "platform");
+  assert.equal(planFromPrice({ id: "price_x", metadata: { sentinel_plan: "enterprise" } }), "enterprise");
+  assert.equal(planFromPrice({ id: "price_x", metadata: { sentinel_plan: "free" } }), "platform");
+});

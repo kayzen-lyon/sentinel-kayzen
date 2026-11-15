@@ -26,6 +26,7 @@ import {
 import { invitationEmail, sendEmail } from "@/lib/email";
 import { publicOrigin } from "@/lib/origin";
 import { getActiveOrg } from "@/lib/activeorg";
+import { checkQuota } from "@/lib/plans";
 
 const ROLE_FR: Record<string, string> = { admin: "Admin", member: "Membre", viewer: "Lecteur" };
 
@@ -84,6 +85,11 @@ export async function POST(req: Request) {
   if (!validateEmail(email))
     return NextResponse.json({ error: "Adresse e-mail invalide." }, { status: 400 });
   const role = body.role || "member";
+  const alreadyMember = (await listMembers(orgId)).some((m) => m.email.toLowerCase() === email);
+  if (!alreadyMember) {
+    const quota = await checkQuota(orgId, "members");
+    if (quota) return NextResponse.json({ error: quota }, { status: 402 });
+  }
 
   // Pas encore de compte → invitation par lien (e-mail si Resend est configuré).
   if (!(await findUserByEmail(email))) {

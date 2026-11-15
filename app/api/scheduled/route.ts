@@ -4,6 +4,7 @@ import { dbConfigured } from "@/lib/db";
 import { validateTargetUrl } from "@/lib/ssrf";
 import { canLaunch, ensurePersonalOrg } from "@/lib/orgs";
 import { getActiveOrg } from "@/lib/activeorg";
+import { checkQuota } from "@/lib/plans";
 import { checkRateLimit } from "@/lib/ratelimit";
 import {
   createSchedule,
@@ -41,6 +42,10 @@ export async function POST(req: Request) {
       ? active.orgId
       : await ensurePersonalOrg(session.id, session.name || session.email).catch(() => null)
     : null;
+  if (orgId) {
+    const quota = await checkQuota(orgId, "schedules");
+    if (quota) return NextResponse.json({ error: quota }, { status: 402 });
+  }
   const id = await createSchedule(session.id, orgId, check.url.toString(), frequency);
   return NextResponse.json({ id, schedules: await listSchedules(session.id) });
 }

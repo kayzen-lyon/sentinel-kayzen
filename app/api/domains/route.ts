@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
-import { listDomains, requestVerification } from "@/lib/domains";
+import { listDomains, normalizeDomain, requestVerification } from "@/lib/domains";
+import { checkQuota } from "@/lib/plans";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { canLaunch } from "@/lib/orgs";
 import { getActiveOrg } from "@/lib/activeorg";
@@ -43,6 +44,13 @@ export async function POST(req: Request) {
         { error: "Votre rôle (Lecteur) ne permet pas d'ajouter un domaine à cette organisation." },
         { status: 403 }
       );
+    // Nouveau domaine seulement : redemander un jeton pour un domaine existant reste possible.
+    const wanted = normalizeDomain(body.domain || "");
+    const known = (await listDomains(orgId)).some((d) => d.domain === wanted);
+    if (!known) {
+      const quota = await checkQuota(orgId, "domains");
+      if (quota) return NextResponse.json({ error: quota }, { status: 402 });
+    }
     const { domain, token } = await requestVerification(orgId, session.id, body.domain || "");
     return NextResponse.json({
       domain,

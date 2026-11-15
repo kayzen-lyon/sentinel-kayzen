@@ -13,7 +13,8 @@ export type ConsoleTab =
   | "monitoring"
   | "cicd"
   | "integrations"
-  | "team";
+  | "team"
+  | "billing";
 
 const TABS: { key: ConsoleTab; href: string; label: string }[] = [
   { key: "scan", href: "/dashboard", label: "Scanner" },
@@ -22,6 +23,7 @@ const TABS: { key: ConsoleTab; href: string; label: string }[] = [
   { key: "cicd", href: "/dashboard/cicd", label: "CI/CD" },
   { key: "integrations", href: "/dashboard/integrations", label: "Intégrations" },
   { key: "team", href: "/dashboard/team", label: "Équipe" },
+  { key: "billing", href: "/dashboard/abonnement", label: "Abonnement" },
 ];
 
 /** En-tête partagé des pages de la console, avec navigation responsive (menu mobile). */

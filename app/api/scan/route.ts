@@ -8,6 +8,7 @@ import { isHostVerified } from "@/lib/domains";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { canLaunch } from "@/lib/orgs";
 import { getActiveOrg } from "@/lib/activeorg";
+import { checkQuota } from "@/lib/plans";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -50,8 +51,14 @@ export async function POST(req: Request) {
   // Scan approfondi uniquement si le domaine est vérifié dans l'organisation active
   // (et pas pour un Lecteur : les contrôles approfondis sondent activement la cible).
   let deep = false;
+  let scanOrgId: string | null = null;
   if (dbConfigured) {
     const active = await getActiveOrg(session).catch(() => null);
+    if (active) {
+      scanOrgId = active.orgId;
+      const quota = await checkQuota(active.orgId, "passiveScans").catch(() => null);
+      if (quota) return NextResponse.json({ error: quota }, { status: 402 });
+    }
     deep = active
       ? canLaunch(active.role) &&
         (await isHostVerified(active.orgId, check.url.hostname).catch(() => false))
@@ -62,7 +69,7 @@ export async function POST(req: Request) {
   let scanId: string | null = null;
   if (persist) {
     try {
-      scanId = await createScanRecord(session.id, check.url.toString(), deep);
+      scanId = await createScanRecord(session.id, check.url.toString(), deep, scanOrgId);
     } catch {
       // on continue même si la persistance échoue
     }

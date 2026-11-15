@@ -7,6 +7,7 @@ import { runScan } from "@/lib/scanner";
 import { createScanRecord, completeScan, listScans } from "@/lib/scans";
 import { isHostVerified } from "@/lib/domains";
 import { pentestEmailBlock } from "@/lib/emailgate";
+import { checkQuota } from "@/lib/plans";
 import { createJob, getJob, listFindings } from "@/lib/jobs";
 import { canManage, ensurePersonalOrg, getOrg, getRole } from "@/lib/orgs";
 import { getPlaybook, PLAYBOOKS } from "@/lib/playbooks";
@@ -90,8 +91,12 @@ async function callTool(
       if (!check.ok) return { ...text(`Erreur : ${check.reason}`), isError: true };
       // Clé API = utilisateur, sans sélecteur : on travaille dans son espace personnel.
       const personalOrg = await ensurePersonalOrg(userId, userEmail).catch(() => null);
+      if (personalOrg) {
+        const quota = await checkQuota(personalOrg, "passiveScans").catch(() => null);
+        if (quota) return { ...text(`Refusé : ${quota}`), isError: true };
+      }
       const deep = await isHostVerified(personalOrg, check.url.hostname).catch(() => false);
-      const scanId = await createScanRecord(userId, check.url.toString(), deep).catch(
+      const scanId = await createScanRecord(userId, check.url.toString(), deep, personalOrg).catch(
         () => null
       );
       const result = await runScan(check.url, { deep });
@@ -128,6 +133,10 @@ async function callTool(
       if (emailBlock) return { ...text(`Refusé : ${emailBlock}`), isError: true };
       // Clé API = utilisateur, sans sélecteur : pentests lancés dans son espace personnel.
       const orgId = await ensurePersonalOrg(userId, userEmail).catch(() => null);
+      if (orgId) {
+        const quota = await checkQuota(orgId, "pentests").catch(() => null);
+        if (quota) return { ...text(`Refusé : ${quota}`), isError: true };
+      }
       const verified = await isHostVerified(orgId, check.url.hostname).catch(() => false);
       if (!verified)
         return {

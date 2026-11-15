@@ -19,12 +19,14 @@ export type ScanRow = {
 export async function createScanRecord(
   userId: string,
   targetUrl: string,
-  deep = false
+  deep = false,
+  /** Organisation qui consomme le scan (quota mensuel). Absent : non décompté (surveillances). */
+  orgId: string | null = null
 ): Promise<string> {
   await ensureSchema();
   const rows = await query<{ id: string }>(
-    `INSERT INTO scans (user_id, target_url, status, deep) VALUES ($1, $2, 'running', $3) RETURNING id`,
-    [userId, targetUrl, deep]
+    `INSERT INTO scans (user_id, target_url, status, deep, org_id) VALUES ($1, $2, 'running', $3, $4) RETURNING id`,
+    [userId, targetUrl, deep, orgId]
   );
   return rows[0].id;
 }
