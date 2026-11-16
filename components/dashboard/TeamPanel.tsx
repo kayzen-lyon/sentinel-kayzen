@@ -274,7 +274,7 @@ export default function TeamPanel() {
 
   return (
     <div className="min-h-screen">
-      <main className="container-x py-10">
+      <main className="container-x py-8 lg:py-10">
         <h1 className="font-heading text-3xl font-bold text-fg">Équipe & audit</h1>
         <p className="mt-2 max-w-2xl text-muted">
           Invitez des coéquipiers à partager vos pentests (un lien d&apos;invitation est créé

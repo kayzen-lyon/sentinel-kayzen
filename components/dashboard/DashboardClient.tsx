@@ -210,7 +210,7 @@ export default function DashboardClient({
 
   return (
     <div className="min-h-screen">
-      <main className="container-x py-10">
+      <main className="container-x py-8 lg:py-10">
           <>
             <h1 className="font-heading text-3xl font-bold text-fg">Scanner de sécurité</h1>
             <p className="mt-2 text-muted">
@@ -225,31 +225,40 @@ export default function DashboardClient({
               </p>
             )}
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                performScan(url);
-              }}
-              className="no-print mt-6 flex flex-col gap-3 sm:flex-row sm:items-end"
-            >
-              <label className="flex-1">
-                <span className="mb-1 block text-xs font-medium text-subtle">
-                  URL à scanner
-                </span>
-                <input
-                  type="text"
-                  inputMode="url"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://mon-site.fr"
-                  disabled={scanning}
-                  className="w-full rounded-xl border border-border-strong bg-bg px-4 py-3 text-fg outline-none transition-colors placeholder:text-subtle focus:border-brand focus:ring-2 focus:ring-brand/30 disabled:opacity-60"
-                />
-              </label>
-              <button type="submit" disabled={scanning} aria-busy={scanning} className="btn btn-primary disabled:opacity-60">
-                {scanning ? "Scan en cours…" : "Lancer le scan"}
-              </button>
-            </form>
+            <div className="no-print card mt-6 p-5">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  performScan(url);
+                }}
+                className="flex flex-col gap-3 sm:flex-row sm:items-end"
+              >
+                <label className="flex-1">
+                  <span className="mb-1 block text-xs font-medium text-subtle">
+                    URL à scanner
+                  </span>
+                  <span className="relative block">
+                    <span className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-subtle" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M10.5 3a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15zM16 16l5 5" />
+                      </svg>
+                    </span>
+                    <input
+                      type="text"
+                      inputMode="url"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      placeholder="https://mon-site.fr"
+                      disabled={scanning}
+                      className="w-full rounded-xl border border-border-strong bg-bg py-3 pl-10 pr-4 text-fg outline-none transition-colors placeholder:text-subtle focus:border-brand focus:ring-2 focus:ring-brand/30 disabled:opacity-60"
+                    />
+                  </span>
+                </label>
+                <button type="submit" disabled={scanning} aria-busy={scanning} className="btn btn-primary disabled:opacity-60">
+                  {scanning ? "Scan en cours…" : "Lancer le scan"}
+                </button>
+              </form>
+            </div>
 
             {error && (
               <p role="alert" className="mt-4 rounded-lg border border-risk/30 bg-risk/10 px-4 py-2.5 text-sm text-risk">
@@ -440,7 +449,8 @@ function Sparkline({ values }: { values: number[] }) {
       <polyline
         points={pts.join(" ")}
         fill="none"
-        stroke={`rgb(var(--${color}))`}
+        data-tint="stroke"
+        data-tone={color}
         strokeWidth="2"
         strokeLinejoin="round"
         strokeLinecap="round"

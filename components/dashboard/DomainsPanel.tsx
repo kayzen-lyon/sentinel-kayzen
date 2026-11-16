@@ -88,23 +88,25 @@ export default function DomainsPanel() {
         tous les membres de l&apos;organisation active.
       </p>
 
-      <form onSubmit={addDomain} className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-end">
-        <label className="flex-1">
-          <span className="mb-1 block text-xs font-medium text-subtle">
-            Domaine à vérifier
-          </span>
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="mon-site.fr"
-            disabled={busy}
-            className="w-full rounded-xl border border-border-strong bg-bg px-4 py-3 text-fg outline-none placeholder:text-subtle focus:border-brand focus:ring-2 focus:ring-brand/30 disabled:opacity-60"
-          />
-        </label>
-        <button type="submit" disabled={busy} aria-busy={busy} className="btn btn-primary disabled:opacity-60">
-          Générer un jeton
-        </button>
-      </form>
+      <div className="card mt-5 p-5">
+        <form onSubmit={addDomain} className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <label className="flex-1">
+            <span className="mb-1 block text-xs font-medium text-subtle">
+              Domaine à vérifier
+            </span>
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="mon-site.fr"
+              disabled={busy}
+              className="w-full rounded-xl border border-border-strong bg-bg px-4 py-3 text-fg outline-none placeholder:text-subtle focus:border-brand focus:ring-2 focus:ring-brand/30 disabled:opacity-60"
+            />
+          </label>
+          <button type="submit" disabled={busy} aria-busy={busy} className="btn btn-primary disabled:opacity-60">
+            Générer un jeton
+          </button>
+        </form>
+      </div>
 
       <ul className="mt-6 space-y-4">
         {domains.length === 0 && (

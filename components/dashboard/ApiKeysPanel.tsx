@@ -88,19 +88,23 @@ export default function ApiKeysPanel() {
         </p>
       )}
 
-      <form onSubmit={create} className="mt-4 flex flex-col gap-2 sm:flex-row">
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Nom de la clé (ex. Claude Desktop)"
-          className="input flex-1"
-          aria-label="Nom de la clé"
-        />
-        <button type="submit" disabled={busy} aria-busy={busy} className="btn btn-primary disabled:opacity-60">
-          Générer une clé
-        </button>
-      </form>
+      <div className="card mt-4 p-5">
+        <form onSubmit={create} className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <label className="flex-1">
+            <span className="mb-1 block text-xs font-medium text-subtle">Nom de la clé</span>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="ex. Claude Desktop"
+              className="input"
+            />
+          </label>
+          <button type="submit" disabled={busy} aria-busy={busy} className="btn btn-primary disabled:opacity-60">
+            Générer une clé
+          </button>
+        </form>
+      </div>
 
       {freshToken && (
         <div className="mt-4 rounded-lg border border-safe/30 bg-safe/10 p-4">
@@ -147,9 +151,9 @@ export default function ApiKeysPanel() {
         ))}
       </ul>
 
-      <div className="mt-6 rounded-lg border border-border bg-bg-elev/40 p-4">
+      <div className="card mt-6 p-4">
         <p className="text-sm font-semibold text-fg">Configuration MCP (Claude Desktop)</p>
-        <pre className="mt-2 overflow-x-auto rounded-md bg-bg-elev/70 p-3 text-xs text-muted">
+        <pre className="mt-2 overflow-x-auto rounded-md bg-sunken p-3 text-xs text-muted">
 {`{
   "mcpServers": {
     "sentinel": {

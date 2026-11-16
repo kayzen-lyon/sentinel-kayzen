@@ -54,7 +54,7 @@ export default function CicdPanel() {
 
   return (
     <div className="min-h-screen">
-      <main className="container-x py-10">
+      <main className="container-x py-8 lg:py-10">
         <h1 className="font-heading text-3xl font-bold text-fg">
           Scan de sécurité sur les Pull Requests
         </h1>
@@ -82,7 +82,7 @@ export default function CicdPanel() {
           </li>
         </ol>
 
-        <div className="mt-6">
+        <div className="card mt-6 p-4">
           <div className="no-print mb-2 flex items-center justify-between">
             <span className="text-sm font-semibold text-subtle">
               .github/workflows/strix-security.yml
@@ -91,7 +91,7 @@ export default function CicdPanel() {
               {copied ? "Copié ✓" : "Copier"}
             </button>
           </div>
-          <pre className="overflow-x-auto rounded-lg border border-border bg-bg-elev/60 p-4 text-xs text-muted">
+          <pre className="overflow-x-auto rounded-lg bg-sunken p-4 text-xs text-muted">
             {WORKFLOW_YAML}
           </pre>
         </div>

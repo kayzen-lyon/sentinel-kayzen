@@ -106,7 +106,7 @@ export default function BillingPanel() {
 
   return (
     <div className="min-h-screen">
-      <main className="container-x py-10">
+      <main className="container-x py-8 lg:py-10">
         <h1 className="font-heading text-3xl font-bold text-fg">Abonnement &amp; utilisation</h1>
         <p className="mt-2 max-w-2xl text-muted">
           Offre et consommation de l&apos;organisation active. Les compteurs mensuels repartent à

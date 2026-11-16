@@ -906,6 +906,7 @@ a:focus-visible .link-grow::after { transform: scaleX(1); }
 [data-tint="fg"] { color: rgb(var(--tone)); }
 [data-tint="dot"] { background-color: rgb(var(--tone)); }
 [data-tint="fill"] { fill: rgb(var(--tone)); }
+[data-tint="stroke"] { stroke: rgb(var(--tone)); }
 [data-size="4xl"] { font-size: var(--text-4xl); }
 [data-size="lg"] { font-size: var(--text-lg); }
 [data-size="hero"] { font-size: clamp(2.25rem, 1.5rem + 3vw, 3.5rem); }

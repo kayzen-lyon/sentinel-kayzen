@@ -12,7 +12,7 @@ export default async function DomainsPage() {
   const session = await getSession();
   if (!session) redirect("/login?next=/dashboard/domaines");
   return (
-    <main className="container-x py-10">
+    <main className="container-x py-8 lg:py-10">
       <h1 className="font-heading text-3xl font-bold text-fg">Domaines</h1>
       <div className="mt-6">
         <DomainsPanel />

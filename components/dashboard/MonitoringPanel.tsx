@@ -80,7 +80,7 @@ export default function MonitoringPanel() {
 
   return (
     <div className="min-h-screen">
-      <main className="container-x py-10">
+      <main className="container-x py-8 lg:py-10">
         <h1 className="font-heading text-3xl font-bold text-fg">Surveillance planifiée</h1>
         <p className="mt-2 max-w-2xl text-muted">
           Sentinel rescanne automatiquement vos cibles et vous alerte (Slack / webhook) en cas de
@@ -89,25 +89,29 @@ export default function MonitoringPanel() {
         </p>
 
 
-        <form onSubmit={add} className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <input
-            type="text"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://mon-site.fr"
-            className="input flex-1"
-            aria-label="URL à surveiller"
-            required
-          />
-          <select
-            value={frequency}
-            onChange={(e) => setFrequency(e.target.value as "daily" | "weekly")}
-            className="input sm:!w-44 sm:flex-none"
-            aria-label="Fréquence"
-          >
-            <option value="daily">Quotidien</option>
-            <option value="weekly">Hebdomadaire</option>
-          </select>
+        <form onSubmit={add} className="no-print card mt-6 flex flex-col gap-3 p-5 sm:flex-row sm:items-end">
+          <label className="flex-1">
+            <span className="mb-1 block text-xs font-medium text-subtle">URL à surveiller</span>
+            <input
+              type="text"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://mon-site.fr"
+              className="input"
+              required
+            />
+          </label>
+          <label className="sm:w-44 sm:flex-none">
+            <span className="mb-1 block text-xs font-medium text-subtle">Fréquence</span>
+            <select
+              value={frequency}
+              onChange={(e) => setFrequency(e.target.value as "daily" | "weekly")}
+              className="input"
+            >
+              <option value="daily">Quotidien</option>
+              <option value="weekly">Hebdomadaire</option>
+            </select>
+          </label>
           <button type="submit" disabled={busy} aria-busy={busy} className="btn btn-primary disabled:opacity-60">
             Surveiller
           </button>

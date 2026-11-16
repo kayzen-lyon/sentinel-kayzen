@@ -44,26 +44,54 @@ const SEVERITIES: { key: keyof SeverityCounts; label: string; tone: string }[] =
   { key: "info", label: "Informations", tone: "border-strong" },
 ];
 
+// Petites icônes (tracé unique) pour les pastilles des indicateurs clés.
+const KPI_ICON = {
+  shield: "M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6l7-3zM9.3 11.8l1.9 1.9 3.6-3.9",
+  alert: "M10.3 4.2 2.6 17.9A1.9 1.9 0 0 0 4.3 20.8h15.4a1.9 1.9 0 0 0 1.7-2.9L13.7 4.2a1.9 1.9 0 0 0-3.4 0zM12 9.5v4M12 17h.01",
+  target: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 12h.01",
+  globe: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z",
+} as const;
+
+function dateShort(iso: string): string {
+  return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
+}
+
 function Kpi({
   label,
   value,
   sub,
-  tone,
+  valueTone,
+  chipTone,
+  icon,
   href,
 }: {
   label: string;
   value: React.ReactNode;
   sub: React.ReactNode;
-  tone?: "safe" | "warn" | "risk";
+  valueTone?: "safe" | "warn" | "risk";
+  chipTone: string;
+  icon: keyof typeof KPI_ICON;
   href: string;
 }) {
   return (
     <Link href={href} className="card block p-5 transition-shadow hover:shadow-[var(--shadow-e3)]">
-      <p className="text-xs font-semibold uppercase tracking-wide text-subtle">{label}</p>
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-subtle">{label}</p>
+        <span
+          className="flex h-10 w-10 flex-none items-center justify-center rounded-xl"
+          data-tint="soft"
+          data-tone={chipTone}
+          aria-hidden="true"
+        >
+          <svg viewBox="0 0 24 24" className="h-[19px] w-[19px]" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+            <path d={KPI_ICON[icon]} />
+          </svg>
+        </span>
+      </div>
       <p
-        className="mt-2 font-heading text-3xl font-bold tabular-nums text-fg"
-        data-tint={tone ? "fg" : undefined}
-        data-tone={tone}
+        className="mt-3 font-heading text-3xl font-bold tabular-nums text-fg"
+        data-tint={valueTone ? "fg" : undefined}
+        data-tone={valueTone}
       >
         {value}
       </p>
@@ -86,7 +114,7 @@ export default async function OverviewPage() {
 
   if (!dbConfigured)
     return (
-      <main className="container-x py-10">
+      <main className="container-x py-8 lg:py-10">
         <h1 className="font-heading text-3xl font-bold text-fg">Vue d&apos;ensemble</h1>
         <p className="mt-4 rounded-lg border border-warn/30 bg-warn/10 px-4 py-2.5 text-sm text-warn">
           Mode démo : la base n&apos;est pas connectée, aucun historique n&apos;est conservé.
@@ -112,10 +140,53 @@ export default async function OverviewPage() {
   const previous = last ? done.find((s) => s !== last && host(s.target_url) === host(last.target_url)) : undefined;
   const delta = last && previous ? (last.score ?? 0) - (previous.score ?? 0) : null;
   const verified = domains.filter((d) => d.verified_at).length;
+  const pendingDomains = domains.length - verified;
   const openTotal = SEVERITIES.reduce((n, s) => n + findings[s.key], 0);
   const urgent = findings.critical + findings.high;
   const limits = PLANS[plan.plan].limits;
   const pentestLimit = limits.pentests;
+
+  // Historique du score pour la cible principale (du plus ancien au plus récent, max 8 points).
+  const primaryHost = last ? host(last.target_url) : null;
+  const history = primaryHost
+    ? done
+        .filter((s) => host(s.target_url) === primaryHost && s.score !== null)
+        .slice(0, 8)
+        .reverse()
+        .map((s) => ({ score: s.score as number, created_at: s.created_at }))
+    : [];
+
+  // Géométrie de la courbe (coordonnées = attributs SVG, aucun style en ligne : CSP).
+  let chart: {
+    line: string;
+    area: string;
+    grid: { v: number; y: number }[];
+    cx: number;
+    cy: number;
+  } | null = null;
+  if (history.length >= 2) {
+    const W = 520, H = 180, L = 36, R = 12, T = 14, B = 26;
+    const plotW = W - L - R, plotH = H - T - B, by = T + plotH;
+    const vals = history.map((p) => p.score);
+    const min = Math.min(...vals), max = Math.max(...vals);
+    let lo = Math.max(0, Math.floor((min - 6) / 10) * 10);
+    let hi = Math.min(100, Math.ceil((max + 6) / 10) * 10);
+    if (hi - lo < 20) {
+      hi = Math.min(100, lo + 20);
+      if (hi - lo < 20) lo = Math.max(0, hi - 20);
+    }
+    const span = hi - lo || 1;
+    const x = (i: number) => L + (i / (history.length - 1)) * plotW;
+    const y = (v: number) => T + (1 - (v - lo) / span) * plotH;
+    const pts = history.map((p, i) => `${x(i).toFixed(1)},${y(p.score).toFixed(1)}`);
+    chart = {
+      line: pts.join(" "),
+      area: `M ${pts.join(" L ")} L ${x(history.length - 1).toFixed(1)},${by} L ${x(0).toFixed(1)},${by} Z`,
+      grid: [hi, Math.round((hi + lo) / 2), lo].map((v) => ({ v, y: y(v) })),
+      cx: x(history.length - 1),
+      cy: y(history[history.length - 1].score),
+    };
+  }
 
   const steps = [
     { done: scans.length > 0, label: "Lancer un premier scan passif", href: "/dashboard/scan", cta: "Scanner un site" },
@@ -174,7 +245,9 @@ export default async function OverviewPage() {
         <Kpi
           href="/dashboard/scan"
           label="Dernier score"
-          tone={last ? gradeTone(last.grade) : undefined}
+          icon="shield"
+          chipTone={last ? gradeTone(last.grade) : "muted"}
+          valueTone={last ? gradeTone(last.grade) : undefined}
           value={last ? `${last.grade ?? "—"} · ${last.score}/100` : "—"}
           sub={
             last ? (
@@ -196,13 +269,17 @@ export default async function OverviewPage() {
         <Kpi
           href="/dashboard/pentest"
           label="Vulnérabilités ouvertes"
-          tone={urgent > 0 ? "risk" : openTotal > 0 ? "warn" : undefined}
+          icon="alert"
+          chipTone={urgent > 0 ? "risk" : openTotal > 0 ? "warn" : "safe"}
+          valueTone={urgent > 0 ? "risk" : openTotal > 0 ? "warn" : undefined}
           value={openTotal}
           sub={urgent > 0 ? `dont ${urgent} critique${urgent > 1 ? "s" : ""} ou élevée${urgent > 1 ? "s" : ""}` : "Aucune critique ni élevée"}
         />
         <Kpi
           href="/dashboard/abonnement"
           label="Pentests ce mois-ci"
+          icon="target"
+          chipTone="brand"
           value={pentestLimit === null ? usage.pentests : pentestLimit === 0 ? usage.pentests : `${usage.pentests} / ${pentestLimit}`}
           sub={
             pentestLimit === 0
@@ -213,47 +290,86 @@ export default async function OverviewPage() {
         <Kpi
           href="/dashboard/domaines"
           label="Domaines vérifiés"
+          icon="globe"
+          chipTone={pendingDomains > 0 ? "warn" : verified > 0 ? "safe" : "muted"}
           value={`${verified}${domains.length > verified ? ` / ${domains.length}` : ""}`}
-          sub={domains.length > verified ? `${domains.length - verified} en attente de vérification` : verified ? "Scan approfondi débloqué" : "Aucun domaine vérifié"}
+          sub={pendingDomains > 0 ? `${pendingDomains} en attente de vérification` : verified ? "Scan approfondi débloqué" : "Aucun domaine vérifié"}
         />
       </section>
 
-      <section aria-labelledby="gravite" className="card mt-6 p-5">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 id="gravite" className="font-heading text-lg font-semibold text-fg">
-            Vulnérabilités ouvertes par gravité
-          </h2>
-          <Link href="/dashboard/pentest" className="text-sm font-medium text-brand-light hover:underline">
-            Voir les pentests →
-          </Link>
-        </div>
-        {openTotal === 0 ? (
-          <p className="mt-3 text-sm text-muted">
-            Aucune vulnérabilité ouverte. Les résultats des pentests autonomes apparaîtront ici.
-          </p>
-        ) : (
-          <>
-            {/* Barre empilée en SVG : les largeurs sont des attributs, pas des styles en ligne (CSP). */}
-            <svg className="mt-4 block h-3 w-full overflow-hidden rounded-full bg-hover" viewBox="0 0 100 3" preserveAspectRatio="none" aria-hidden="true">
-              {SEVERITIES.map((s, i) => {
-                const before = SEVERITIES.slice(0, i).reduce((n, p) => n + findings[p.key], 0);
-                return findings[s.key] > 0 ? (
-                  <rect key={s.key} x={(before / openTotal) * 100} y="0" height="3" width={(findings[s.key] / openTotal) * 100} data-tint="fill" data-tone={s.tone} />
-                ) : null;
-              })}
-            </svg>
-            <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-5">
-              {SEVERITIES.map((s) => (
-                <li key={s.key} className="flex items-center gap-2 text-sm">
-                  <span className="h-2.5 w-2.5 flex-none rounded-full" data-tint="dot" data-tone={s.tone} aria-hidden="true" />
-                  <span className="text-muted">{s.label}</span>
-                  <span className="ml-auto font-semibold tabular-nums text-fg">{findings[s.key]}</span>
-                </li>
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+        <section aria-labelledby="evolution" className="card p-5">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="evolution" className="font-heading text-lg font-semibold text-fg">
+              Évolution du score
+            </h2>
+            {primaryHost && <span className="truncate text-sm text-subtle">{primaryHost}</span>}
+          </div>
+          {chart ? (
+            <svg
+              viewBox="0 0 520 180"
+              className="mt-4 block w-full"
+              role="img"
+              aria-label={`Score de sécurité de ${primaryHost} : de ${history[0].score} à ${history[history.length - 1].score} sur 100, sur ${history.length} scans.`}
+            >
+              {chart.grid.map((g) => (
+                <g key={g.v}>
+                  <line x1="36" y1={g.y} x2="508" y2={g.y} data-tint="stroke" data-tone="border-strong" strokeOpacity="0.4" />
+                  <text x="30" y={g.y + 3.5} textAnchor="end" fontSize="11" data-tint="fill" data-tone="subtle">{g.v}</text>
+                </g>
               ))}
-            </ul>
-          </>
-        )}
-      </section>
+              <path d={chart.area} data-tint="fill" data-tone="brand" fillOpacity="0.12" />
+              <polyline points={chart.line} data-tint="stroke" data-tone="brand" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx={chart.cx} cy={chart.cy} r="4.5" data-tint="fill" data-tone="brand" />
+              <text x="36" y="174" fontSize="11" data-tint="fill" data-tone="subtle">{dateShort(history[0].created_at)}</text>
+              <text x="508" y="174" textAnchor="end" fontSize="11" data-tint="fill" data-tone="subtle">{dateShort(history[history.length - 1].created_at)}</text>
+            </svg>
+          ) : (
+            <p className="mt-6 text-sm text-muted">
+              {primaryHost
+                ? "Pas encore assez d'historique pour tracer une courbe. Relancez un scan sur la même cible pour suivre l'évolution du score."
+                : "Lancez un premier scan pour commencer à suivre l'évolution du score de vos cibles."}
+            </p>
+          )}
+        </section>
+
+        <section aria-labelledby="gravite" className="card p-5">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="gravite" className="font-heading text-lg font-semibold text-fg">
+              Vulns par gravité
+            </h2>
+            <Link href="/dashboard/pentest" className="text-sm font-medium text-brand-light hover:underline">
+              Pentests →
+            </Link>
+          </div>
+          {openTotal === 0 ? (
+            <p className="mt-3 text-sm text-muted">
+              Aucune vulnérabilité ouverte. Les résultats des pentests autonomes apparaîtront ici.
+            </p>
+          ) : (
+            <>
+              {/* Barre empilée en SVG : les largeurs sont des attributs, pas des styles en ligne (CSP). */}
+              <svg className="mt-4 block h-3 w-full overflow-hidden rounded-full bg-hover" viewBox="0 0 100 3" preserveAspectRatio="none" aria-hidden="true">
+                {SEVERITIES.map((s, i) => {
+                  const before = SEVERITIES.slice(0, i).reduce((n, p) => n + findings[p.key], 0);
+                  return findings[s.key] > 0 ? (
+                    <rect key={s.key} x={(before / openTotal) * 100} y="0" height="3" width={(findings[s.key] / openTotal) * 100} data-tint="fill" data-tone={s.tone} />
+                  ) : null;
+                })}
+              </svg>
+              <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5">
+                {SEVERITIES.map((s) => (
+                  <li key={s.key} className="flex items-center gap-2 text-sm">
+                    <span className="h-2.5 w-2.5 flex-none rounded-full" data-tint="dot" data-tone={s.tone} aria-hidden="true" />
+                    <span className="text-muted">{s.label}</span>
+                    <span className="ml-auto font-semibold tabular-nums text-fg">{findings[s.key]}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </section>
+      </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <section aria-labelledby="scans" className="card p-5">
