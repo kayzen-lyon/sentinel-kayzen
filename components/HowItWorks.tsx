@@ -1,3 +1,10 @@
+"use client";
+/* « Le déroulé » en scène fixe (styles .apv-scene, .apv-stage, .apv-step dans globals.css).
+   Sur grand écran, un panneau reste à l'écran et affiche l'étape en cours pendant que
+   la liste défile à côté ; en dessous de 1024 px, les étapes restent des cartes empilées.
+   Défilement natif : on ne fait que lire la position, jamais intercepter la molette. */
+import { useEffect, useRef, useState } from "react";
+
 const STEPS = [
   {
     n: "01",
@@ -22,34 +29,82 @@ const STEPS = [
 ];
 
 export default function HowItWorks() {
+  const [active, setActive] = useState(0);
+  const listRef = useRef<HTMLOListElement>(null);
+
+  // L'étape active est celle dont le bloc est le plus proche du milieu de l'écran.
+  // Position mesurée à chaque défilement (les sections voisines peuvent changer de hauteur).
+  useEffect(() => {
+    let frame = 0;
+    const measure = () => {
+      frame = 0;
+      const list = listRef.current;
+      if (!list) return;
+      const bounds = list.getBoundingClientRect();
+      if (bounds.bottom < 0 || bounds.top > window.innerHeight) return;
+      const mid = window.innerHeight / 2;
+      let best = 0;
+      let bestDistance = Infinity;
+      Array.from(list.children).forEach((el, i) => {
+        const r = el.getBoundingClientRect();
+        const d = Math.abs(r.top + r.height / 2 - mid);
+        if (d < bestDistance) {
+          bestDistance = d;
+          best = i;
+        }
+      });
+      setActive(best);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+    measure();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  const step = STEPS[active];
+
   return (
-    <section className="border-t border-border py-24">
+    <section className="apv-scene">
       <div className="container-x">
-        <div className="mx-auto max-w-2xl text-center">
+        <div className="apv-scene-head">
           <span className="eyebrow">Le déroulé</span>
-          <h2
-            className="mt-4 font-heading font-bold text-fg"
-            data-size="4xl"
-          >
+          <h2 className="mt-4 font-heading font-bold text-fg" data-size="4xl">
             Opérationnel en moins de 10 minutes
           </h2>
         </div>
 
-        <ol className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map((s) => (
-            <li key={s.n} className="card relative p-7">
-              <span aria-hidden="true" className="font-heading text-4xl font-bold text-brand/75">
-                {s.n}
-              </span>
-              <h3 className="mt-3 font-heading text-lg font-semibold text-fg">
-                {s.title}
-              </h3>
-              <p className="mt-2.5 text-[0.95rem] leading-relaxed text-muted">
-                {s.body}
-              </p>
-            </li>
-          ))}
-        </ol>
+        <div className="apv-scene-grid">
+          {/* Décoratif : répète l'étape en cours, déjà lue dans la liste. */}
+          <div className="apv-stage band-dark" aria-hidden="true">
+            <p className="apv-stage-count">
+              <b key={step.n} className="apv-stage-n">{step.n}</b>
+              <span>/ {STEPS[STEPS.length - 1].n}</span>
+            </p>
+            <p key={step.title} className="apv-stage-title">{step.title}</p>
+            <div className="apv-stage-rail">
+              {STEPS.map((s, i) => (
+                <i key={s.n} className={i <= active ? "on" : undefined} />
+              ))}
+            </div>
+          </div>
+
+          <ol className="apv-steps" ref={listRef}>
+            {STEPS.map((s, i) => (
+              <li key={s.n} className={i === active ? "apv-step on" : "apv-step"}>
+                <span aria-hidden="true" className="apv-step-n">{s.n}</span>
+                <h3>{s.title}</h3>
+                <p>{s.body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
     </section>
   );
