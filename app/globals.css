@@ -1038,3 +1038,37 @@ a:focus-visible .link-grow::after { transform: scaleX(1); }
 @media (prefers-reduced-motion: reduce) {
   .apv-stage-n, .apv-stage-title { animation: none; }
 }
+
+/* ── Défilement des applications du groupe ── */
+.apv-reel { overflow: hidden; padding-bottom: 6rem; }
+.apv-reel-row { overflow: hidden; padding-block: 0.6rem; }
+.apv-reel-row:first-of-type { margin-top: 1.5rem; }
+.apv-reel-track { display: flex; gap: 1.25rem; width: max-content; animation: apv-reel 60s linear infinite; }
+.apv-reel-row--back .apv-reel-track { animation-direction: reverse; }
+.apv-reel-row:hover .apv-reel-track,
+.apv-reel-row:focus-within .apv-reel-track { animation-play-state: paused; }
+@keyframes apv-reel { to { transform: translateX(calc(-50% - 0.625rem)); } }
+.apv-reel-list { display: flex; gap: 1.25rem; }
+.apv-reel-card {
+  flex: none;
+  width: min(26rem, 78vw);
+  border: 1px solid rgb(var(--border));
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background-color: rgb(var(--bg-card));
+  transition: border-color var(--dur-normal) ease;
+}
+.apv-reel-card:hover, .apv-reel-card:focus-within { border-color: rgb(var(--brand)); }
+.apv-reel-card a { display: block; }
+.apv-reel-card a:focus-visible { outline-offset: -3px; border-radius: 1.25rem; }
+.apv-reel-shot { display: block; aspect-ratio: 16 / 9; background-color: rgb(var(--bg-elev)); border-bottom: 1px solid rgb(var(--border)); }
+.apv-reel-shot img { display: block; width: 100%; height: 100%; }
+.apv-reel-body { display: grid; gap: 0.15rem; padding: 1rem 1.15rem 1.15rem; }
+.apv-reel-name { font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; color: rgb(var(--heading)); }
+.apv-reel-host { font-size: 0.85rem; font-weight: 600; color: rgb(var(--brand-light)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .apv-reel-track { animation: none; }
+  .apv-reel-row { overflow-x: auto; }
+  .apv-reel-list[aria-hidden="true"] { display: none; }
+}

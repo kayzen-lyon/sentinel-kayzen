@@ -9,6 +9,7 @@ import Offers from "@/components/Offers";
 import Coverage from "@/components/Coverage";
 import Pricing from "@/components/Pricing";
 import Group from "@/components/Group";
+import GroupReel from "@/components/GroupReel";
 import Faq from "@/components/Faq";
 import CtaFinal from "@/components/CtaFinal";
 import Footer from "@/components/Footer";
@@ -99,6 +100,7 @@ export default function Page() {
         <Coverage />
         <Pricing />
         <Group />
+        <GroupReel />
         <Faq />
         <CtaFinal />
       </main>
