@@ -227,10 +227,8 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Signature en filigrane. Décorative : le nom est déjà lu en haut du pied de page. */}
-      <div aria-hidden="true" className="apv-foot-mark">
-        <p>SENTINEL</p>
-      </div>
+      {/* Signature en filigrane (texte posé en CSS, .apv-foot-mark). Décorative : le nom est déjà lu plus haut. */}
+      <div aria-hidden="true" className="apv-foot-mark" />
     </footer>
   );
 }

@@ -1098,7 +1098,10 @@ a:focus-visible .link-grow::after { transform: scaleX(1); }
 }
 .apv-foot-phone:hover { color: #fff; }
 .apv-foot-mark { overflow: hidden; user-select: none; pointer-events: none; }
-.apv-foot-mark p {
+/* Texte posé en CSS : purement décoratif, il n'entre ni dans le contenu ni dans les contrôles de contraste. */
+.apv-foot-mark::after {
+  content: "SENTINEL";
+  display: block;
   margin-bottom: -3.6vw;
   text-align: center;
   font-family: var(--font-heading);
