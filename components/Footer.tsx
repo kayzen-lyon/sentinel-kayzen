@@ -5,8 +5,8 @@ import DigitalContactCard from "@/components/DigitalContactCard";
 
 /**
  * Pied de page — même structure que kayzen-lyon.com, adaptée à Sentinel :
- * bloc marque + coordonnées + réseaux, trois colonnes de plan du site, applications
- * du groupe, « Nous trouver », bandeau légal (éditeur, hébergeur, domaine, SIRET).
+ * ouverture sur le contact en très grand, bloc marque + coordonnées + réseaux, trois colonnes de plan du site, applications
+ * du groupe, « Nous trouver », bandeau légal (éditeur, hébergeur, domaine, SIRET), nom de la marque en filigrane.
  *
  * La carte Google n'est pas embarquée : un lien vers la fiche d'établissement suffit
  * et ne dépose aucun traceur (la CSP du site interdit d'ailleurs toute iframe).
@@ -63,7 +63,30 @@ const social =
 
 export default function Footer() {
   return (
-    <footer className="spot-dark bg-navy-deep text-white">
+    <footer className="bg-navy-deep text-white">
+      {/* Ouverture : le contact en très grand, avant le plan du site. */}
+      <div className="border-b border-white/10">
+        <div className="mx-auto grid max-w-7xl gap-8 px-6 py-14 md:py-20 lg:grid-cols-[1.7fr_1fr] lg:items-end">
+          <div className="min-w-0">
+            <a href={`mailto:${COMPANY.email}`} className="apv-foot-mail">
+              {COMPANY.email}
+            </a>
+            <a href={COMPANY.phoneHref} className="apv-foot-phone">
+              {COMPANY.phone}
+            </a>
+          </div>
+          <div className="band-dark flex flex-col items-start gap-3 !bg-transparent lg:items-end">
+            <Link href="/signup" className="btn btn-primary btn-lg">
+              Scanner mon site gratuitement
+            </Link>
+            <Link href="/#contact" className="btn btn-ghost btn-lg">
+              Demander un audit managé
+            </Link>
+            <p className="text-sm text-white/70">{COMPANY.hours}</p>
+          </div>
+        </div>
+      </div>
+
       <div className="mx-auto max-w-7xl px-6 py-16">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
@@ -202,6 +225,11 @@ export default function Footer() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Signature en filigrane. Décorative : le nom est déjà lu en haut du pied de page. */}
+      <div aria-hidden="true" className="apv-foot-mark">
+        <p>SENTINEL</p>
       </div>
     </footer>
   );

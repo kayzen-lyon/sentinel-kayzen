@@ -1072,3 +1072,39 @@ a:focus-visible .link-grow::after { transform: scaleX(1); }
   .apv-reel-row { overflow-x: auto; }
   .apv-reel-list[aria-hidden="true"] { display: none; }
 }
+
+/* ── Pied de page : contact en très grand, puis le nom en filigrane ── */
+.apv-foot-mail {
+  display: block;
+  overflow-wrap: anywhere;
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 4.6vw, 3.9rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: #fff;
+  transition: color var(--dur-fast) ease;
+}
+.apv-foot-mail:hover { color: rgb(var(--gold)); }
+.apv-foot-phone {
+  display: inline-block;
+  margin-top: 1.25rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.25rem, 2.4vw, 2.1rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: rgb(255 255 255 / 0.8);
+  transition: color var(--dur-fast) ease;
+}
+.apv-foot-phone:hover { color: #fff; }
+.apv-foot-mark { overflow: hidden; user-select: none; pointer-events: none; }
+.apv-foot-mark p {
+  margin-bottom: -3.6vw;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 17.5vw;
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  color: rgb(255 255 255 / 0.06);
+}
