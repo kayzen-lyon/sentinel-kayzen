@@ -41,6 +41,7 @@ const ACTION_LABEL: Record<string, string> = {
   "pentest.approved": "Pentest approuvé",
   "pentest.rejected": "Pentest rejeté",
   "finding.status": "Statut de vulnérabilité modifié",
+  "finding.triage": "Grille de triage renseignée",
   "team.add_member": "Membre ajouté",
   "team.invite": "Invitation envoyée",
   "team.invite_revoked": "Invitation annulée",

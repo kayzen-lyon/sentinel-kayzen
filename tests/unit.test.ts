@@ -302,3 +302,96 @@ test("compliance : correspondances et synthèse", async () => {
   assert.equal(pci624?.failing, 2);
   assert.ok(!rows.some((r) => r.control === "4.2.1")); // https n'est pas en échec
 });
+
+test("jssurface : secrets détectés, masqués, bruit ignoré", async () => {
+  const { scanSecrets } = await import("../lib/jssurface");
+  const aws = "AKIA" + "ABCDEFGHIJKLMNOP";
+  const hits = scanSecrets(`const k="${aws}"; const g="${"gh" + "p_" + "a".repeat(36)}";`, "/app.js");
+  assert.equal(hits.length, 2);
+  assert.ok(hits.every((h) => !h.redacted.includes(aws) && h.redacted.includes("…")));
+  assert.equal(hits[0].severity, "critical");
+  // Gabarits de documentation et références d'environnement : ignorés
+  assert.equal(scanSecrets(`key="${"AK" + "IAXXXXEXAMPLE12345"}"`, "/").length, 0);
+  assert.equal(scanSecrets(`access_token: process.env.TOKEN_VALUE_0123456789`, "/").length, 0);
+});
+
+test("jssurface : extraction d'endpoints et classement", async () => {
+  const { mineEndpoints, classifyItem, buildSurface } = await import("../lib/jssurface");
+  const eps = mineEndpoints(`fetch("/api/v1/users/me");x='/graphql';y="/logo.png";z="/_next/data/abc123/fr/page.json"`);
+  assert.ok(eps.includes("/api/v1/users/me"));
+  assert.ok(eps.includes("/graphql"));
+  assert.ok(eps.some((e) => e.startsWith("/_next/data/…")));
+  assert.ok(classifyItem("/login", "next").includes("open-redirect"));
+  assert.ok(classifyItem("/search", "q").includes("sqli"));
+  assert.ok(classifyItem("/graphql").includes("graphql"));
+  const html = `<form action="/recherche"><input name="q"><input type="hidden" name="csrf"></form>
+    <a href="https://tiers.example.net/x?url=1">t</a><a href="/doc?file=a&utm_source=x">d</a>`;
+  const s = buildSurface(html, [], "https://site.fr");
+  assert.ok(s.some((i) => i.path === "/recherche" && i.param === "q"));
+  assert.ok(s.some((i) => i.path === "/doc" && i.param === "file" && i.classes.includes("lfi")));
+  assert.ok(!s.some((i) => i.param === "csrf" || i.param === "utm_source" || i.param === "url"));
+});
+
+test("surface : consigne de ciblage Strix", async () => {
+  const { surfaceInstruction } = await import("../lib/surface");
+  assert.equal(surfaceInstruction([{ path: "/a", source: "js", classes: ["info-leak"] }]), null);
+  const txt = surfaceInstruction([{ path: "/api/x", param: "id", method: "GET", source: "lien", classes: ["idor"] }]);
+  assert.ok(txt && txt.includes("/api/x") && txt.includes("« id »"));
+});
+
+test("scopeAudit : hôtes hors périmètre, OOB et documentation", async () => {
+  const { auditScope } = await import("../lib/scopeAudit");
+  const r = auditScope(
+    {
+      poc_script_code:
+        "requests.get('https://api.site.fr/x'); requests.get('https://victime-tierce.com/y')\n" +
+        "# callback http://abc.oast.fun  ref https://owasp.org/x  http://127.0.0.1:8080",
+      endpoint: "https://site.fr/login",
+    },
+    "https://www.site.fr/"
+  );
+  assert.deepEqual(r.outOfScope, ["victime-tierce.com"]);
+  assert.deepEqual(r.oob, ["abc.oast.fun"]);
+  assert.deepEqual(auditScope(null, "https://site.fr").outOfScope, []);
+});
+
+test("triage : grille en 7 questions", async () => {
+  const { triageVerdict, parseTriage, TRIAGE_QUESTIONS } = await import("../lib/triage");
+  assert.equal(TRIAGE_QUESTIONS.length, 7);
+  assert.equal(triageVerdict(null).kind, "pending");
+  assert.deepEqual(triageVerdict([true, true, false, null, null, null, null]), { kind: "reject", failedAt: 2 });
+  assert.equal(triageVerdict(Array(7).fill(true)).kind, "valid");
+  assert.equal(parseTriage([true]), null);
+  assert.equal(parseTriage(Array(7).fill("oui")), null);
+  assert.ok(parseTriage(Array(7).fill(null)));
+});
+
+test("validation et couverture", async () => {
+  const { validationOf } = await import("../lib/validation");
+  assert.equal(validationOf({}), null);
+  assert.equal(validationOf({ _sentinel_validation: { verdict: "bof" } }), null);
+  assert.deepEqual(validationOf({ _sentinel_validation: { verdict: "doubtful", severity: "LOW", reason: "r" } }), {
+    verdict: "doubtful",
+    severity: "low",
+    reason: "r",
+  });
+  const { buildCoverage } = await import("../lib/coverage");
+  const cov = buildCoverage(
+    [
+      { path: "/api/users", param: "id", source: "lien", classes: ["idor", "sqli"] },
+      { path: "/apikeys", source: "js", classes: ["info-leak"] },
+    ],
+    [
+      { title: "IDOR sur les profils", payload: { endpoint: "https://site.fr/api/users/42" } },
+      { title: "SQL injection", payload: { endpoint: "/api/users" }, status: "false_positive" },
+    ]
+  );
+  assert.equal(cov.points, 2);
+  assert.equal(cov.pairs, 3);
+  assert.equal(cov.pairsWithFinding, 1); // faux positif exclu, /apikeys ne correspond pas à /api
+});
+
+test("compliance : secrets JS rattachés", async () => {
+  const { controlsFor } = await import("../lib/compliance");
+  assert.deepEqual(controlsFor("js-secret-cle-d-acces-aws", "Divulgation").pci, ["8.6.2", "3.6.1"]);
+});

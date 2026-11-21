@@ -5,6 +5,7 @@ import type { Finding, ScanResult, Severity } from "@/lib/scanner";
 import { complianceSummary, controlsFor, controlsLabel, FRAMEWORK_LABELS } from "@/lib/compliance";
 import type { ScanDiff } from "@/lib/scanDiff";
 import { formatDateTime } from "@/lib/format";
+import { ATTACK_CLASS_LABELS, type SurfaceItem } from "@/lib/surface";
 
 /** Comparaison avec le scan précédent de la même cible (calculée par l’appelant). */
 export type ScanComparison = { diff: ScanDiff<Finding>; baselineDate: string; baselineScore: number | null };
@@ -218,6 +219,56 @@ export default function ScanResultView({
   );
 }
 
+/** Carte de surface : points d'entrée cartographiés et classes d'attaque indicatives. */
+function SurfaceMap({ items }: { items: SurfaceItem[] }) {
+  const [all, setAll] = useState(false);
+  const shown = all ? items : items.slice(0, 12);
+  return (
+    <div className="mt-3 overflow-x-auto rounded-lg border border-border">
+      <table className="w-full text-left text-xs">
+        <caption className="sr-only">Carte de surface d&apos;attaque</caption>
+        <thead className="bg-bg-elev/60 text-subtle">
+          <tr>
+            <th scope="col" className="px-3 py-1.5 font-semibold">Point d&apos;entrée</th>
+            <th scope="col" className="px-3 py-1.5 font-semibold">Paramètre</th>
+            <th scope="col" className="px-3 py-1.5 font-semibold">Source</th>
+            <th scope="col" className="px-3 py-1.5 font-semibold">Classes à tester</th>
+          </tr>
+        </thead>
+        <tbody>
+          {shown.map((it) => (
+            <tr key={`${it.method}-${it.path}-${it.param}`} className="border-t border-border/60 align-top">
+              <td className="px-3 py-1.5 font-mono text-fg">
+                {it.method && it.method !== "GET" ? `${it.method} ` : ""}
+                {it.path}
+              </td>
+              <td className="px-3 py-1.5 font-mono text-muted">{it.param || "—"}</td>
+              <td className="px-3 py-1.5 text-muted">{it.source === "js" ? "JavaScript" : it.source === "form" ? "Formulaire" : "Lien"}</td>
+              <td className="px-3 py-1.5">
+                <span className="flex flex-wrap gap-1">
+                  {it.classes.map((c) => (
+                    <span key={c} className="rounded-full px-2 py-0.5 text-[0.65rem] font-semibold" data-tint="soft" data-tone={c === "info-leak" ? "muted" : "warn"}>
+                      {ATTACK_CLASS_LABELS[c] ?? c}
+                    </span>
+                  ))}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {items.length > 12 && (
+        <button
+          onClick={() => setAll((v) => !v)}
+          className="no-print w-full border-t border-border px-3 py-1.5 text-xs text-brand-light hover:bg-hover"
+        >
+          {all ? "Réduire" : `Afficher les ${items.length} points d'entrée`}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function FindingRow({ f, isNew }: { f: Finding; isNew?: boolean }) {
   const controls = f.state === "pass" || f.state === "info" ? "" : controlsLabel(controlsFor(f.id, f.category));
   const [copied, setCopied] = useState(false);
@@ -286,6 +337,7 @@ function FindingRow({ f, isNew }: { f: Finding; isNew?: boolean }) {
               ))}
             </div>
           )}
+          {f.surface && f.surface.length > 0 && <SurfaceMap items={f.surface} />}
           {f.recommendation && (
             <div className="mt-2 flex items-start gap-2 rounded-lg border border-border bg-bg-elev/60 px-3 py-2">
               <p className="flex-1 text-sm text-muted">

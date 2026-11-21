@@ -1,0 +1,15 @@
+Sentinel by Kayzen
+Copyright (c) 2026 Kayzen Web — licence MIT (voir LICENSE).
+
+Ce projet adapte des éléments tiers :
+
+Claude-BugHunter — https://github.com/elementalsouls/Claude-BugHunter
+Copyright (c) 2026 Sachin Sharma
+  - Code sous licence MIT : motifs de détection de secrets dans le JavaScript client,
+    règles de classement des points d'entrée par classe d'attaque, principes d'audit de
+    périmètre des preuves, de relecture contradictoire et de registre de couverture
+    (lib/jssurface.ts, lib/surface.ts, lib/scopeAudit.ts, lib/coverage.ts,
+    lib/validation.ts, worker/github-actions/validate_findings.py).
+  - Contenu sous licence CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/) :
+    grille de triage en 7 questions (« 7-Question Gate »), traduite et adaptée au
+    contexte d'un audit sur son propre périmètre (lib/triage.ts).

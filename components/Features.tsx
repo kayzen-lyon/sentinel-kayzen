@@ -30,6 +30,24 @@ const FEATURES = [
     accent: "secondary",
   },
   {
+    title: "Carte de surface d'attaque",
+    body: "Sentinel extrait les endpoints, formulaires et paramètres de votre HTML et de vos bundles JavaScript, puis indique pour chacun les attaques à tester (IDOR, SSRF, injection, redirection…). Le pentest autonome cible ces points en priorité.",
+    icon: "map",
+    accent: "brand",
+  },
+  {
+    title: "Secrets exposés dans le JavaScript",
+    body: "Clés AWS, Stripe, GitHub, OpenAI, jetons et clés privées oubliés dans le code livré au navigateur sont détectés à chaque scan approfondi. Les valeurs sont masquées : Sentinel ne conserve jamais un secret en clair.",
+    icon: "key",
+    accent: "safe",
+  },
+  {
+    title: "Contrôle qualité de chaque finding",
+    body: "Relecture contradictoire par un second modèle, audit du périmètre de chaque preuve (aucun hôte tiers), grille de triage en 7 questions et registre de couverture dans le rapport. Vous ne transmettez que ce qui tient.",
+    icon: "filter",
+    accent: "secondary",
+  },
+  {
     title: "Exports & rapports conformité",
     body: "Rapport de pentest imprimable (PDF), envoi e-mail automatique et exports SARIF / CSV / JSON pour brancher vos findings dans GitHub, vos SIEM ou vos audits réglementaires.",
     icon: "doc",
@@ -131,6 +149,24 @@ function Icon({ name }: { name: string }) {
       return (
         <svg {...common}>
           <path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" /><path d="M14 3v4h4M9 13h6M9 17h4" />
+        </svg>
+      );
+    case "map":
+      return (
+        <svg {...common}>
+          <path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z" /><path d="M9 4v14M15 6v14" />
+        </svg>
+      );
+    case "key":
+      return (
+        <svg {...common}>
+          <circle cx="8" cy="15" r="4" /><path d="m10.8 12.2 8.7-8.7M16 7l2.5 2.5M14 9l2 2" />
+        </svg>
+      );
+    case "filter":
+      return (
+        <svg {...common}>
+          <path d="M4 5h16l-6 7.5V19l-4 1.5v-8L4 5Z" />
         </svg>
       );
     default:

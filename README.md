@@ -22,6 +22,13 @@ Au-delà de la vitrine, le projet embarque un **outil fonctionnel** :
 - **Scanner de sécurité passif réel** (`lib/scanner.ts`) : le client saisit son URL et
   Sentinel analyse en direct HTTPS/HSTS, en-têtes de sécurité, CSP, cookies, CORS,
   fuites serveur, `security.txt` et expositions (`.env`, `.git`…). Note **A→F** + score.
+- **Scan approfondi du JavaScript client** (`lib/jssurface.ts`, domaine vérifié) : secrets
+  exposés (clés cloud, jetons, clés privées — valeurs masquées) et **carte de surface**
+  (endpoints, formulaires, paramètres → classes d'attaque), réutilisée pour cibler Strix.
+- **Contrôle qualité des findings du pentest** : audit de périmètre des preuves
+  (`lib/scopeAudit.ts`), relecture contradictoire par un second modèle
+  (`worker/github-actions/validate_findings.py`), grille de triage en 7 questions
+  (`lib/triage.ts`) et registre de couverture dans le rapport (`lib/coverage.ts`).
 - **Garde anti-SSRF** (`lib/ssrf.ts`) : refuse localhost, IP privées et métadonnées cloud.
 - **Dashboard** `/dashboard` protégé, avec historique des scans par utilisateur.
 
@@ -123,4 +130,4 @@ Contribuer : [`CONTRIBUTING.md`](CONTRIBUTING.md) · Sécurité : [`SECURITY.md`
 
 ## Licence
 
-[MIT](LICENSE) © 2026 Kayzen Web.
+[MIT](LICENSE) © 2026 Kayzen Web. Composants tiers adaptés : voir [NOTICE](NOTICE).

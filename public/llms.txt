@@ -5,6 +5,11 @@
 - [Sentinel by Kayzen — Pentest IA autonome & cybersécurité offensive](https://sentinel.kayzen-lyon.com/) : Sentinel déploie des agents IA qui pensent comme de vrais hackers : ils exécutent votre code, trouvent les failles et les prouvent par des PoC réels. Audit managé + plateforme self-service. Une entité du groupe Kayzen (Lyon).
 - [Rétractation](https://sentinel.kayzen-lyon.com/retractation) : Se rétracter d'un contrat conclu avec Sentinel by Kayzen, en ligne, sans motif.
 
+## Fonctionnalités
+- Pentest autonome : des agents IA exploitent les failles d'un domaine dont la propriété est vérifiée et livrent des preuves rejouables.
+- Scan approfondi : en-têtes, TLS, DNS, expositions, CVE, secrets oubliés dans le JavaScript client (masqués) et carte de surface des points d'entrée.
+- Contrôle qualité des findings : relecture contradictoire, audit du périmètre des preuves, grille de triage en 7 questions et registre de couverture.
+
 ## Écosystème KAYZEN
 - [Studio AI](https://studio-ai.kayzen-lyon.com/) : Dix-huit outils photo et vidéo dopés à l'IA, gratuits et sans compte.
 - [Restomix](https://restomix-app.vercel.app/) : Le menu QR qui prend les commandes et encaisse à table.
