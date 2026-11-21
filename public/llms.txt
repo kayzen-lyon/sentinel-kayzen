@@ -2,7 +2,7 @@
 > Des agents de sécurité testent réellement votre application et documentent les vulnérabilités exploitables avec des preuves rejouables.
 
 ## Pages principales
-- [Sentinel by Kayzen](https://sentinel.kayzen-lyon.com/) : Sentinel déploie des agents IA qui pensent comme de vrais hackers : ils exécutent votre code, trouvent les failles et les prouvent par des PoC réels. Audit managé + plateforme self-service. Une entité du groupe Kayzen (Lyon).
+- [Sentinel by Kayzen — Pentest IA autonome & cybersécurité offensive](https://sentinel.kayzen-lyon.com/) : Sentinel déploie des agents IA qui pensent comme de vrais hackers : ils exécutent votre code, trouvent les failles et les prouvent par des PoC réels. Audit managé + plateforme self-service. Une entité du groupe Kayzen (Lyon).
 - [Rétractation](https://sentinel.kayzen-lyon.com/retractation) : Se rétracter d'un contrat conclu avec Sentinel by Kayzen, en ligne, sans motif.
 
 ## Écosystème KAYZEN
