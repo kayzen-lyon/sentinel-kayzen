@@ -9,7 +9,7 @@ Le verdict (confirmed / doubtful / rejected), une gravité recalibrée et une ra
 Principe repris du validateur adversarial de Claude-BugHunter (Sachin Sharma, MIT).
 Best-effort : toute erreur laisse le finding sans verdict, le run n'échoue jamais.
 
-Env : GEMINI_API_KEY (tier gratuit Google AI Studio), STRIX_LLM (ex. "gemini/gemini-2.0-flash"),
+Env : GEMINI_API_KEY (tier gratuit Google AI Studio), STRIX_LLM (ex. "gemini/gemini-3.8-flash"),
 STRIX_RUNS_DIR (défaut "strix_runs"). Stdlib uniquement.
 """
 from __future__ import annotations
@@ -21,7 +21,7 @@ import urllib.request
 
 RUNS_DIR = os.environ.get("STRIX_RUNS_DIR", "strix_runs")
 API_KEY = os.environ.get("GEMINI_API_KEY", "")
-MODEL = os.environ.get("STRIX_LLM", "gemini/gemini-2.0-flash").split("/", 1)[-1]
+MODEL = os.environ.get("STRIX_LLM", "gemini/gemini-3.8-flash").split("/", 1)[-1]
 OUT_NAME = "sentinel_validations.json"
 MAX_FIELD = 6000
 VERDICTS = {"confirmed", "doubtful", "rejected"}

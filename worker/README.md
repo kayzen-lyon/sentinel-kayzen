@@ -32,7 +32,7 @@ Settings → Secrets and variables → Actions → **New repository secret** :
 | `WORKER_INGEST_SECRET` | une longue chaîne aléatoire (identique côté Vercel) |
 | `GEMINI_API_KEY` | clé **gratuite** Google AI Studio (https://aistudio.google.com/apikey) |
 
-Variables optionnelles (onglet *Variables*) : `STRIX_MODEL` (défaut `gemini/gemini-2.0-flash`),
+Variables optionnelles (onglet *Variables*) : `STRIX_MODEL` (défaut `gemini/gemini-3.8-flash`),
 `STRIX_MAX_BUDGET_USD` (défaut `0.50`).
 
 ## 3. Créer un PAT GitHub (déclenchement)

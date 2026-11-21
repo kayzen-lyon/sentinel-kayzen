@@ -27,7 +27,7 @@ jobs:
 
       - name: Run Strix on the pull request
         env:
-          STRIX_LLM: ${{ vars.STRIX_MODEL || 'gemini/gemini-2.0-flash' }}
+          STRIX_LLM: ${{ vars.STRIX_MODEL || 'gemini/gemini-3.8-flash' }}
           LLM_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         # Exit code 2 si des vulnérabilités sont trouvées → le check PR échoue.
