@@ -1,7 +1,7 @@
 # Sentinel by Kayzen
 
 [![CI](https://github.com/skyymar69-rgb/sentinel-kayzen/actions/workflows/ci.yml/badge.svg)](https://github.com/skyymar69-rgb/sentinel-kayzen/actions/workflows/ci.yml)
-[![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+[![Licence: FSL-1.1-MIT](https://img.shields.io/badge/licence-FSL--1.1--MIT-blue.svg)](LICENSE)
 [![Sécurité : divulgation coordonnée](https://img.shields.io/badge/sécurité-SECURITY.md-brightgreen.svg)](SECURITY.md)
 
 
@@ -96,12 +96,14 @@ fond blanc détouré → PNG transparents. L'emblème sert de marque dans le hea
 le footer et le favicon ; le wordmark navy est réservé aux fonds clairs
 (`logo-full.png`).
 
-## Open source & qualité
+## Code source & qualité
 
-Sentinel est **open source** sous licence **MIT** (voir [`LICENSE`](LICENSE)) :
-réutilisation libre, y compris commerciale, à condition de conserver la mention
-de copyright. Pour un modèle open-core protégeant l'hébergement SaaS, basculez le
-fichier `LICENSE` en AGPL-3.0 et ajustez les mentions.
+Le code de Sentinel est **public** sous **Functional Source License 1.1, MIT Future
+License** (FSL-1.1-MIT, voir [`LICENSE`](LICENSE)) : vous pouvez le lire, l'étudier,
+le modifier et l'utiliser en interne, pour l'enseignement, la recherche ou des
+prestations rendues à un client. **Il est interdit de l'exploiter dans un produit ou
+service commercial concurrent de Sentinel.** Chaque version devient automatiquement
+disponible sous licence MIT deux ans après sa publication.
 
 Chaîne de vérification **100 % open source**, exécutée en CI sur chaque PR
 ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) :
@@ -130,4 +132,4 @@ Contribuer : [`CONTRIBUTING.md`](CONTRIBUTING.md) · Sécurité : [`SECURITY.md`
 
 ## Licence
 
-[MIT](LICENSE) © 2026 Kayzen Web. Composants tiers adaptés : voir [NOTICE](NOTICE).
+[FSL-1.1-MIT](LICENSE) © 2026 Tarek BELHADJ (Kayzen Web). Composants tiers adaptés : voir [NOTICE](NOTICE).
