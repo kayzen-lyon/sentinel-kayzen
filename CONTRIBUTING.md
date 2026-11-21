@@ -1,7 +1,7 @@
 # Contribuer à Sentinel
 
-Merci de votre intérêt ! Sentinel est un projet **open source** (MIT) et les
-contributions sont les bienvenues.
+Merci de votre intérêt ! le code de Sentinel est public (licence
+[FSL-1.1-MIT](LICENSE)) et les contributions sont les bienvenues.
 
 ## Démarrer
 
@@ -52,4 +52,5 @@ Format conventionnel : `type(scope): résumé` (`feat`, `fix`, `docs`, `chore`,
 ## Licence des contributions
 
 En contribuant, vous acceptez que votre travail soit distribué sous la licence
-**MIT** du projet.
+**FSL-1.1-MIT** du projet, et vous accordez à l'éditeur (Tarek BELHADJ, Kayzen Web)
+le droit de le distribuer sous toute autre licence.
