@@ -1,0 +1,27 @@
+# Sentinel
+> Des agents de sécurité testent réellement votre application et documentent les vulnérabilités exploitables avec des preuves rejouables.
+
+## Pages principales
+- [Sentinel by Kayzen](https://sentinel.kayzen-lyon.com/) : Sentinel déploie des agents IA qui pensent comme de vrais hackers : ils exécutent votre code, trouvent les failles et les prouvent par des PoC réels. Audit managé + plateforme self-service. Une entité du groupe Kayzen (Lyon).
+- [Rétractation](https://sentinel.kayzen-lyon.com/retractation) : Se rétracter d'un contrat conclu avec Sentinel by Kayzen, en ligne, sans motif.
+
+## Écosystème KAYZEN
+- [Studio AI](https://studio-ai.kayzen-lyon.com/) : Dix-huit outils photo et vidéo dopés à l'IA, gratuits et sans compte.
+- [Restomix](https://restomix-app.vercel.app/) : Le menu QR qui prend les commandes et encaisse à table.
+- [KAYZEN Flux](https://flux.kayzen-lyon.com/) : Téléchargez et convertissez vos vidéos et vos musiques en MP3, M4A, Opus, FLAC ou MP4, directement sur votre ordinateur.
+- [JURIS LIMEN](https://juris-limen.vercel.app/) : Le droit français à la source : jurisprudence, codes à la date des faits, doctrine en accès libre et références vérifiées sur Légifrance et Judilibre.
+- [KAYZEN AI Radar](https://radar-ai.kayzen-lyon.com/) : Le média francophone de l'IA édité par KAYZEN : modèles, agents, MCP et open source.
+- [Omnillink](https://omnillink.kayzen-lyon.com/) : Une API REST qui lit une page web à votre place : métadonnées, capture d'écran, export PDF, extraction sur mesure et contenu en Markdown pour vos agents IA.
+- [DocuSûr](https://docusur.kayzen-lyon.com/) : Des outils gratuits pour vos PDF, images et fichiers Word, Excel et PowerPoint : fusionner, convertir, compresser, protéger.
+- [Synaptik](https://synaptik.kayzen-lyon.com/) : Les IA peuvent-elles lire votre site ? Synaptik sonde 8 robots IA, lit vos données structurées et vos coordonnées, puis rend un rapport priorisé.
+- [Nexus SEO](https://nexus.kayzen-lyon.com/) : Obtenez un audit gratuit de votre SEO technique, de votre contenu et de votre visibilité dans les réponses des moteurs IA.
+- [Konsent](https://konsent.kayzen-lyon.com/) : Vérifiez les traceurs déposés avant le consentement, les destinataires des données et les références applicables.
+- [Konforme](https://konforme.kayzen-lyon.com/) : Évaluez l'accessibilité de votre site avec des contrôles RGAA et WCAG, des explications et des pistes de correction.
+- [Nutriéa](https://nutriea.kayzen-lyon.com/) : Le portail francophone de la naturopathie et de la nutrithérapie édité par KAYZEN.
+- [Sésame](https://sesame.kayzen-lyon.com/) : Un coffre de mots de passe chiffré de bout en bout, open source et gratuit, avec synchronisation et partage familial.
+- [Sésame Éclair](https://eclair.kayzen-lyon.com/) : Partagez un mot de passe ou une clé API avec un lien à usage unique, chiffré dans votre navigateur.
+- [Kayzen Security](https://kayzen-security.vercel.app/) : Filtrage DNS, correctifs, antivirus et rapports de conformité réunis dans un seul agent et une seule console.
+- Kayzen VPN (bientôt disponible) : Un VPN conçu à Lyon, avec des critères de confiance publiés et une offre gratuite prévue au lancement.
+
+## Éditeur
+KAYZEN, Lyon — https://www.kayzen-lyon.com/
