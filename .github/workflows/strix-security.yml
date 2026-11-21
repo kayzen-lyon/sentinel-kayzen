@@ -30,5 +30,7 @@ jobs:
           STRIX_LLM: ${{ vars.STRIX_MODEL || 'gemini/gemini-3.8-flash' }}
           LLM_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Le niveau gratuit de Gemini peut répondre lentement aux heures chargées.
+          LLM_PREFLIGHT_TIMEOUT: "120"
         # Exit code 2 si des vulnérabilités sont trouvées → le check PR échoue.
         run: strix -n -t ./ --scan-mode quick
