@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
-import { getJob, setFindingStatus, type FindingStatus } from "@/lib/jobs";
+import { getJob, setFindingStatus, setFindingTriage, type FindingStatus } from "@/lib/jobs";
+import { parseTriage } from "@/lib/triage";
 import { logAudit } from "@/lib/audit";
 import { canLaunch, getRole } from "@/lib/orgs";
 
@@ -24,12 +25,28 @@ export async function PATCH(
   if (job.org_id && !canLaunch(await getRole(job.org_id, session.id).catch(() => null)))
     return NextResponse.json({ error: "Droits insuffisants (Lecteur)." }, { status: 403 });
 
-  let body: { status?: string };
+  let body: { status?: string; triage?: unknown };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Requête invalide." }, { status: 400 });
   }
+  // Grille de triage (7 questions) : enregistrée seule, sans changer le statut.
+  if (body.triage !== undefined) {
+    const answers = parseTriage(body.triage);
+    if (!answers) return NextResponse.json({ error: "Grille de triage invalide." }, { status: 400 });
+    await setFindingTriage(id, nid, answers);
+    await logAudit({
+      orgId: job.org_id,
+      actorId: session.id,
+      actorEmail: session.email,
+      action: "finding.triage",
+      target: nid,
+      meta: { jobId: id },
+    });
+    if (body.status === undefined) return NextResponse.json({ ok: true });
+  }
+
   const status = body.status as FindingStatus;
   if (!VALID.includes(status))
     return NextResponse.json({ error: "Statut invalide." }, { status: 400 });

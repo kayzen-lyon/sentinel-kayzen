@@ -26,8 +26,10 @@ jobs:
         run: npm run lint
       - name: Tests unitaires
         run: npm test
-      - name: Tests worker (normaliseur OSS)
-        run: python3 worker/github-actions/test_push_oss.py
+      - name: Tests worker (normaliseur OSS, relecture contradictoire)
+        run: |
+          python3 worker/github-actions/test_push_oss.py
+          python3 worker/github-actions/test_validate.py
       - name: Build
         run: npm run build
 

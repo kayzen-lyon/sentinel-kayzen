@@ -297,4 +297,11 @@ export const MIGRATIONS: Migration[] = [
     CREATE INDEX IF NOT EXISTS scans_org_created_idx ON scans (org_id, created_at DESC);
   `,
   },
+  {
+    id: "006_finding_triage",
+    sql: `
+    -- Grille de triage en 7 questions (réponses oui/non/non répondu) posée par l'analyste.
+    ALTER TABLE job_findings ADD COLUMN IF NOT EXISTS triage jsonb;
+  `,
+  },
 ];

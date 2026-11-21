@@ -1,4 +1,5 @@
 import { safeFetch } from "./ssrf";
+import type { SurfaceItem } from "./surface";
 
 export type Severity = "critical" | "high" | "medium" | "low" | "info";
 export type CheckState = "pass" | "fail" | "warn" | "info";
@@ -23,6 +24,8 @@ export type Finding = {
   cves?: CveRef[];
   /** Liens de référence (sources externes, preuves). */
   refs?: { label: string; url: string }[];
+  /** Carte de surface (points d'entrée → classes d'attaque), portée par le finding `attack-surface`. */
+  surface?: SurfaceItem[];
 };
 
 export type ScanSummary = {
@@ -605,6 +608,14 @@ export async function runScan(
       for (const f of extra) add(f);
     } catch {
       /* l'analyse d'exposition est best-effort */
+    }
+    // JavaScript client : secrets exposés + carte de surface (endpoints/paramètres → classes)
+    try {
+      const { jsSurfaceChecks } = await import("./jssurface");
+      const extra = await jsSurfaceChecks(new URL(finalUrl));
+      for (const f of extra) add(f);
+    } catch {
+      /* l'analyse du JavaScript client est best-effort */
     }
   }
 

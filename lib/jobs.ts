@@ -44,6 +44,8 @@ export type JobFindingRow = {
   cvss: number | null;
   status: FindingStatus;
   payload: unknown;
+  /** Réponses à la grille de triage en 7 questions (lib/triage.ts). */
+  triage: (boolean | null)[] | null;
   created_at: string;
 };
 
@@ -138,6 +140,19 @@ export async function setFindingStatus(
   await query(
     `UPDATE job_findings SET status = $3 WHERE job_id = $1 AND native_id = $2`,
     [jobId, nativeId, status]
+  );
+}
+
+/** Enregistre les réponses à la grille de triage d'un finding. */
+export async function setFindingTriage(
+  jobId: string,
+  nativeId: string,
+  answers: (boolean | null)[]
+): Promise<void> {
+  await ensureSchema();
+  await query(
+    `UPDATE job_findings SET triage = $3 WHERE job_id = $1 AND native_id = $2`,
+    [jobId, nativeId, JSON.stringify(answers)]
   );
 }
 

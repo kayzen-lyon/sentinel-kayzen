@@ -12,6 +12,14 @@ export const FAQ: { q: string; a: string }[] = [
     a: "Il démultiplie vos capacités. Sentinel automatise la reconnaissance, l'exploitation et la validation à une échelle et une fréquence impossibles manuellement. Sur les audits managés, nos experts Kayzen interprètent les résultats et vous accompagnent sur la remédiation.",
   },
   {
+    q: "Comment Sentinel évite-t-il les faux positifs ?",
+    a: "Chaque vulnérabilité remontée par le pentest autonome passe par trois filtres : une relecture contradictoire par un second modèle chargé de réfuter la preuve, un audit automatique qui signale toute preuve citant un hôte hors de votre domaine vérifié, et une grille de triage en 7 questions que votre équipe renseigne avant de confirmer le finding. Le rapport inclut un registre de couverture des points d'entrée cartographiés.",
+  },
+  {
+    q: "Que fait le scan approfondi sur mon JavaScript ?",
+    a: "Sur un domaine dont vous avez prouvé la propriété, Sentinel lit votre page d'accueil et ses bundles JavaScript (simples requêtes GET, rien n'est injecté). Il y repère les secrets oubliés (clés cloud, jetons, clés privées), qu'il masque, et dresse une carte de surface : endpoints, formulaires et paramètres, avec les classes d'attaque à tester pour chacun.",
+  },
+  {
     q: "Quels types de cibles puis-je tester ?",
     a: "Un dépôt de code (GitHub, GitLab…), une API, une application web déployée ou un domaine. Les tests peuvent être menés en white-box, grey-box ou black-box selon l'accès que vous fournissez.",
   },

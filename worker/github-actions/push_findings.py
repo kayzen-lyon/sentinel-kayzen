@@ -48,14 +48,20 @@ def read_text(path: str) -> str | None:
 
 def map_findings(run_dir: str) -> list[dict]:
     vulns = read_json(os.path.join(run_dir, "vulnerabilities.json")) or []
+    # Verdicts de relecture contradictoire (validate_findings.py), s'ils existent.
+    validations = read_json(os.path.join(run_dir, "sentinel_validations.json")) or {}
     out = []
     for v in vulns:
         if not isinstance(v, dict):
             continue
         cvss = v.get("cvss")
+        native_id = v.get("id") or f"vuln-{len(out) + 1}"
+        verdict = validations.get(native_id) if isinstance(validations, dict) else None
+        if isinstance(verdict, dict):
+            v = {**v, "_sentinel_validation": verdict}
         out.append(
             {
-                "nativeId": v.get("id") or f"vuln-{len(out) + 1}",
+                "nativeId": native_id,
                 "title": v.get("title"),
                 "severity": (v.get("severity") or "").lower() or None,
                 "cvss": cvss if isinstance(cvss, (int, float)) else None,

@@ -37,6 +37,8 @@ const MAP: Record<string, ControlRefs> = {
   "sourcemap-exposure": { pci: ["6.3.1"], iso: ["A.8.9"], soc2: ["CC6.1"] },
   "api-spec": { pci: ["6.3.1"], iso: ["A.8.9"], soc2: ["CC6.1"] },
   "graphql-endpoint": { pci: ["6.2.4"], iso: ["A.8.26"], soc2: ["CC6.6"] },
+  // Secrets livrés dans le JavaScript client (identifiants `js-secret-<type>`).
+  "js-secret": { pci: ["8.6.2", "3.6.1"], iso: ["A.5.17", "A.8.24"], soc2: ["CC6.1"] },
   "exposed/.env": { pci: ["2.2.1", "8.3.1"], iso: ["A.8.9", "A.5.17"], soc2: ["CC6.1"] },
   "exposed/.git/config": { pci: ["6.4.1"], iso: ["A.8.9"], soc2: ["CC6.1"] },
   "exposed/server-status": { pci: ["2.2.1"], iso: ["A.8.9"], soc2: ["CC6.1"] },
@@ -74,6 +76,7 @@ export const FRAMEWORK_LABELS: Record<keyof ControlRefs, string> = {
 /** Exigences rattachées à un contrôle (par id, sinon par catégorie, sinon vide). */
 export function controlsFor(id: string, category?: string | null): ControlRefs {
   if (MAP[id]) return MAP[id];
+  if (id.startsWith("js-secret-")) return MAP["js-secret"];
   const normalized = id.startsWith("exposed/") ? id : undefined;
   if (normalized && MAP[normalized]) return MAP[normalized];
   if (category && CATEGORY_MAP[category]) return CATEGORY_MAP[category];

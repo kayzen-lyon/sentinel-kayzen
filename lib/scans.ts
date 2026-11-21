@@ -1,5 +1,6 @@
 import { ensureSchema, query } from "./db";
 import type { ScanResult } from "./scanner";
+import type { SurfaceItem } from "./surface";
 
 export type ScanRow = {
   id: string;
@@ -75,4 +76,36 @@ export async function getScan(
     [id, userId]
   );
   return rows[0] ?? null;
+}
+
+/**
+ * Carte de surface du dernier scan approfondi terminé d'un hôte, dans une organisation
+ * (ou, à défaut, pour l'utilisateur). Sert à cibler le pentest autonome et à calculer sa couverture.
+ */
+export async function latestSurface(
+  userId: string,
+  orgId: string | null,
+  hostname: string
+): Promise<SurfaceItem[] | null> {
+  await ensureSchema();
+  const rows = await query<{ final_url: string | null; target_url: string; findings: ScanResult["findings"] | null }>(
+    `SELECT final_url, target_url, findings FROM scans
+      WHERE status = 'done' AND deep = true
+        AND (($2::uuid IS NOT NULL AND org_id = $2) OR user_id = $1)
+      ORDER BY created_at DESC LIMIT 20`,
+    [userId, orgId]
+  );
+  const host = hostname.toLowerCase();
+  for (const r of rows) {
+    let h = "";
+    try {
+      h = new URL(r.final_url || r.target_url).hostname.toLowerCase();
+    } catch {
+      continue;
+    }
+    if (h !== host) continue;
+    const f = (r.findings || []).find((x) => x.id === "attack-surface");
+    if (f?.surface?.length) return f.surface;
+  }
+  return null;
 }

@@ -12,6 +12,8 @@ import { checkQuota } from "@/lib/plans";
 import { logAudit } from "@/lib/audit";
 import { getPlaybook } from "@/lib/playbooks";
 import { pentestEmailBlock } from "@/lib/emailgate";
+import { latestSurface } from "@/lib/scans";
+import { surfaceInstruction } from "@/lib/surface";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -89,8 +91,15 @@ export async function POST(req: Request) {
     : body.mode === "deep"
       ? "deep"
       : "standard";
-  const instruction = playbook?.instruction ?? null;
   const engine: ScanEngine = body.engine === "oss" ? "oss" : "strix";
+  // Ciblage : la carte de surface du dernier scan approfondi de ce domaine oriente Strix
+  // vers les points d'entrée prioritaires (chemins de l'hôte vérifié uniquement).
+  const surface =
+    engine === "strix"
+      ? await latestSurface(session.id, orgId, check.url.hostname).catch(() => null)
+      : null;
+  const focus = surface ? surfaceInstruction(surface) : null;
+  const instruction = [playbook?.instruction, focus].filter(Boolean).join("\n\n") || null;
 
   // Approbation human-in-the-loop : si l'organisation l'exige et que le demandeur n'est pas
   // gestionnaire (owner/admin), le run attend une validation avant d'être déclenché.
