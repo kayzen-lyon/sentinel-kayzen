@@ -948,3 +948,166 @@ a:focus-visible .link-grow::after { transform: scaleX(1); }
 
 /* Courbe du score : hauteur fixe (la regle globale svg{height:auto} letirait). */
 .sparkline { height: 28px; min-width: 0; overflow: visible; }
+
+/* ============================================================
+   Mise en scène « immersive » de l'accueil — préfixe « apv- ».
+   Uniquement les jetons ci-dessus (clair et sombre sans rien redéfinir).
+   Aucun dégradé, aucun halo, aucun effet verre, aucun style en ligne.
+   ============================================================ */
+
+/* ── Premier écran : texte à gauche, animation d'audit sur un pan coupé en biais ── */
+.apv-hero { position: relative; overflow: hidden; padding-top: 5rem; padding-bottom: 4rem; }
+.apv-hero-top { position: relative; }
+.apv-hero-panel { display: none; }
+.apv-hero-grid { position: relative; display: grid; gap: 3rem; padding-block: 4rem 0; }
+/* Sous 1024 px : le pan devient un bandeau pleine largeur derrière l'animation. */
+.apv-hero-visual {
+  margin-inline: -1.5rem;
+  padding: 4.5rem 1.5rem 2.5rem;
+  background-color: rgb(var(--navy-deep));
+  clip-path: polygon(0 2.5rem, 100% 0, 100% 100%, 0 100%);
+}
+.apv-stats { border-radius: 1.5rem; margin-top: 3rem; }
+
+@media (min-width: 1024px) {
+  .apv-hero-top { min-height: min(46rem, calc(100svh - 5rem)); display: grid; align-items: center; }
+  .apv-hero-panel {
+    display: block;
+    position: absolute;
+    inset: 0 0 0 50%;
+    background-color: rgb(var(--navy-deep));
+    clip-path: polygon(18% 0, 100% 0, 100% 100%, 0 100%);
+  }
+  .apv-hero-grid { grid-template-columns: 1.05fr 1fr; gap: 4rem; align-items: center; padding-block: 4rem; }
+  .apv-hero-visual { margin: 0; padding: 0; background: none; clip-path: none; }
+  .apv-stats { margin-top: 4rem; }
+}
+
+/* ── Le déroulé : scène fixe + liste qui défile ── */
+.apv-scene { border-top: 1px solid rgb(var(--border)); padding-block: 6rem; }
+.apv-scene-head { max-width: 44rem; }
+.apv-scene-grid { display: grid; gap: 1.5rem; margin-top: 3.5rem; }
+.apv-stage { display: none; }
+.apv-steps { display: grid; gap: 1.5rem; }
+.apv-step {
+  background-color: rgb(var(--bg-card));
+  border: 1px solid rgb(var(--border));
+  border-radius: 1rem;
+  padding: 1.75rem;
+}
+.apv-step-n { font-family: var(--font-heading); font-size: 2.25rem; font-weight: 700; line-height: 1; color: rgb(var(--brand)); }
+.apv-step h3 { margin-top: 0.75rem; font-size: 1.125rem; font-weight: 600; }
+.apv-step p { margin-top: 0.625rem; font-size: 0.95rem; line-height: 1.625; color: rgb(var(--fg-muted)); }
+
+@media (min-width: 1024px) {
+  .apv-scene-grid { grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 5rem); align-items: start; }
+  .apv-stage {
+    position: sticky;
+    top: 6.5rem;
+    display: grid;
+    align-content: space-between;
+    gap: 2rem;
+    min-height: min(30rem, calc(100svh - 9rem));
+    padding: clamp(1.75rem, 3vw, 3rem);
+    border-radius: 1.5rem;
+  }
+  .apv-stage-count { display: flex; align-items: baseline; gap: 1rem; font-family: var(--font-heading); font-weight: 800; line-height: 0.85; }
+  .apv-stage-n { display: inline-block; font-size: clamp(7rem, 15vw, 12rem); letter-spacing: -0.05em; color: rgb(var(--gold)); animation: float-up var(--dur-slow) var(--ease-out) both; }
+  .apv-stage-count span { font-size: 1.5rem; color: rgb(var(--fg-muted)); }
+  .apv-stage-title { font-family: var(--font-heading); font-size: clamp(1.5rem, 2.4vw, 2.25rem); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; color: rgb(var(--fg)); animation: float-up var(--dur-slow) var(--ease-out) both; }
+  .apv-stage-rail { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+  .apv-stage-rail i { height: 4px; border-radius: 2px; background-color: rgb(var(--border-strong)); transition: background-color var(--dur-normal) ease; }
+  .apv-stage-rail i.on { background-color: rgb(var(--gold)); }
+
+  .apv-steps { gap: 0; padding: 4vh 0 16vh; }
+  .apv-step {
+    background: none;
+    border: 0;
+    border-left: 3px solid rgb(var(--border));
+    border-radius: 0;
+    padding: 3rem 0 3rem 1.75rem;
+    transition: border-color var(--dur-normal) ease;
+  }
+  .apv-step.on { border-left-color: rgb(var(--brand)); }
+  .apv-step-n { display: none; }
+  .apv-step h3 { margin-top: 0; font-size: clamp(1.5rem, 2.2vw, 2rem); font-weight: 700; line-height: 1.1; color: rgb(var(--fg-subtle)); transition: color var(--dur-normal) ease; }
+  .apv-step.on h3 { color: rgb(var(--heading)); }
+  .apv-step p { margin-top: 1rem; font-size: 1.05rem; max-width: 44ch; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apv-stage-n, .apv-stage-title { animation: none; }
+}
+
+/* ── Défilement des applications du groupe ── */
+.apv-reel { overflow: hidden; padding-bottom: 6rem; }
+.apv-reel-row { overflow: hidden; padding-block: 0.6rem; }
+.apv-reel-row:first-of-type { margin-top: 1.5rem; }
+.apv-reel-track { display: flex; gap: 1.25rem; width: max-content; animation: apv-reel 60s linear infinite; }
+.apv-reel-row--back .apv-reel-track { animation-direction: reverse; }
+.apv-reel-row:hover .apv-reel-track,
+.apv-reel-row:focus-within .apv-reel-track { animation-play-state: paused; }
+@keyframes apv-reel { to { transform: translateX(calc(-50% - 0.625rem)); } }
+.apv-reel-list { display: flex; gap: 1.25rem; }
+.apv-reel-card {
+  flex: none;
+  width: min(26rem, 78vw);
+  border: 1px solid rgb(var(--border));
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background-color: rgb(var(--bg-card));
+  transition: border-color var(--dur-normal) ease;
+}
+.apv-reel-card:hover, .apv-reel-card:focus-within { border-color: rgb(var(--brand)); }
+.apv-reel-card a { display: block; }
+.apv-reel-card a:focus-visible { outline-offset: -3px; border-radius: 1.25rem; }
+.apv-reel-shot { display: block; aspect-ratio: 16 / 9; background-color: rgb(var(--bg-elev)); border-bottom: 1px solid rgb(var(--border)); }
+.apv-reel-shot img { display: block; width: 100%; height: 100%; }
+.apv-reel-body { display: grid; gap: 0.15rem; padding: 1rem 1.15rem 1.15rem; }
+.apv-reel-name { font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; color: rgb(var(--heading)); }
+.apv-reel-host { font-size: 0.85rem; font-weight: 600; color: rgb(var(--brand-light)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .apv-reel-track { animation: none; }
+  .apv-reel-row { overflow-x: auto; }
+  .apv-reel-list[aria-hidden="true"] { display: none; }
+}
+
+/* ── Pied de page : contact en très grand, puis le nom en filigrane ── */
+.apv-foot-mail {
+  display: block;
+  overflow-wrap: anywhere;
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 4.6vw, 3.9rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: #fff;
+  transition: color var(--dur-fast) ease;
+}
+.apv-foot-mail:hover { color: rgb(var(--gold)); }
+.apv-foot-phone {
+  display: inline-block;
+  margin-top: 1.25rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.25rem, 2.4vw, 2.1rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: rgb(255 255 255 / 0.8);
+  transition: color var(--dur-fast) ease;
+}
+.apv-foot-phone:hover { color: #fff; }
+.apv-foot-mark { overflow: hidden; user-select: none; pointer-events: none; }
+/* Texte posé en CSS : purement décoratif, il n'entre ni dans le contenu ni dans les contrôles de contraste. */
+.apv-foot-mark::after {
+  content: "SENTINEL";
+  display: block;
+  margin-bottom: -3.6vw;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 17.5vw;
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  color: rgb(255 255 255 / 0.06);
+}

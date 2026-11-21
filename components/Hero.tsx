@@ -1,37 +1,32 @@
+/* Premier écran : le texte à gauche, l'animation d'audit (HeroMotion) posée sur un
+   pan bleu nuit coupé net en biais (styles .apv-hero-* dans globals.css).
+   Aucun dégradé, aucun halo. */
 import Link from "next/link";
 import HeroMotion from "@/components/HeroMotion";
 
 export default function Hero() {
   return (
-    <section id="contenu" className="relative overflow-hidden pt-20">
-      <div className="container-x py-16 sm:py-24">
-        <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
+    <section id="contenu" className="apv-hero">
+      <div className="apv-hero-top">
+        <div className="apv-hero-panel" aria-hidden="true" />
+        <div className="container-x apv-hero-grid">
           <div>
             <p className="eyebrow reveal mb-5">Cybersécurité offensive · Groupe Kayzen</p>
 
-            {/* Pas d'animation d'entrée sur le h1 : c'est l'élément LCP, il doit être visible tout de suite. */}
-            <h1
-              className="leading-[1.06] text-fg"
-              data-size="hero"
-            >
+            {/* Pas d'animation d'entrée sur le h1 : c'est l'élément LCP. */}
+            <h1 className="leading-[1.06] text-fg" data-size="hero">
               Des hackers IA qui trouvent vos failles{" "}
               <span className="gradient-text">avant les vrais.</span>
             </h1>
 
-            <p
-              className="reveal mt-6 max-w-xl text-fg"
-              data-size="lg" data-delay="120"
-            >
+            <p className="reveal mt-6 max-w-xl text-fg" data-size="lg" data-delay="120">
               Sentinel déploie des agents autonomes qui exécutent réellement votre
               application, exploitent les vulnérabilités et les prouvent par des{" "}
               <strong className="font-semibold">PoC concrets</strong> — pas
               de faux positifs. Un pentest complet en heures, pas en semaines.
             </p>
 
-            <div
-              className="reveal mt-8 flex flex-col gap-3 sm:flex-row"
-              data-delay="180"
-            >
+            <div className="reveal mt-8 flex flex-col gap-3 sm:flex-row" data-delay="180">
               <Link href="/signup" className="btn btn-primary btn-lg w-full sm:w-auto">
                 Scanner mon site gratuitement
                 <IconArrow />
@@ -41,10 +36,7 @@ export default function Hero() {
               </a>
             </div>
 
-            <ul
-              className="reveal mt-6 flex flex-wrap gap-2"
-              data-delay="220"
-            >
+            <ul className="reveal mt-6 flex flex-wrap gap-2" data-delay="220">
               {["Moteur open-source Strix", "PoC validés", "Rapports prêts pour la conformité"].map(
                 (t) => (
                   <li key={t} className="chip">
@@ -56,10 +48,14 @@ export default function Hero() {
             </ul>
           </div>
 
-          <HeroMotion />
+          <div className="apv-hero-visual">
+            <HeroMotion />
+          </div>
         </div>
+      </div>
 
-        <dl className="band-dark stat-band mt-16 grid grid-cols-2 gap-6 px-6 py-8 md:grid-cols-4 md:px-10">
+      <div className="container-x">
+        <dl className="band-dark apv-stats grid grid-cols-2 gap-6 px-6 py-8 md:grid-cols-4 md:px-10">
           {[
             ["100+", "vecteurs testés"],
             ["OWASP", "Top 10 & au-delà"],
