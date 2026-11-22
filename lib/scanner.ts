@@ -1,5 +1,6 @@
 import { safeFetch } from "./ssrf";
 import type { SurfaceItem } from "./surface";
+import type { ScanInsights } from "./insights/types";
 
 export type Severity = "critical" | "high" | "medium" | "low" | "info";
 export type CheckState = "pass" | "fail" | "warn" | "info";
@@ -8,6 +9,10 @@ export type CheckState = "pass" | "fail" | "warn" | "info";
 export type CveRef = {
   id: string;
   cvss?: number;
+  /** Exploitée activement d'après le catalogue CISA KEV. */
+  kev?: boolean;
+  /** Probabilité d'exploitation dans les 30 jours (FIRST EPSS, 0 à 1). */
+  epss?: number;
   source: "NVD" | "OSV";
   url: string;
 };
@@ -26,6 +31,20 @@ export type Finding = {
   refs?: { label: string; url: string }[];
   /** Carte de surface (points d'entrée → classes d'attaque), portée par le finding `attack-surface`. */
   surface?: SurfaceItem[];
+  /** Effort de correction estimé (lib/insights/scoring.ts). */
+  effort?: "rapide" | "moyen" | "important";
+  /** Indice de priorité : gravité × facilité de correction (plus haut = à traiter d'abord). */
+  priority?: number;
+  /** Pourquoi c'est important, en une phrase. */
+  why?: string;
+  owasp?: string;
+  cwe?: string;
+  /** Test correspondant du guide OWASP WSTG (ex. WSTG-CONF-07). */
+  wstg?: string;
+  /** Extraits de configuration prêts à copier (nginx, Apache, Vercel, Next.js). */
+  snippets?: { label: string; code: string }[];
+  /** Commande à lancer soi-même pour vérifier le constat (lecture seule). */
+  repro?: string;
 };
 
 export type ScanSummary = {
@@ -45,6 +64,8 @@ export type ScanResult = {
   score: number;
   summary: ScanSummary;
   findings: Finding[];
+  /** Données enrichies (certificat, DNS, e-mail, tiers, sous-scores…). */
+  insights?: ScanInsights;
 };
 
 const SEVERITY_WEIGHT: Record<Severity, number> = {
@@ -107,7 +128,20 @@ export async function runScan(
 
   // Corps de la page principale, lu une seule fois (plafonné) : sert à détecter
   // les WAF/CDN et les défis anti-bot (CAPTCHA) sur en-têtes + contenu.
-  const bodyText = (await res.text().catch(() => "")).slice(0, 20000);
+  const fullBody = (await res.text().catch(() => "")).slice(0, 600000);
+  const bodyText = fullBody.slice(0, 20000);
+
+  // Analyses enrichies lancées tout de suite, en parallèle des contrôles historiques
+  // (chacune bornée dans le temps : le scan doit tenir dans la limite de 60 s).
+  const finalHost = new URL(finalUrl).hostname;
+  const apexHost = finalHost.split(".").slice(-2).join(".");
+  const insightsJobs = {
+    tls: isHttps
+      ? within(import("./insights/tls").then((m) => m.analyzeTls(finalHost, h.get("strict-transport-security") || "")), 15000)
+      : Promise.resolve(null),
+    dns: within(import("./insights/dns").then((m) => m.analyzeDns(finalHost, apexHost)), 15000),
+    redirects: within(import("./insights/http").then((m) => m.analyzeRedirects(target, finalUrl)), 15000),
+  };
 
   // 1. HTTPS
   add(
@@ -489,8 +523,13 @@ export async function runScan(
       const correlated = await correlateCves(components);
       for (const { component, cves } of correlated) {
         const maxCvss = Math.max(...cves.map((c) => c.cvss ?? 0));
-        const sev: Severity =
+        const exploited = cves.filter((c) => c.kev);
+        const likely = cves.some((c) => (c.epss ?? 0) >= 0.5);
+        // Une CVE exploitée activement est au moins « élevée », quel que soit son score CVSS.
+        const base: Severity =
           maxCvss >= 9 ? "critical" : maxCvss >= 7 ? "high" : maxCvss >= 4 ? "medium" : "low";
+        const sev: Severity =
+          exploited.length && (base === "medium" || base === "low") ? "high" : likely && base === "low" ? "medium" : base;
         add({
           id: `cve-${component.product}-${component.version}`,
           category: "CVE",
@@ -501,7 +540,10 @@ export async function runScan(
             `La version détectée (${component.product} ${component.version}) correspond à des ` +
             `CVE publiées (corrélation par bannière, à confirmer) : ` +
             cves.map((c) => c.id + (c.cvss ? ` [${c.cvss}]` : "")).join(", ") +
-            ".",
+            "." +
+            (exploited.length
+              ? ` ${exploited.length} d'entre elles sont exploitées activement par des attaquants (catalogue CISA KEV) : ${exploited.map((c) => c.id).join(", ")}.`
+              : ""),
           recommendation:
             "Mettez à jour le composant vers une version corrigée et masquez le numéro de version.",
           cves,
@@ -583,43 +625,74 @@ export async function runScan(
     }
   }
 
-  // --- Contrôles approfondis (domaine vérifié) ---
+  // --- Contrôles approfondis (domaine vérifié), exécutés en parallèle ---
   if (opts.deep) {
-    try {
-      const { deepChecks } = await import("./deepchecks");
-      const extra = await deepChecks(new URL(finalUrl));
-      for (const f of extra) add(f);
-    } catch {
-      /* les contrôles approfondis sont best-effort */
-    }
-    // Reconnaissance étendue : sous-domaines (CT), pages admin, formulaires
-    try {
-      const { reconChecks } = await import("./recon");
-      const apex = new URL(finalUrl).hostname.split(".").slice(-2).join(".");
-      const extra = await reconChecks(new URL(finalUrl), apex);
-      for (const f of extra) add(f);
-    } catch {
-      /* la reconnaissance étendue est best-effort */
-    }
-    // Surface d'exposition : VCS, sauvegardes, Actuator, specs d'API, source maps
-    try {
-      const { exposureChecks } = await import("./exposure");
-      const extra = await exposureChecks(new URL(finalUrl));
-      for (const f of extra) add(f);
-    } catch {
-      /* l'analyse d'exposition est best-effort */
-    }
-    // JavaScript client : secrets exposés + carte de surface (endpoints/paramètres → classes)
-    try {
-      const { jsSurfaceChecks } = await import("./jssurface");
-      const extra = await jsSurfaceChecks(new URL(finalUrl));
-      for (const f of extra) add(f);
-    } catch {
-      /* l'analyse du JavaScript client est best-effort */
+    const u = new URL(finalUrl);
+    const groups = await Promise.all([
+      within(import("./deepchecks").then((m) => m.deepChecks(u)), 20000),
+      within(import("./recon").then((m) => m.reconChecks(u, apexHost)), 35000),
+      within(import("./exposure").then((m) => m.exposureChecks(u)), 20000),
+      within(import("./jssurface").then((m) => m.jsSurfaceChecks(u)), 25000),
+      within(
+        import("./recon").then(async (r) => {
+          const subs = (await within(r.enumerateSubdomains(apexHost), 30000)) ?? [];
+          const { deepInsightChecks } = await import("./insights/deep");
+          return deepInsightChecks(u, fullBody, subs.filter((s) => s !== finalHost));
+        }),
+        40000
+      ),
+    ]);
+    for (const g of groups) for (const f of g ?? []) add(f);
+  }
+
+  // --- Analyses enrichies : en-têtes, contenu, TLS, DNS & e-mail, redirections ---
+  const insights: ScanInsights = {};
+  try {
+    const { analyzeHeaders, analyzeContent } = await import("./insights/http");
+    const hd = analyzeHeaders(h);
+    insights.headers = hd.headers;
+    insights.cookies = hd.cookies;
+    hd.findings.forEach(add);
+    const ct = analyzeContent(fullBody, finalUrl);
+    insights.thirdParties = ct.thirdParties;
+    insights.libraries = ct.libraries;
+    insights.emailsExposed = ct.emailsExposed;
+    ct.findings.forEach(add);
+  } catch {
+    /* analyse du contenu best-effort */
+  }
+  insights.compression = h.get("content-encoding") || undefined;
+  insights.http3 = /h3/.test(h.get("alt-svc") || "");
+  const [tlsRes, dnsRes, redirRes] = await Promise.all([insightsJobs.tls, insightsJobs.dns, insightsJobs.redirects]);
+  if (tlsRes) {
+    insights.tls = tlsRes.insights;
+    insights.http2 = tlsRes.insights.alpn === "h2";
+    tlsRes.findings.forEach(add);
+  }
+  if (dnsRes) {
+    insights.dns = dnsRes.dns;
+    insights.email = dnsRes.email;
+    insights.domain = dnsRes.domain;
+    insights.hosting = dnsRes.hosting;
+    dnsRes.findings.forEach(add);
+  }
+  if (redirRes) {
+    insights.redirects = redirRes.redirects;
+    redirRes.findings.forEach(add);
+  }
+
+  // Un même contrôle peut être produit par deux modules : on garde la première occurrence.
+  {
+    const seen = new Set<string>();
+    for (let i = 0; i < findings.length; i++) {
+      if (seen.has(findings[i].id)) findings.splice(i--, 1);
+      else seen.add(findings[i].id);
     }
   }
 
   // --- Scoring ---
+  const scoring = await import("./insights/scoring");
+  scoring.enrichFindings(findings, finalUrl);
   let score = 100;
   for (const f of findings) {
     if (f.state === "fail") score -= SEVERITY_WEIGHT[f.severity];
@@ -645,9 +718,16 @@ export async function runScan(
       (a.state === "fail" ? -1 : 1)
   );
 
+  const finalGrade = scoring.capGrade(grade(score), findings);
+  insights.categoryScores = scoring.categoryScores(findings);
+  insights.quickWins = scoring.quickWins(findings);
+  insights.summary = scoring.executiveSummary(finalGrade, score, findings, insights.categoryScores);
+  insights.durationMs = Date.now() - started;
+  insights.checks = findings.length;
+
   return {
     targetUrl: target.toString(),
-    grade: grade(score),
+    grade: finalGrade,
     score,
     summary: {
       finalUrl,
@@ -660,5 +740,14 @@ export async function runScan(
       total: findings.length,
     },
     findings,
+    insights,
   };
+}
+
+/** Résout `p` ou renvoie null au-delà de `ms` (ou en cas d'erreur) : un module lent ne bloque pas le scan. */
+function within<T>(p: Promise<T>, ms: number): Promise<T | null> {
+  return Promise.race([
+    p.catch(() => null),
+    new Promise<null>((r) => setTimeout(() => r(null), ms)),
+  ]);
 }

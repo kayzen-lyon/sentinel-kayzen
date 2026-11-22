@@ -3,8 +3,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
-import { listScans } from "@/lib/scans";
-import { listJobs, openFindingsBySeverity, type SeverityCounts } from "@/lib/jobs";
+import { listScans, listScansDetailed } from "@/lib/scans";
+import { buildOverview } from "@/lib/overview";
+import { listAudit } from "@/lib/audit";
+import OverviewInsights from "@/components/dashboard/OverviewInsights";
+import { listJobs, openFindingsBySeverity, remediationStats, type SeverityCounts } from "@/lib/jobs";
 import { listDomains } from "@/lib/domains";
 import { getActiveOrg } from "@/lib/activeorg";
 import { getOrgPlan, getUsage, PLANS } from "@/lib/plans";
@@ -133,6 +136,12 @@ export default async function OverviewPage() {
     );
 
   const { orgId } = await getActiveOrg(session);
+  const [detailed, audit, remediation] = await Promise.all([
+    listScansDetailed(session.id, orgId).catch(() => []),
+    listAudit(orgId, 8).catch(() => []),
+    remediationStats(orgId).catch(() => null),
+  ]);
+  const overview = buildOverview(detailed);
   const [scans, jobs, domains, findings, plan, usage] = await Promise.all([
     listScans(session.id).catch(() => []),
     listJobs(session.id, orgId).catch(() => []),
@@ -385,6 +394,8 @@ export default async function OverviewPage() {
           )}
         </section>
       </div>
+
+      <OverviewInsights overview={overview} audit={audit} remediation={remediation} />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <section aria-labelledby="scans" className="card p-6">

@@ -14,3 +14,11 @@ Copyright (c) 2026 Sachin Sharma
   - Contenu sous licence CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/) :
     grille de triage en 7 questions (« 7-Question Gate »), traduite et adaptée au
     contexte d'un audit sur son propre périmètre (lib/triage.ts).
+
+Idées reprises sans copie de code (implémentations originales) :
+  - REAP (hackwither/reap, MIT) : commande de reproduction par constat.
+  - BBOT (blacklanternsecurity/bbot, AGPL-3.0) : croisement de sources passives de sous-domaines.
+  - CVEngine (hevnsnt/CVEngine, GPL-3.0) : priorisation des CVE par KEV et EPSS.
+  - OWASP WSTG (CC BY-SA 4.0) : seuls les identifiants de tests sont cités.
+Données publiques interrogées : CISA KEV, FIRST EPSS, RDAP (IANA et registres), Cert Spotter,
+crt.sh, HackerTarget, Team Cymru (ASN), Cloudflare DNS-over-HTTPS.

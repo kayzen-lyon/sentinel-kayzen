@@ -47,32 +47,84 @@ async function mapLimit<T, R>(
   return out;
 }
 
-// --- 1. Énumération passive de sous-domaines (Certificate Transparency) -------------------
+// --- 1. Énumération passive de sous-domaines (sources publiques) -------------------
 
 type CrtEntry = { name_value?: string; common_name?: string };
 
 /** Interroge crt.sh (logs CT publics) et renvoie la liste dédupliquée des sous-domaines. */
-export async function enumerateSubdomains(apex: string): Promise<string[]> {
+// Mémoïsation par instance : un même scan interroge crt.sh une seule fois (recon + prise de contrôle).
+const subdomainCache = new Map<string, Promise<string[]>>();
+
+/** Interroge crt.sh une seule fois par apex et par instance (voir enumerateSubdomainsUncached). */
+export function enumerateSubdomains(apex: string): Promise<string[]> {
+  let p = subdomainCache.get(apex);
+  if (!p) {
+    p = enumerateSubdomainsUncached(apex);
+    subdomainCache.set(apex, p);
+    setTimeout(() => subdomainCache.delete(apex), 10 * 60 * 1000).unref?.();
+  }
+  return p;
+}
+
+/** Garde un nom s'il appartient bien à l'apex (anti-pollution des sources tierces). */
+function keepHost(raw: string, apex: string): string | null {
+  const host = raw.trim().toLowerCase().replace(/^\*\./, "");
+  return host && (host === apex || host.endsWith(`.${apex}`)) && /^[a-z0-9.-]+$/.test(host) ? host : null;
+}
+
+/** Source 1 — crt.sh (logs Certificate Transparency). Souvent lent : timeout large + un retry. */
+async function fromCrtSh(apex: string): Promise<string[]> {
   const url = `https://crt.sh/?q=%25.${encodeURIComponent(apex)}&output=json`;
-  // crt.sh est souvent lent / instable : timeout large + un retry.
   let res = await fetchWithTimeout(url, { timeoutMs: 25000 });
   if (!res || !res.ok) res = await fetchWithTimeout(url, { timeoutMs: 25000 });
   if (!res || !res.ok) return [];
-
-  let entries: CrtEntry[];
   try {
-    entries = JSON.parse(await res.text()) as CrtEntry[];
+    const entries = JSON.parse(await res.text()) as CrtEntry[];
+    return entries.flatMap((e) => `${e.name_value ?? ""}\n${e.common_name ?? ""}`.split("\n"));
   } catch {
     return []; // corps malformé sous charge → on abandonne proprement
   }
+}
 
+/** Source 2 — Cert Spotter (logs CT, API publique sans clé). */
+async function fromCertSpotter(apex: string): Promise<string[]> {
+  const res = await fetchWithTimeout(
+    `https://api.certspotter.com/v1/issuances?domain=${encodeURIComponent(apex)}&include_subdomains=true&expand=dns_names`,
+    { timeoutMs: 10000 }
+  );
+  if (!res || !res.ok) return [];
+  try {
+    return ((await res.json()) as { dns_names?: string[] }[]).flatMap((e) => e.dns_names ?? []);
+  } catch {
+    return [];
+  }
+}
+
+/** Source 3 — HackerTarget (DNS passif, quota gratuit partagé : best-effort). */
+async function fromHackerTarget(apex: string): Promise<string[]> {
+  const res = await fetchWithTimeout(`https://api.hackertarget.com/hostsearch/?q=${encodeURIComponent(apex)}`, {
+    timeoutMs: 8000,
+  });
+  if (!res || !res.ok) return [];
+  const body = await res.text().catch(() => "");
+  if (/API count exceeded|error/i.test(body.slice(0, 80))) return [];
+  return body.split("\n").map((l) => l.split(",")[0]);
+}
+
+/**
+ * Énumération passive multi-sources (aucun paquet envoyé à la cible). Le croisement de
+ * plusieurs sources publiques suit l'approche de BBOT (idée seulement, code original).
+ */
+async function enumerateSubdomainsUncached(apex: string): Promise<string[]> {
+  const lists = await Promise.all([
+    fromCrtSh(apex).catch(() => [] as string[]),
+    fromCertSpotter(apex).catch(() => [] as string[]),
+    fromHackerTarget(apex).catch(() => [] as string[]),
+  ]);
   const set = new Set<string>();
-  for (const e of entries) {
-    const names = `${e.name_value ?? ""}\n${e.common_name ?? ""}`.split("\n");
-    for (const n of names) {
-      const host = n.trim().toLowerCase().replace(/^\*\./, "");
-      if (host && host.endsWith(apex) && /^[a-z0-9.-]+$/.test(host)) set.add(host);
-    }
+  for (const raw of lists.flat()) {
+    const h = keepHost(raw, apex);
+    if (h) set.add(h);
   }
   return [...set].sort();
 }
@@ -84,7 +136,7 @@ async function subdomainFinding(apex: string): Promise<Finding | null> {
   return {
     id: "recon-subdomains",
     category: "Reconnaissance",
-    title: `${subs.length} sous-domaine(s) exposé(s) (Certificate Transparency)`,
+    title: `${subs.length} sous-domaine(s) exposé(s) (sources publiques)`,
     severity: subs.length > 25 ? "medium" : "low",
     state: "warn",
     detail:
