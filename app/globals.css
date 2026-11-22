@@ -30,6 +30,7 @@
   --brand: 183 72 31; /* --primary 16 71% 42% #b7481f */
   --brand-hover: 157 61 27; /* 16 71% 36% */
   --brand-light: 183 72 31; /* liens : primary (contraste sur blanc) */
+  --on-brand: 255 255 255; /* texte posé sur un fond de marque */
   --secondary: 31 59 97; /* --navy 214 52% 25% #1f3b61 */
   --secondary-hover: 19 41 68; /* --navy-deep 213 56% 17% #132944 */
   --navy-deep: 19 41 68; /* bandes sombres (stats, footer, panneaux) */
@@ -631,6 +632,8 @@ img, svg, video, canvas {
   --brand: 225 109 71; /* --primary 15 72% 58% */
   --brand-hover: 229 130 97;
   --brand-light: 225 109 71;
+  /* Texte sur fond de marque : navy très sombre (blanc sur #e16d47 = 3,2:1 ; navy = 5,6:1). [WCAG 1.4.3] */
+  --on-brand: 13 22 33;
   --secondary: 214 223 235;
   --secondary-hover: 235 239 244;
   --navy-deep: 17 31 50; /* --navy-deep 213 50% 13% */
@@ -638,7 +641,7 @@ img, svg, video, canvas {
 
   --safe: 94 186 143; /* --kayzen-green 152 40% 55% */
   --safe-light: 94 186 143;
-  --risk: 240 100 100; /* #F06464 : 5,05:1 sur les fonds teintés (234 83 83 = 4,41:1) */
+  --risk: 240 106 106; /* éclairci : #ea5353 = 4,4:1 sur les cartes teintées, #f06a6a ≥ 5,2:1 [WCAG 1.4.3] */
   --warn: 240 188 76; /* --gold 41 85% 62% */
   --violet: 214 223 235;
 
@@ -1063,7 +1066,7 @@ a:focus-visible .link-grow::after { transform: scaleX(1); }
   transition: border-color var(--dur-normal) ease;
 }
 .apv-reel-card:hover, .apv-reel-card:focus-within { border-color: rgb(var(--brand)); }
-.apv-reel-card a { display: block; }
+.apv-reel-card > :is(a, span) { display: block; }
 .apv-reel-card a:focus-visible { outline-offset: -3px; border-radius: 1.25rem; }
 .apv-reel-shot { display: block; aspect-ratio: 16 / 9; background-color: rgb(var(--bg-elev)); border-bottom: 1px solid rgb(var(--border)); }
 .apv-reel-shot img { display: block; width: 100%; height: 100%; }
@@ -1248,6 +1251,7 @@ html[data-espace='dashboard'] {
   --warn: 146 64 14;          /* ambre assombri #92400E : 6,3:1 */
   --violet: 30 64 175;        /* bleu assombri #1E40AF : 8,7:1 */
   --risk: 185 28 28;          /* alerte #B91C1C en clair (#EF4444 : 3,8:1 sur blanc) */
+  --on-brand: 255 255 255;    /* blanc sur #E11D48 : 4,7:1 */
 }
 /* Studio (sombre) — et la barre latérale, sombre dans les trois thèmes */
 html[data-espace='dashboard'].dark,
@@ -1275,6 +1279,7 @@ html[data-espace='dashboard'] .charte-sombre {
   --warn: 251 191 36;
   --violet: 96 165 250;
   --risk: 248 113 113;        /* texte d'alerte #F87171 : 5,8:1 (#EF4444 : 4,2:1 sur surface 2) */
+  --on-brand: 255 255 255;
 }
 /* OLED (noir absolu) */
 html[data-espace='dashboard'].dark.oled,
@@ -1424,4 +1429,14 @@ html[data-espace="dashboard"] :is(table, .tabular-nums) {
     white-space: pre-wrap;
     word-break: break-word;
   }
+/* Texte sur fond de marque : un seul jeton (--on-brand) au lieu du blanc codé en dur. */
+.bg-brand.text-white {
+  color: rgb(var(--on-brand));
+}
+
+/* Liens dans le texte du tableau de bord : soulignés en permanence, la couleur seule ne
+   suffit pas à les distinguer du texte voisin. [WCAG 1.4.1 ; RGAA 10.6] */
+html[data-espace='dashboard'] :is(p, li) a:not([data-slot='button']):not(.btn) {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
