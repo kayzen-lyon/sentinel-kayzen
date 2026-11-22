@@ -24,10 +24,14 @@ const APPS = KAYZEN_APPS.filter((a) => SHOTS[a.name]).map((a) => ({
 
 function Cards({ items, hidden = false }: { items: typeof APPS; hidden?: boolean }) {
   return (
-    <ul className="apv-reel-list" aria-hidden={hidden || undefined}>
-      {items.map((app) => (
+    // Copie de la boucle : décorative et inerte, sans lien (ni focus, ni lecteur d'écran) [WCAG 4.1.2 ; RGAA 10.8].
+    <ul className="apv-reel-list" aria-hidden={hidden || undefined} inert={hidden || undefined}>
+      {items.map((app) => {
+        const Wrap = hidden ? "span" : "a";
+        const link = hidden ? {} : { href: app.href, target: "_blank", rel: "noopener noreferrer" };
+        return (
         <li key={app.name} className="apv-reel-card">
-          <a href={app.href} target="_blank" rel="noopener noreferrer" tabIndex={hidden ? -1 : undefined}>
+          <Wrap {...link}>
             <span className="apv-reel-shot">
               <img src={app.shot} alt="" width={800} height={450} loading="lazy" decoding="async" />
             </span>
@@ -38,9 +42,10 @@ function Cards({ items, hidden = false }: { items: typeof APPS; hidden?: boolean
                 <span className="sr-only"> (nouvel onglet)</span>
               </span>
             </span>
-          </a>
+          </Wrap>
         </li>
-      ))}
+        );
+      })}
     </ul>
   );
 }
