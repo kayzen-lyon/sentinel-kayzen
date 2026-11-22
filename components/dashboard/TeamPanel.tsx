@@ -89,6 +89,9 @@ export default function TeamPanel() {
   const [email, setEmail] = useState("");
   const [newRole, setNewRole] = useState<Role>("member");
   const [requireApproval, setRequireApproval] = useState(false);
+  // Conservation des preuves/rapports (jours) ; vide = pas de purge (aucune valeur par défaut).
+  const [retentionDays, setRetentionDays] = useState("");
+  const [retentionSaved, setRetentionSaved] = useState(false);
   // Les URLs enregistrées ne reviennent jamais au navigateur : seulement un aperçu (hint).
   // Un champ n'est envoyé que s'il a été modifié (sinon la valeur actuelle est conservée).
   const [slackUrl, setSlackUrl] = useState<string | undefined>(undefined);
@@ -111,6 +114,7 @@ export default function TeamPanel() {
       setAudit(d.audit || []);
       setRole(d.role || null);
       setRequireApproval(Boolean(d.requireApproval));
+      setRetentionDays(d.evidenceRetentionDays != null ? String(d.evidenceRetentionDays) : "");
       setSlackHint(d.slackHint || "");
       setWebhookHint(d.webhookHint || "");
       setSlackUrl(undefined);
@@ -135,6 +139,30 @@ export default function TeamPanel() {
         setIntegSaved(true);
         setTimeout(() => setIntegSaved(false), 2000);
         await load();
+      } else {
+        const d = await res.json();
+        setError(d.error || "Échec.");
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function saveRetention(e: React.FormEvent) {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    setRetentionSaved(false);
+    try {
+      const res = await fetch("/api/team/settings", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ evidenceRetentionDays: retentionDays.trim() || null }),
+      });
+      if (res.ok) {
+        setRetentionSaved(true);
+        setTimeout(() => setRetentionSaved(false), 2000);
       } else {
         const d = await res.json();
         setError(d.error || "Échec.");
@@ -282,6 +310,39 @@ export default function TeamPanel() {
               Exiger l'approbation d'un administrateur avant tout pentest lancé par un membre
             </label>
           </div>
+        )}
+
+        {canManage && (
+          <form onSubmit={saveRetention} className="mt-4 card space-y-3 p-4">
+            <h2 className="font-heading text-sm font-semibold text-subtle">
+              Conservation des preuves et rapports de pentest
+            </h2>
+            <p className="text-xs text-muted">
+              Aucune durée par défaut : laissée vide, rien n&apos;est purgé. Fixez-la avec votre
+              juriste. Une fois définie, les preuves d&apos;exploitation et rapports des pentests
+              terminés depuis plus de N jours sont effacés chaque nuit (titres, gravités et
+              statuts restent dans l&apos;historique).
+            </p>
+            <div className="flex flex-wrap items-end gap-3">
+              <label>
+                <span className="mb-1 block text-xs font-medium text-subtle">Durée (jours)</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={3650}
+                  step={1}
+                  inputMode="numeric"
+                  value={retentionDays}
+                  onChange={(e) => setRetentionDays(e.target.value)}
+                  placeholder="Pas de purge"
+                  className="input"
+                />
+              </label>
+              <button type="submit" disabled={busy} className="btn btn-ghost !py-2 text-sm disabled:opacity-60">
+                {retentionSaved ? "Enregistré ✓" : "Enregistrer"}
+              </button>
+            </div>
+          </form>
         )}
 
         {canManage && (

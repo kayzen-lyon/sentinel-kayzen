@@ -17,11 +17,11 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://sentinel.kayzen-lyon.com"),
   title: {
-    default: "Sentinel by Kayzen — Pentest IA autonome & cybersécurité offensive",
+    default: "Pentest IA et test d'intrusion | Sentinel by Kayzen",
     template: "%s | Sentinel by Kayzen",
   },
   description:
-    "Sentinel déploie des agents IA qui pensent comme de vrais hackers : ils exécutent votre code, trouvent les failles et les prouvent par des PoC réels. Audit managé + plateforme self-service. Une entité du groupe Kayzen (Lyon).",
+    "Pentest IA et test d'intrusion automatisé : des agents exploitent vos failles et les prouvent par un PoC. Scan passif gratuit, audit managé par Kayzen à Lyon.",
   keywords: [
     "pentest IA",
     "test d'intrusion automatisé",

@@ -19,6 +19,8 @@ export type OrgRow = {
   owner_id: string;
   personal: boolean;
   require_approval: boolean;
+  /** Conservation des preuves/rapports en jours ; null = pas de purge (lib/retention.ts). */
+  evidence_retention_days: number | null;
   created_at: string;
 };
 

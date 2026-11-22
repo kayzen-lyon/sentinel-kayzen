@@ -1,8 +1,9 @@
 import ContactForm from "@/components/ContactForm";
+import { HOME_SECTIONS } from "@/lib/homeSections";
 
 export default function CtaFinal() {
   return (
-    <section id="contact" className="border-t border-border py-24">
+    <section id={HOME_SECTIONS.contact.id} className="border-t border-border py-24">
       <div className="container-x">
         <div className="relative overflow-hidden rounded-3xl border border-border bg-card px-6 py-16 text-center shadow-[var(--shadow-section)] sm:px-16">
           <span className="eyebrow justify-center">
@@ -12,7 +13,7 @@ export default function CtaFinal() {
             className="mx-auto mt-5 max-w-2xl font-heading font-bold text-fg"
             data-size="4xl"
           >
-            Découvrez ce qu'un attaquant verrait sur votre application
+            {HOME_SECTIONS.contact.title}
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
             Lancez un premier audit avec les experts Kayzen. Vous repartez avec une

@@ -1,6 +1,7 @@
 import { parse } from "node-html-parser";
 import type { Finding, Severity } from "./scanner";
 import { safeFetch } from "./ssrf";
+import { maskSecret } from "./redact";
 import type { AttackClass, SurfaceItem } from "./surface";
 
 export type { AttackClass, SurfaceItem } from "./surface";
@@ -15,7 +16,7 @@ export type { AttackClass, SurfaceItem } from "./surface";
  *
  * Motifs de secrets et règles de classement adaptés du moteur de Claude-BugHunter
  * (Sachin Sharma, licence MIT — voir NOTICE). Aucune valeur de secret n'est stockée en clair :
- * seule une forme masquée (6 premiers + 4 derniers caractères) est conservée.
+ * seule une forme masquée (4 premiers caractères + « …[masqué] », lib/redact.ts) est conservée.
  */
 
 const UA =
@@ -25,7 +26,7 @@ const UA =
 
 type SecretPattern = { label: string; re: RegExp; severity: Severity; note?: string };
 
-const SECRET_PATTERNS: SecretPattern[] = [
+export const SECRET_PATTERNS: SecretPattern[] = [
   { label: "Clé d'accès AWS", re: /\bAKIA[0-9A-Z]{16}\b/g, severity: "critical" },
   { label: "Clé secrète Stripe (live)", re: /\bsk_live_[0-9A-Za-z]{24,}\b/g, severity: "critical" },
   { label: "Clé restreinte Stripe (live)", re: /\brk_live_[0-9A-Za-z]{24,}\b/g, severity: "high" },
@@ -66,9 +67,8 @@ const SECRET_NOISE = /EXAMPLE|YOUR_|XXXX|\.\.\.|<[^>]+>|process\.env|import\.met
 
 export type SecretHit = { type: string; severity: Severity; redacted: string; source: string; note?: string };
 
-function redact(tok: string): string {
-  return tok.length <= 12 ? `${tok.slice(0, 3)}…` : `${tok.slice(0, 6)}…${tok.slice(-4)}`;
-}
+/** Même forme masquée que tous les rapports Sentinel (lib/redact.ts). */
+const redact = maskSecret;
 
 /** Secrets repérés dans un texte client. Les valeurs sont masquées, jamais stockées en clair. */
 export function scanSecrets(text: string, source: string): SecretHit[] {

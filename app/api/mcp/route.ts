@@ -14,6 +14,9 @@ import { getPlaybook, PLAYBOOKS } from "@/lib/playbooks";
 import { appBaseUrl, dispatchWorkerRun, githubConfigured } from "@/lib/github";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { logAudit } from "@/lib/audit";
+import { findCoveringAuthorization } from "@/lib/authorizations";
+import { authorizationRequiredMessage } from "@/lib/authorizationScope";
+import { redactSecrets } from "@/lib/redact";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -166,6 +169,10 @@ async function callTool(
           ),
           isError: true,
         };
+      // Même verrou légal que la voie web : autorisation écrite du client en cours de validité.
+      const authorization = await findCoveringAuthorization(orgId, check.url.hostname).catch(() => null);
+      if (!authorization)
+        return { ...text(`Refusé : ${authorizationRequiredMessage(check.url.hostname)}`), isError: true };
       // Même quota que la voie web (2 lancements offensifs / heure).
       const rl = await checkRateLimit(`job:${userId}`, 2, 3600);
       if (!rl.allowed)
@@ -201,7 +208,7 @@ async function callTool(
         actorEmail: userEmail,
         action: needsApproval ? "pentest.pending" : "pentest.launch",
         target: check.url.hostname,
-        meta: { mode, jobId, via: "mcp" },
+        meta: { mode, jobId, via: "mcp", authorizationId: authorization.id },
       });
       if (needsApproval)
         return text({
@@ -230,8 +237,9 @@ async function callTool(
         status: job.status,
         target: job.target_url,
         costUsd: job.cost_usd,
+        // Jamais de preuve ni de rapport vers un client IA : titres secrets masqués.
         findings: findings.map((f) => ({
-          title: f.title,
+          title: redactSecrets(f.title),
           severity: f.severity,
           cvss: f.cvss,
           status: f.status,

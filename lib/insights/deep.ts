@@ -20,7 +20,7 @@ async function get(url: string, method = "GET", timeoutMs = 6000): Promise<{ sta
 
 type Probe = { path: string; label: string; severity: Severity; valid: (b: string) => boolean; fix: string };
 
-const SENSITIVE: Probe[] = [
+export const SENSITIVE: Probe[] = [
   { path: "/.DS_Store", label: "Index de dossier macOS (.DS_Store)", severity: "low", valid: (b) => b.includes("Bud1"), fix: "Supprimez les fichiers .DS_Store du serveur et bloquez-les." },
   { path: "/.htaccess", label: "Configuration Apache (.htaccess)", severity: "medium", valid: (b) => /RewriteEngine|RewriteRule|Deny from|Require all|AuthType/i.test(b) && !/<html/i.test(b), fix: "Interdisez la lecture des fichiers .ht* (directive FilesMatch)." },
   { path: "/web.config", label: "Configuration IIS (web.config)", severity: "medium", valid: (b) => /<configuration[\s>]/i.test(b), fix: "Bloquez la lecture de web.config." },
@@ -50,7 +50,7 @@ const ERROR_LEAKS: [RegExp, string][] = [
   [/(Apache|nginx|Microsoft-IIS)\/\d+\.\d+/i, "version du serveur web"],
 ];
 
-const TAKEOVER: [RegExp, RegExp, string][] = [
+export const TAKEOVER: [RegExp, RegExp, string][] = [
   [/github\.io$/, /There isn't a GitHub Pages site here/i, "GitHub Pages"],
   [/herokuapp\.com$|herokudns\.com$/, /No such app|herokucdn\.com\/error-pages/i, "Heroku"],
   [/s3[.-][\w.-]*amazonaws\.com$|s3\.amazonaws\.com$/, /NoSuchBucket/i, "Amazon S3"],

@@ -141,7 +141,7 @@ export default function Header() {
           </Link>
           <Link
             href="/signup"
-            className="group flex h-11 items-center justify-center gap-1.5 rounded-full bg-brand px-5 font-heading text-sm font-bold whitespace-nowrap text-white transition-colors duration-150 hover:bg-brand-hover"
+            className="group flex h-11 items-center justify-center gap-1.5 rounded-full btn-primary px-5 font-heading text-sm font-bold whitespace-nowrap transition-colors duration-150"
           >
             Scanner mon site
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true">

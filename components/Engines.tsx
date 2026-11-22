@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HOME_SECTIONS } from "@/lib/homeSections";
 
 const STRIX = [
   "Agents IA autonomes (reconnaissance, exploitation, post-exploitation)",
@@ -16,7 +17,7 @@ const OSS = [
 
 export default function Engines() {
   return (
-    <section className="border-t border-border py-24">
+    <section id={HOME_SECTIONS.moteurs.id} className="border-t border-border py-24">
       <div className="container-x">
         <div className="mx-auto max-w-2xl text-center">
           <span className="eyebrow">Le moteur</span>
@@ -24,7 +25,7 @@ export default function Engines() {
             className="mt-4 font-heading font-bold text-fg"
             data-size="4xl"
           >
-            Deux moteurs, un même pipeline
+            {HOME_SECTIONS.moteurs.title}
           </h2>
           <p className="mt-4 text-lg text-muted">
             Choisissez l'IA offensive de Strix ou la rigueur déterministe de

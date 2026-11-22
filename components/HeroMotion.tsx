@@ -102,7 +102,7 @@ export default function HeroMotion() {
       </div>
       <div className={`${pill} hm-float-2 -left-2 bottom-2 sm:-left-4`}>
         <Icon d="M12 21a9 9 0 100-18 9 9 0 000 18zM12 7v5l3 2" className="h-3.5 w-3.5 text-brand" />
-        Résultat en 30 secondes
+        Résultat en moins d&apos;une minute
       </div>
     </div>
   );

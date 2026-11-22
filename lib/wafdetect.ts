@@ -12,7 +12,7 @@ import type { Finding } from "./scanner";
 
 type Signature = { name: string; patterns: RegExp[] };
 
-const WAF_SIGNATURES: Signature[] = [
+export const WAF_SIGNATURES: Signature[] = [
   { name: "Cloudflare", patterns: [/\bcf-ray\b/i, /\b__cf(duid|_bm|uid)\b/i, /\bcloudflare\b/i, /attention required/i] },
   { name: "Akamai", patterns: [/\bak_bmsc\b/i, /\b_abck\b/i, /\bakamai(ghost)?\b/i, /\bx-akamai\b/i] },
   { name: "AWS WAF / ELB", patterns: [/\bawsalb\b/i, /\bx-amzn-(requestid|trace-id)\b/i, /\baws.?waf\b/i] },

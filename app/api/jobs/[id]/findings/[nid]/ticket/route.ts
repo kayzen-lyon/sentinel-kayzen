@@ -6,6 +6,7 @@ import { createTicket } from "@/lib/tickets";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { logAudit } from "@/lib/audit";
 import { canLaunch, getRole } from "@/lib/orgs";
+import { redactSecrets } from "@/lib/redact";
 
 export const runtime = "nodejs";
 
@@ -61,7 +62,8 @@ export async function POST(
     .filter((l) => l !== undefined)
     .join("\n");
 
-  const result = await createTicket(job.org_id, system, title, description);
+  // Le ticket part chez un tiers (Jira/Linear) : aucune preuve, secrets masqués.
+  const result = await createTicket(job.org_id, system, redactSecrets(title), redactSecrets(description));
   if (result.error) return NextResponse.json({ error: result.error }, { status: 502 });
 
   await logAudit({

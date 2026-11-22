@@ -9,6 +9,7 @@ import { checkRateLimit } from "@/lib/ratelimit";
 import { canLaunch } from "@/lib/orgs";
 import { getActiveOrg } from "@/lib/activeorg";
 import { checkQuota } from "@/lib/plans";
+import { redactDeep } from "@/lib/redact";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -78,7 +79,7 @@ export async function POST(req: Request) {
   try {
     const result = await runScan(check.url, { deep });
     if (scanId) await completeScan(scanId, result).catch(() => {});
-    return NextResponse.json({ id: scanId, result, deep });
+    return NextResponse.json({ id: scanId, result: redactDeep(result), deep });
   } catch (e) {
     const message =
       e instanceof Error ? e.message : "Échec du scan de la cible.";

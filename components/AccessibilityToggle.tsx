@@ -102,7 +102,7 @@ export default function AccessibilityToggle() {
 
   const option = (on: boolean) =>
     `flex min-h-11 w-full items-center gap-3 rounded-xl border p-3 text-left text-sm font-semibold transition-colors ${
-      on ? "border-brand bg-brand/10 text-brand" : "border-border text-fg enabled:hover:bg-hover"
+      on ? "border-brand bg-brand/10 text-brand-light" : "border-border text-fg enabled:hover:bg-hover"
     }`;
   const step =
     "flex h-11 w-11 items-center justify-center rounded-xl border border-border text-fg transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-40";

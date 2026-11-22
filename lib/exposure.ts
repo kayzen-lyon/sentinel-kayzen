@@ -60,7 +60,7 @@ type TextProbe = {
   recommendation: string;
 };
 
-const TEXT_PROBES: TextProbe[] = [
+export const TEXT_PROBES: TextProbe[] = [
   {
     path: "/.git/HEAD",
     label: "Dépôt Git exposé (.git/HEAD)",
@@ -156,7 +156,7 @@ async function textProbes(origin: string): Promise<Finding[]> {
 
 // --- 2. Sauvegardes / archives exposées (en-têtes seulement, corps non téléchargé) ---------
 
-const ARCHIVE_PROBES: { path: string; label: string }[] = [
+export const ARCHIVE_PROBES: { path: string; label: string }[] = [
   { path: "/backup.zip", label: "backup.zip" },
   { path: "/backup.sql", label: "backup.sql" },
   { path: "/database.sql", label: "database.sql" },

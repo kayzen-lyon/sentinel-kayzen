@@ -4,6 +4,7 @@ import { dbConfigured } from "@/lib/db";
 import { getJob, listFindings } from "@/lib/jobs";
 import { emailConfigured, pentestReportEmail, sendEmail } from "@/lib/email";
 import { checkRateLimit } from "@/lib/ratelimit";
+import { openReport } from "@/lib/proofs";
 
 export const runtime = "nodejs";
 
@@ -47,7 +48,8 @@ export async function POST(
         severity: f.severity,
         cvss: f.cvss,
       })),
-      reportMd: job.report_md,
+      // Destinataire = membre authentifié ; secrets masqués par pentestReportEmail.
+      reportMd: openReport(job.report_md),
     })
   );
   if (!ok) return NextResponse.json({ error: "Échec de l'envoi." }, { status: 502 });

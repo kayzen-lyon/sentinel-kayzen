@@ -5,6 +5,8 @@ import { approveJob, getJob, updateJobSystem } from "@/lib/jobs";
 import { canManage, getRole } from "@/lib/orgs";
 import { appBaseUrl, dispatchWorkerRun, githubConfigured } from "@/lib/github";
 import { logAudit } from "@/lib/audit";
+import { findCoveringAuthorization } from "@/lib/authorizations";
+import { authorizationRequiredMessage } from "@/lib/authorizationScope";
 
 export const runtime = "nodejs";
 
@@ -42,6 +44,18 @@ export async function POST(
     return NextResponse.json({ ok: true, status: "cancelled" });
   }
 
+  // L'autorisation écrite a pu expirer ou être révoquée depuis la demande : revérifiée ici.
+  const host = (() => {
+    try {
+      return new URL(job.target_url).hostname;
+    } catch {
+      return "";
+    }
+  })();
+  const authorization = await findCoveringAuthorization(job.org_id, host).catch(() => null);
+  if (!authorization)
+    return NextResponse.json({ error: authorizationRequiredMessage(host || job.target_url) }, { status: 403 });
+
   await approveJob(id);
   await logAudit({
     orgId: job.org_id,
@@ -49,6 +63,7 @@ export async function POST(
     actorEmail: session.email,
     action: "pentest.approved",
     target: id,
+    meta: { authorizationId: authorization.id },
   });
 
   if (githubConfigured) {

@@ -1,7 +1,8 @@
+import { HOME_SECTIONS } from "@/lib/homeSections";
 const FEATURES = [
   {
     title: "Validation par PoC réels",
-    body: "Chaque faille est exploitée pour de vrai et livrée avec une preuve de concept reproductible, un score CVSS et sa classification OWASP. Zéro faux positif : ce que Sentinel remonte est exploitable.",
+    body: "Chaque faille est exploitée pour de vrai et livrée avec une preuve de concept reproductible, un score CVSS et sa classification OWASP. Chaque preuve est ensuite relue par un second modèle chargé de la réfuter.",
     icon: "check",
     accent: "safe",
   },
@@ -57,7 +58,7 @@ const FEATURES = [
 
 export default function Features() {
   return (
-    <section id="service" className="border-t border-border py-24">
+    <section id={HOME_SECTIONS.service.id} className="border-t border-border py-24">
       <div className="container-x">
         <div className="mx-auto max-w-2xl text-center">
           <span className="eyebrow">La plateforme</span>
@@ -65,7 +66,7 @@ export default function Features() {
             className="mt-4 font-heading font-bold text-fg"
             data-size="4xl"
           >
-            L'arsenal complet d'un pentester, opérationnel en continu
+            {HOME_SECTIONS.service.title}
           </h2>
           <p className="mt-4 text-lg text-muted">
             Au-delà du scan : validation, spécialisation, gouvernance et

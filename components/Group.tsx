@@ -1,3 +1,4 @@
+import { HOME_SECTIONS } from "@/lib/homeSections";
 const ENTITIES = [
   {
     name: "Kayzen Web",
@@ -28,7 +29,7 @@ const ENTITIES = [
 
 export default function Group() {
   return (
-    <section className="border-t border-border py-24">
+    <section id={HOME_SECTIONS.groupe.id} className="border-t border-border py-24">
       <div className="container-x">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           <div>
@@ -37,7 +38,7 @@ export default function Group() {
               className="mt-4 font-heading font-bold text-fg"
               data-size="4xl"
             >
-              Une nouvelle brique du groupe Kayzen
+              {HOME_SECTIONS.groupe.title}
             </h2>
             <p className="mt-4 text-lg text-muted">
               Sentinel rejoint Nexus et Konforme aux côtés de{" "}

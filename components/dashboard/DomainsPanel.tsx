@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/Toast";
+import AuthorizationsPanel from "@/components/dashboard/AuthorizationsPanel";
 
 type Domain = {
   id: string;
@@ -162,6 +163,8 @@ export default function DomainsPanel() {
           </li>
         ))}
       </ul>
+
+      <AuthorizationsPanel />
     </div>
   );
 }

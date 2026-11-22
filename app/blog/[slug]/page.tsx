@@ -100,6 +100,20 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
             </section>
           )}
 
+          {/* Sous 1024 px, le sommaire latéral est masqué : on le reprend en tête du cours. */}
+          {toc.length > 0 && (
+            <nav aria-label="Sur cette page" className="mt-6 rounded-xl border border-border p-5 lg:hidden">
+              <p className="font-semibold text-fg">Sur cette page</p>
+              <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm">
+                {toc.map((h) => (
+                  <li key={h.id}>
+                    <a href={`#${h.id}`} className="text-brand underline underline-offset-2 hover:text-fg">{h.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )}
+
           <div className="prose mt-4 blog-prose">
             <CourseBlocks blocks={c.body} />
           </div>

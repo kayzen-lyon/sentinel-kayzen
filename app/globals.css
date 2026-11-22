@@ -1359,6 +1359,78 @@ html[data-espace='dashboard'] table {
   font-variant-numeric: tabular-nums;
 }
 
+/* Scores CVSS, compteurs et dates alignés dans les tableaux. */
+html[data-espace="dashboard"] :is(table, .tabular-nums) {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   RAPPORT DE PENTEST — impression / PDF (Chrome « Enregistrer en PDF »).
+   Thème clair forcé quel que soit le thème de l'écran, chapitres sur une
+   nouvelle page, pied de page « Page n sur N ».
+   ============================================================ */
+@page {
+  size: A4;
+  margin: 18mm 16mm 20mm;
+  @bottom-left {
+    content: "Sentinel by Kayzen — rapport confidentiel";
+    font-size: 8pt;
+    color: #475569;
+  }
+  @bottom-right {
+    content: "Page " counter(page) " sur " counter(pages);
+    font-size: 8pt;
+    color: #475569;
+  }
+}
+@media print {
+  html,
+  html *,
+  html.dark,
+  html.dark * {
+    --bg: 255 255 255 !important;
+    --bg-card: 255 255 255 !important;
+    --bg-elev: 248 250 252 !important;
+    --bg-hover: 241 245 249 !important;
+    --bg-sunken: 248 250 252 !important;
+    --border: 203 213 225 !important;
+    --border-strong: 100 116 139 !important;
+    --fg: 15 23 42 !important;
+    --fg-muted: 51 65 85 !important;
+    --fg-subtle: 71 85 105 !important;
+    --heading: 15 23 42 !important;
+    --brand: 190 18 60 !important;
+    --brand-light: 159 18 57 !important;
+    --safe: 22 101 52 !important;
+    --warn: 146 64 14 !important;
+    --risk: 185 28 28 !important;
+    --violet: 29 78 216 !important;
+    color-scheme: light !important;
+  }
+  .rapport .card {
+    break-inside: auto;
+    border: 0 !important;
+    padding: 0 !important;
+  }
+  .rapport-couverture {
+    min-height: 240mm;
+  }
+  .rapport-chapitre {
+    break-before: page;
+  }
+  .rapport-vuln {
+    break-inside: avoid-page;
+  }
+  .rapport a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .rapport pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+}
+
 /* Texte sur fond de marque : un seul jeton (--on-brand) au lieu du blanc codé en dur. */
 .bg-brand.text-white {
   color: rgb(var(--on-brand));

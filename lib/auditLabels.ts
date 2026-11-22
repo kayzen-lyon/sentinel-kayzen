@@ -17,6 +17,9 @@ export const ACTION_LABEL: Record<string, string> = {
   "team.remove_member": "Membre retiré",
   "team.require_approval": "Politique d'approbation modifiée",
   "team.integrations": "Notifications configurées",
+  "team.evidence_retention": "Durée de conservation des preuves modifiée",
+  "authorization.recorded": "Autorisation écrite de pentest enregistrée",
+  "authorization.revoked": "Autorisation écrite de pentest révoquée",
   "scan.regression": "Régression de sécurité détectée",
   "scan.alert": "Alerte de surveillance",
 };

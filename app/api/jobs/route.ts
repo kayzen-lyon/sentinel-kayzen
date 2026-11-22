@@ -3,6 +3,8 @@ import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
 import { validateTargetUrl } from "@/lib/ssrf";
 import { isHostVerified } from "@/lib/domains";
+import { findCoveringAuthorization } from "@/lib/authorizations";
+import { authorizationRequiredMessage } from "@/lib/authorizationScope";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { createJob, listJobs, updateJobSystem, type JobMode } from "@/lib/jobs";
 import { appBaseUrl, dispatchWorkerRun, githubConfigured, type ScanEngine } from "@/lib/github";
@@ -85,6 +87,14 @@ export async function POST(req: Request) {
       { status: 403 }
     );
 
+  // VERROU LÉGAL (2) : autorisation écrite du client, en cours de validité, couvrant l'hôte.
+  const authorization = await findCoveringAuthorization(orgId, check.url.hostname).catch(() => null);
+  if (!authorization)
+    return NextResponse.json(
+      { error: authorizationRequiredMessage(check.url.hostname) },
+      { status: 403 }
+    );
+
   const playbook = getPlaybook(body.playbook);
   const mode: JobMode = playbook
     ? playbook.mode
@@ -121,7 +131,7 @@ export async function POST(req: Request) {
     actorEmail: session.email,
     action: needsApproval ? "pentest.pending" : "pentest.launch",
     target: check.url.hostname,
-    meta: { mode, jobId },
+    meta: { mode, jobId, authorizationId: authorization.id },
   });
 
   if (needsApproval) {

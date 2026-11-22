@@ -1,14 +1,15 @@
+import { HOME_SECTIONS } from "@/lib/homeSections";
 const CARDS = [
   {
     tag: "Le rythme a changé",
     title: "Vous livrez en continu, les audits arrivent trop tard",
-    body: "CI/CD, déploiements quotidiens, dépendances qui bougent : entre deux pentests annuels, des dizaines de failles passent en production sans être vues.",
+    body: "CI/CD, déploiements quotidiens, dépendances qui bougent : entre deux pentests annuels, des failles passent en production sans être vues.",
     accent: "risk",
   },
   {
     tag: "Le scan ne suffit plus",
     title: "Les scanners statiques noient vos équipes de faux positifs",
-    body: "Des centaines d'alertes non exploitables, aucun contexte métier. Vos développeurs perdent confiance et finissent par tout ignorer.",
+    body: "Des alertes non exploitables, sans contexte métier. Vos développeurs perdent confiance et finissent par tout ignorer.",
     accent: "warn",
   },
   {
@@ -21,7 +22,7 @@ const CARDS = [
 
 export default function Problem() {
   return (
-    <section className="border-t border-border py-24">
+    <section id={HOME_SECTIONS.constat.id} className="border-t border-border py-24">
       <div className="container-x">
         <div className="mx-auto max-w-2xl text-center">
           <span className="eyebrow">Le constat</span>
@@ -29,11 +30,11 @@ export default function Problem() {
             className="mt-4 font-heading font-bold text-fg"
             data-size="4xl"
           >
-            La sécurité applicative ne suit plus la vitesse du code
+            {HOME_SECTIONS.constat.title}
           </h2>
           <p className="mt-4 text-lg text-muted">
-            En 2026, la surface d'attaque grandit plus vite que les équipes qui la
-            protègent. Sentinel comble ce fossé.
+            La surface d'attaque change à chaque livraison. Sentinel teste au
+            même rythme que vous déployez.
           </p>
         </div>
 

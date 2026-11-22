@@ -13,6 +13,7 @@ import { notifyOrg } from "@/lib/notify";
 import { getUserById } from "@/lib/users";
 import { pentestReportEmail, sendEmail } from "@/lib/email";
 import { postCommitStatus, postPrComment } from "@/lib/githubApp";
+import { redactSecrets } from "@/lib/redact";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -128,7 +129,9 @@ export async function POST(req: Request) {
           job.gh_owner,
           job.gh_repo,
           job.gh_pr,
-          `### 🛡️ Sentinel by Kayzen — ${findings.length} vulnérabilité(s)\n\n${lines || "Aucune vulnérabilité détectée."}`
+          redactSecrets(
+            `### 🛡️ Sentinel by Kayzen — ${findings.length} vulnérabilité(s)\n\n${lines || "Aucune vulnérabilité détectée."}`
+          )
         ).catch(() => {});
       }
     }

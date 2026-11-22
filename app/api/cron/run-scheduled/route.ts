@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { dbConfigured } from "@/lib/db";
 import { runDueScheduledScans } from "@/lib/scheduled";
 import { runMaintenance } from "@/lib/maintenance";
+import { purgeExpiredEvidence } from "@/lib/retention";
 import { timingSafeEqual } from "node:crypto";
 
 export const runtime = "nodejs";
@@ -23,7 +24,9 @@ export async function GET(req: Request) {
 
   const result = await runDueScheduledScans();
   const maintenance = await runMaintenance().catch(() => null);
-  return NextResponse.json({ ok: true, ...result, maintenance });
+  // Purge des preuves/rapports échus, seulement pour les organisations ayant fixé une durée.
+  const retention = await purgeExpiredEvidence().catch(() => null);
+  return NextResponse.json({ ok: true, ...result, maintenance, retention });
 }
 
 /** Comparaison en temps constant (évite de deviner le secret à la milliseconde près). */

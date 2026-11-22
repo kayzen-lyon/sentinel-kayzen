@@ -7,7 +7,7 @@ import { WITHDRAW_LABEL } from "@/lib/withdrawal";
  */
 export default function WithdrawalLink() {
   return (
-    <footer className="border-t border-border py-4">
+    <footer className="no-print border-t border-border py-4">
       <p className="container-x flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted">
         <Link href="/mentions-legales" className="hover:text-fg">Mentions légales</Link>
         <Link href="/cgv" className="hover:text-fg">CGV</Link>

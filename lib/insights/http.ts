@@ -58,7 +58,7 @@ export function analyzeCsp(csp: string): { weaknesses: string[]; missing: string
 // ---------------------------------------------------------------- bibliothèques
 
 /** Versions minimales sans vulnérabilité publique connue (sources : avis OSV / GitHub). */
-const LIB_RULES: { name: string; re: RegExp; safe: string; note: string }[] = [
+export const LIB_RULES: { name: string; re: RegExp; safe: string; note: string }[] = [
   { name: "jQuery", re: /jquery[.-]?(\d+\.\d+\.\d+)|jQuery v(\d+\.\d+\.\d+)/i, safe: "3.5.0", note: "XSS (CVE-2020-11022/11023)" },
   { name: "Bootstrap", re: /bootstrap[@/.-]v?(\d+\.\d+\.\d+)|Bootstrap v(\d+\.\d+\.\d+)/i, safe: "4.3.1", note: "XSS (CVE-2019-8331)" },
   { name: "AngularJS", re: /angular(?:js)?[@/.-]v?(1\.\d+\.\d+)|AngularJS v(1\.\d+\.\d+)/i, safe: "2.0.0", note: "fin de support depuis 2022" },

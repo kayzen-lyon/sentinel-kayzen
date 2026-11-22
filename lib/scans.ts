@@ -1,6 +1,7 @@
 import { ensureSchema, query } from "./db";
 import type { ScanResult } from "./scanner";
 import type { SurfaceItem } from "./surface";
+import { redactDeep } from "./redact";
 
 export type ScanRow = {
   id: string;
@@ -45,9 +46,10 @@ export async function completeScan(
       result.summary.finalUrl,
       result.grade,
       result.score,
-      JSON.stringify(result.summary),
-      JSON.stringify(result.findings),
-      result.insights ? JSON.stringify(result.insights) : null,
+      // Rapport de scan secrets masqués (en-têtes, cookies, jetons cités dans les constats).
+      JSON.stringify(redactDeep(result.summary)),
+      JSON.stringify(redactDeep(result.findings)),
+      result.insights ? JSON.stringify(redactDeep(result.insights)) : null,
     ]
   );
 }

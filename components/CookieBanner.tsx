@@ -204,7 +204,7 @@ export default function CookieBanner() {
                   n&apos;est déposé, et aucun ne le sera sans votre accord. Vous pouvez accepter,
                   refuser ou choisir précisément ; votre choix reste modifiable à tout moment via
                   l&apos;icône en bas à gauche.{" "}
-                  <Link href="/confidentialite" className="text-brand underline underline-offset-2">
+                  <Link href="/confidentialite" className="text-brand-light underline underline-offset-2">
                     Politique de confidentialité
                   </Link>
                   .{" "}
