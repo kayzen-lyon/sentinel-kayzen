@@ -179,6 +179,7 @@ export default async function OverviewPage() {
     line: string;
     area: string;
     grid: { v: number; y: number }[];
+    points: { x: number; y: number }[];
     cx: number;
     cy: number;
   } | null = null;
@@ -201,6 +202,7 @@ export default async function OverviewPage() {
       line: pts.join(" "),
       area: `M ${pts.join(" L ")} L ${x(history.length - 1).toFixed(1)},${by} L ${x(0).toFixed(1)},${by} Z`,
       grid: [hi, Math.round((hi + lo) / 2), lo].map((v) => ({ v, y: y(v) })),
+      points: history.map((p, i) => ({ x: x(i), y: y(p.score) })),
       cx: x(history.length - 1),
       cy: y(history[history.length - 1].score),
     };
@@ -328,7 +330,9 @@ export default async function OverviewPage() {
             {primaryHost && <span className="truncate text-sm text-subtle">{primaryHost}</span>}
           </div>
           {chart ? (
+            <>
             <svg
+              data-chart="score"
               viewBox="0 0 520 180"
               className="mt-4 block w-full"
               role="img"
@@ -343,9 +347,37 @@ export default async function OverviewPage() {
               <path d={chart.area} data-tint="fill" data-tone="brand" fillOpacity="0.12" />
               <polyline points={chart.line} data-tint="stroke" data-tone="brand" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               <circle cx={chart.cx} cy={chart.cy} r="4.5" data-tint="fill" data-tone="brand" />
+              {/* Zones de survol : infobulle native (couleurs du système, lisible dans tous les thèmes). */}
+              {chart.points.map((pt, i) => (
+                <circle key={i} cx={pt.x} cy={pt.y} r="12" fill="transparent">
+                  <title>{`${dateShort(history[i].created_at)} : ${history[i].score}/100`}</title>
+                </circle>
+              ))}
               <text x="36" y="174" fontSize="11" data-tint="fill" data-tone="subtle">{dateShort(history[0].created_at)}</text>
               <text x="508" y="174" textAnchor="end" fontSize="11" data-tint="fill" data-tone="subtle">{dateShort(history[history.length - 1].created_at)}</text>
             </svg>
+            {/* Le graphique est doublé de ses valeurs (lecteurs d'écran, impression, daltonisme). */}
+            <details open className="mt-3 text-sm">
+              <summary className="cursor-pointer text-muted">Valeurs du graphique</summary>
+              <table className="mt-2 w-full text-left">
+                <caption className="sr-only">Score de sécurité de {primaryHost} par scan</caption>
+                <thead className="text-subtle">
+                  <tr>
+                    <th scope="col" className="py-1 font-medium">Date du scan</th>
+                    <th scope="col" className="py-1 text-right font-medium">Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {history.map((p, i) => (
+                    <tr key={i} className="border-t border-border">
+                      <td className="py-1 text-muted">{formatDateTime(p.created_at)}</td>
+                      <td className="py-1 text-right font-semibold text-fg">{p.score}/100</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </details>
+            </>
           ) : (
             <p className="mt-6 text-sm text-muted">
               {primaryHost

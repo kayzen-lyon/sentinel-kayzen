@@ -43,8 +43,10 @@ function Icon({ d }: { d: string }) {
 
 export default function AccessibilityToggle() {
   const [open, setOpen] = useState(false);
-  const [settings, setSettings] = useState<A11ySettings>(DEFAULTS);
-  const [loaded, setLoaded] = useState(false);
+  // null tant que les préférences n'ont pas été lues : rien n'est écrit (ni appliqué) avant cette lecture,
+  // sinon les valeurs par défaut écraseraient un réglage OLED enregistré.
+  const [stored, setStored] = useState<A11ySettings | null>(null);
+  const settings = stored ?? DEFAULTS;
   const rootRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
   // Le noir pur ne s'applique que sous le thème sombre.
@@ -56,26 +58,25 @@ export default function AccessibilityToggle() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- préférences lues une fois au montage
-    setSettings(readStored());
-    setLoaded(true);
+    setStored(readStored());
   }, []);
 
   useEffect(() => {
-    if (!loaded) return;
+    if (!stored) return;
     try {
       // Rien n'est écrit tant que le visiteur n'a rien réglé (minimisation).
-      const untouched = (Object.keys(DEFAULTS) as (keyof A11ySettings)[]).every((k) => settings[k] === DEFAULTS[k]);
+      const untouched = (Object.keys(DEFAULTS) as (keyof A11ySettings)[]).every((k) => stored[k] === DEFAULTS[k]);
       if (untouched) localStorage.removeItem(STORAGE_KEY);
-      else localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+      else localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
     } catch {
       /* stockage indisponible */
     }
     const root = document.documentElement;
-    root.style.fontSize = settings.fontSize ? SIZES[settings.fontSize] : "";
-    root.classList.toggle("high-contrast", settings.highContrast);
-    root.classList.toggle("dyslexic-font", settings.dyslexicFont);
-    root.classList.toggle("oled", settings.oled);
-  }, [settings, loaded]);
+    root.style.fontSize = stored.fontSize ? SIZES[stored.fontSize] : "";
+    root.classList.toggle("high-contrast", stored.highContrast);
+    root.classList.toggle("dyslexic-font", stored.dyslexicFont);
+    root.classList.toggle("oled", stored.oled);
+  }, [stored]);
 
   useEffect(() => {
     if (!open) return;
@@ -97,7 +98,7 @@ export default function AccessibilityToggle() {
   }, [open]);
 
   const update = <K extends keyof A11ySettings>(key: K, val: A11ySettings[K]) =>
-    setSettings((s) => ({ ...s, [key]: val }));
+    setStored((s) => ({ ...(s ?? readStored()), [key]: val }));
 
   const option = (on: boolean) =>
     `flex min-h-11 w-full items-center gap-3 rounded-xl border p-3 text-left text-sm font-semibold transition-colors ${
@@ -180,7 +181,7 @@ export default function AccessibilityToggle() {
 
           <button
             type="button"
-            onClick={() => setSettings(DEFAULTS)}
+            onClick={() => setStored(DEFAULTS)}
             className="min-h-11 w-full text-center text-xs text-muted underline underline-offset-2 transition-colors hover:text-fg"
           >
             Réinitialiser
