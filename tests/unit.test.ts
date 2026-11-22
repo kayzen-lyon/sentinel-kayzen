@@ -395,3 +395,12 @@ test("compliance : secrets JS rattachés", async () => {
   const { controlsFor } = await import("../lib/compliance");
   assert.deepEqual(controlsFor("js-secret-cle-d-acces-aws", "Divulgation").pci, ["8.6.2", "3.6.1"]);
 });
+
+test("CI/CD : le modèle proposé aux clients suit le workflow du dépôt", async () => {
+  const { readFileSync } = await import("node:fs");
+  const model = (txt: string) => txt.match(/gemini\/gemini-[0-9a-z.-]+/)?.[0];
+  const repo = model(readFileSync(".github/workflows/strix-security.yml", "utf8"));
+  const panel = model(readFileSync("components/dashboard/CicdPanel.tsx", "utf8"));
+  assert.ok(repo);
+  assert.equal(panel, repo);
+});
