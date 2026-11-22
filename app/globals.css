@@ -112,6 +112,10 @@
   --color-heading: rgb(var(--heading));
   --color-navy-deep: rgb(var(--navy-deep));
   --color-gold: rgb(var(--gold));
+  /* Palette de marque à teinte variable (carmin dans le tableau de bord, terracotta ailleurs). */
+  --color-brand-500: hsl(var(--brand-h, 16) var(--brand-s, 71%) 50%);
+  --color-brand-600: hsl(var(--brand-h, 16) var(--brand-s, 71%) 41%);
+  --color-brand-700: hsl(var(--brand-h, 16) var(--brand-s, 71%) 34%);
 
   --font-size-hero: var(--text-hero);
   --font-size-fluid-5xl: var(--text-5xl);
@@ -1208,4 +1212,139 @@ a:focus-visible .link-grow::after { transform: scaleX(1); }
 .blog-callout .blog-callout-body {
   margin: 0;
   color: rgb(var(--fg));
+}
+
+/* ============================================================
+   CHARTE « NOIR, GRIS ET ROUGE CARMIN » — TABLEAU DE BORD UNIQUEMENT
+   Activée par html[data-espace='dashboard'] (posé par app/dashboard/layout.tsx,
+   retiré en quittant l'espace) : le site public garde la charte Kayzen.
+   Trois thèmes : Daylight (clair), Studio (.dark), OLED (.dark.oled).
+   Jetons en triplets RGB, comme le reste du site (utilisés en rgb(var(--x) / alpha)).
+   Écarts à la charte, tous pour l'accessibilité (contraste mesuré, commenté ligne à ligne).
+   ============================================================ */
+html[data-espace='dashboard'] {
+  /* Teinte de marque variable (palette brand-500/600/700, voir @theme) : carmin. */
+  --brand-h: 347;
+  --brand-s: 77%;
+  /* Daylight */
+  --bg: 244 246 249;          /* #F4F6F9 */
+  --bg-card: 255 255 255;     /* #FFFFFF */
+  --bg-elev: 248 250 252;     /* #F8FAFC (surface 2) */
+  --bg-sunken: 248 250 252;
+  --bg-hover: 233 237 243;
+  --border: 226 232 240;      /* #E2E8F0 */
+  --border-strong: 100 116 139; /* #64748B : contour de champ 4,8:1 (≥ 3:1, WCAG 1.4.11) */
+  --fg: 15 23 42;             /* #0F172A */
+  --fg-muted: 71 85 105;      /* #475569 : 7,0:1 sur le fond */
+  --fg-subtle: 71 85 105;     /* gris désactivés (#94A3B8…) réservés aux éléments désactivés */
+  --heading: 15 23 42;
+  --brand: 225 29 72;         /* #E11D48 : fond des boutons, texte blanc 4,7:1 */
+  --brand-hover: 190 18 60;   /* #BE123C */
+  --brand-light: 190 18 60;   /* texte rouge : #BE123C 5,8:1 (#E11D48 : 4,3:1 sur #F4F6F9, insuffisant) */
+  --secondary: 15 23 42;
+  --secondary-hover: 30 41 59;
+  --safe: 22 101 52;          /* vert assombri #166534 : 6,3:1 sur sa teinte */
+  --safe-light: 22 101 52;
+  --warn: 146 64 14;          /* ambre assombri #92400E : 6,3:1 */
+  --violet: 30 64 175;        /* bleu assombri #1E40AF : 8,7:1 */
+  --risk: 185 28 28;          /* alerte #B91C1C en clair (#EF4444 : 3,8:1 sur blanc) */
+}
+/* Studio (sombre) — et la barre latérale, sombre dans les trois thèmes */
+html[data-espace='dashboard'].dark,
+html[data-espace='dashboard'] .charte-sombre {
+  color-scheme: dark;
+  --bg: 11 13 16;             /* #0B0D10 */
+  --bg-card: 20 23 29;        /* #14171D */
+  --bg-elev: 30 34 43;        /* #1E222B */
+  --bg-sunken: 20 23 29;      /* barre latérale = cartes */
+  --bg-hover: 39 44 55;
+  --border: 39 44 55;         /* #272C37 */
+  --border-strong: 113 120 134; /* contour de champ 4,1:1 (#272C37 de la charte : 1,3:1) */
+  --fg: 243 244 246;          /* #F3F4F6 */
+  --fg-muted: 156 163 175;    /* #9CA3AF */
+  --fg-subtle: 139 147 160;   /* 5,1:1 sur surface 2 */
+  --heading: 243 244 246;
+  --brand: 225 29 72;
+  --brand-hover: 190 18 60;
+  --brand-light: 251 113 133; /* petit texte rouge #FB7185 : 5,9 à 7,4:1 (#E11D48 : 3,2:1) */
+  --secondary: 243 244 246;
+  --secondary-hover: 255 255 255;
+  --navy-deep: 11 13 16;
+  --safe: 74 222 128;
+  --safe-light: 74 222 128;
+  --warn: 251 191 36;
+  --violet: 96 165 250;
+  --risk: 248 113 113;        /* texte d'alerte #F87171 : 5,8:1 (#EF4444 : 4,2:1 sur surface 2) */
+}
+/* OLED (noir absolu) */
+html[data-espace='dashboard'].dark.oled,
+html[data-espace='dashboard'].dark.oled .charte-sombre {
+  --bg: 0 0 0;                /* #000000 */
+  --bg-card: 8 9 11;          /* #08090B */
+  --bg-elev: 18 20 24;        /* #121418 */
+  --bg-sunken: 8 9 11;
+  --bg-hover: 31 35 43;
+  --border: 31 35 43;         /* #1F232B */
+  --border-strong: 113 120 134; /* 4,3:1 sur les cartes */
+  --fg: 255 255 255;
+  --fg-muted: 161 161 170;    /* #A1A1AA */
+  --fg-subtle: 150 150 160;
+  --heading: 255 255 255;
+}
+/* Barre latérale du thème clair : sombre (#0F1115) */
+html[data-espace='dashboard']:not(.dark) .charte-sombre {
+  --bg: 15 17 21;
+  --bg-card: 15 17 21;
+  --bg-sunken: 15 17 21;
+  --bg-elev: 30 34 43;
+  --bg-hover: 39 44 55;
+}
+.charte-sombre {
+  background-color: rgb(var(--bg-card));
+  color: rgb(var(--fg));
+}
+/* Contraste renforcé (réglage d'accessibilité) : reste prioritaire sur la charte. */
+html[data-espace='dashboard'].high-contrast {
+  --fg: 0 0 0;
+  --fg-muted: 38 38 38;
+  --fg-subtle: 38 38 38;
+  --heading: 0 0 0;
+  --border: 89 89 89;
+  --border-strong: 51 51 51;
+  --brand-light: 136 19 55;
+}
+html[data-espace='dashboard'].dark.high-contrast,
+html[data-espace='dashboard'].high-contrast .charte-sombre {
+  --fg: 255 255 255;
+  --fg-muted: 240 240 240;
+  --fg-subtle: 240 240 240;
+  --heading: 255 255 255;
+  --border: 179 179 179;
+  --border-strong: 217 217 217;
+  --brand-light: 253 164 175;
+}
+/* Rouge de marque = action : le TEXTE rouge prend la nuance lisible du thème, les fonds restent #E11D48. */
+html[data-espace='dashboard'] .text-brand,
+html[data-espace='dashboard'] .hover\:text-brand:hover {
+  color: rgb(var(--brand-light));
+}
+html[data-espace='dashboard'] .btn-primary {
+  color: #fff;
+}
+/* Fond d'alerte sous texte blanc : #B91C1C (6,5:1) dans tous les thèmes. */
+html[data-espace='dashboard'] .bg-risk {
+  background-color: rgb(185 28 28);
+}
+/* Vulnérabilité critique : le rouge d'alerte est toujours doublé d'une icône (triangle).
+   Fichier statique et non data: — la CSP n'autorise que img-src 'self'. */
+[data-sev='critical']::before {
+  content: "";
+  display: inline-block;
+  width: 0.95em;
+  height: 0.95em;
+  margin-inline-end: 0.3em;
+  vertical-align: -0.12em;
+  background-color: currentColor;
+  -webkit-mask: url("/icons/alerte.svg") center / contain no-repeat;
+  mask: url("/icons/alerte.svg") center / contain no-repeat;
 }

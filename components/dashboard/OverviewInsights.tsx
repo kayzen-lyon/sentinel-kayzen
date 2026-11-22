@@ -185,7 +185,7 @@ export default function OverviewInsights({
             <ol className="space-y-2.5">
               {o.topProblems.map((p, n) => (
                 <li key={p.title + n} className="flex items-start gap-3 text-sm">
-                  <Badge tone={SEV_TONE[p.severity]} className="mt-0.5">{SEV_LABEL[p.severity]}</Badge>
+                  <Badge tone={SEV_TONE[p.severity]} data-sev={p.severity} className="mt-0.5">{SEV_LABEL[p.severity]}</Badge>
                   <span className="min-w-0">
                     <span className="font-medium text-fg">{p.title}</span>
                     <span className="block truncate text-xs text-subtle">

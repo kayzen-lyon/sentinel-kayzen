@@ -3,7 +3,7 @@
  * un pentest et une surveillance, sur le domaine réservé « demo.sentinel.test »
  * (le TLD .test n'existe pas sur Internet : aucune cible réelle).
  *
- *   DATABASE_URL=postgres://postgres@localhost:54339/postgres PG_POOL_MAX=1 npx tsx scripts/seed-demo.ts
+ *   DATABASE_URL=postgres://postgres@localhost:54339/postgres npx tsx scripts/seed-demo.ts
  *
  * Identifiants de démo (base locale uniquement, jamais en production) :
  *   demo@sentinel.test / Demo-Sentinel-2026
