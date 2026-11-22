@@ -14,3 +14,6 @@ next-env.d.ts
 # Python
 __pycache__/
 *.pyc
+
+# Rapports d'analyse de conformité générés localement (internes, ne pas publier)
+/compliance/reports/
