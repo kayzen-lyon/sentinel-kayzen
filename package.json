@@ -10,7 +10,10 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "node --import tsx --test tests/unit.test.ts tests/insights.test.ts tests/blog.test.ts",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "db:local": "node scripts/dev-db.mjs",
+    "seed:demo": "tsx scripts/seed-demo.ts",
+    "a11y:sweep": "node scripts/axe-sweep.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.2.1",
@@ -29,6 +32,8 @@
     "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.17",
+    "@electric-sql/pglite-socket": "^0.2.20",
     "@eslint/js": "^9.39.5",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/bcryptjs": "^2.4.6",
@@ -36,6 +41,7 @@
     "@types/pg": "^8.20.0",
     "@types/react": "19.0.7",
     "@types/react-dom": "19.0.3",
+    "axe-core": "^4.14.1",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.3.5",
     "eslint-plugin-jsx-a11y": "^6.10.2",
@@ -43,6 +49,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-security": "^4.0.1",
     "globals": "^17.12.0",
+    "playwright": "^1.59.1",
     "qrcode": "^1.5.4",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.1",
