@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HOME_SECTIONS } from "@/lib/homeSections";
 
 const MANAGED = [
   "Audit mené et interprété par les experts Kayzen",
@@ -18,7 +19,7 @@ const PLATFORM = [
 
 export default function Offers() {
   return (
-    <section id="plateforme" className="border-t border-border py-24">
+    <section id={HOME_SECTIONS.plateforme.id} className="border-t border-border py-24">
       <div className="container-x">
         <div className="mx-auto max-w-2xl text-center">
           <span className="eyebrow">Deux façons de travailler avec nous</span>
@@ -26,11 +27,10 @@ export default function Offers() {
             className="mt-4 font-heading font-bold text-fg"
             data-size="4xl"
           >
-            L'expertise d'une agence, la puissance d'une plateforme
+            {HOME_SECTIONS.plateforme.title}
           </h2>
           <p className="mt-4 text-lg text-muted">
             Faites piloter votre sécurité par Kayzen, ou prenez la main vous-même.
-            La plupart de nos clients combinent les deux.
           </p>
         </div>
 

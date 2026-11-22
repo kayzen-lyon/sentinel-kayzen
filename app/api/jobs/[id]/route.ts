@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
 import { getJob, listFindings } from "@/lib/jobs";
 import { latestSurface } from "@/lib/scans";
+import { presentFinding, presentJob } from "@/lib/proofs";
 
 export const runtime = "nodejs";
 
@@ -25,5 +26,9 @@ export async function GET(
   } catch {
     surface = null;
   }
-  return NextResponse.json({ job, findings, surface });
+  // Membre authentifié de l'organisation (getJob) : preuves et rapport déchiffrés, secrets masqués.
+  return NextResponse.json(
+    { job: presentJob(job), findings: findings.map(presentFinding), surface },
+    { headers: { "cache-control": "private, no-store", "x-robots-tag": "noindex, nofollow" } }
+  );
 }

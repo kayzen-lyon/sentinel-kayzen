@@ -1,6 +1,7 @@
 import { ensureSchema, query } from "./db";
 import { safeFetch, validateTargetUrl } from "./ssrf";
 import { open, seal } from "./secretbox";
+import { redactDeep, redactSecrets } from "./redact";
 
 /** Intégrations de notification sortantes par organisation (Slack + webhook générique). */
 
@@ -79,13 +80,15 @@ export async function notifyOrg(orgId: string | null, payload: NotifyPayload): P
   try {
     const integ = await getIntegrations(orgId);
     const tasks: Promise<void>[] = [];
-    if (integ.slack_url) tasks.push(post(integ.slack_url, { text: payload.text }));
+    // Une notification quitte Sentinel : secrets masqués dans le texte et les données.
+    const text = redactSecrets(payload.text);
+    if (integ.slack_url) tasks.push(post(integ.slack_url, { text }));
     if (integ.webhook_url)
       tasks.push(
         post(integ.webhook_url, {
           event: payload.event,
-          text: payload.text,
-          ...payload.data,
+          text,
+          ...redactDeep(payload.data),
         })
       );
     await Promise.all(tasks);

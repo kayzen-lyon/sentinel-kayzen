@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { FAQ as QA } from "@/lib/faq";
+import { HOME_SECTIONS } from "@/lib/homeSections";
 
 export default function Faq() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="border-t border-border py-24">
+    <section id={HOME_SECTIONS.faq.id} className="border-t border-border py-24">
       <div className="container-x">
         <div className="mx-auto max-w-2xl text-center">
           <span className="eyebrow">Questions fréquentes</span>
@@ -15,7 +16,7 @@ export default function Faq() {
             className="mt-4 font-heading font-bold text-fg"
             data-size="4xl"
           >
-            Tout ce que vous devez savoir
+            {HOME_SECTIONS.faq.title}
           </h2>
         </div>
 
@@ -47,7 +48,7 @@ export default function Faq() {
                 >
                   <div className="overflow-hidden">
                     <p className="px-6 pb-5 text-[0.95rem] leading-relaxed text-muted">
-                      {item.a}
+                      <Answer text={item.a} />
                     </p>
                   </div>
                 </div>
@@ -57,5 +58,18 @@ export default function Faq() {
         </div>
       </div>
     </section>
+  );
+}
+
+/** Rend les marqueurs `**terme**` de lib/faq.ts en <strong>. */
+function Answer({ text }: { text: string }) {
+  return text.split(/\*\*(.+?)\*\*/).map((part, i) =>
+    i % 2 ? (
+      <strong key={i} className="font-semibold text-fg">
+        {part}
+      </strong>
+    ) : (
+      part
+    )
   );
 }

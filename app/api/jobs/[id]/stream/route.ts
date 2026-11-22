@@ -1,6 +1,8 @@
 import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
 import { getJob, listFindings } from "@/lib/jobs";
+import { presentFinding } from "@/lib/proofs";
+import { redactDeep } from "@/lib/redact";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -60,7 +62,7 @@ export async function GET(
         const s = JSON.stringify(graph);
         if (s !== lastGraph) {
           lastGraph = s;
-          send("graph", graph);
+          send("graph", redactDeep(graph));
         }
       };
 
@@ -72,7 +74,7 @@ export async function GET(
       if (findings.length) lastIso = findings[findings.length - 1].created_at;
       send("status", { status: initial?.status, costUsd: initial?.cost_usd });
       maybeSendGraph(initial?.agents_graph);
-      for (const f of findings) send("finding", f, new Date(f.created_at).toISOString());
+      for (const f of findings) send("finding", presentFinding(f), new Date(f.created_at).toISOString());
       if (initial && TERMINAL.has(initial.status)) {
         send("done", { status: initial.status });
         close();
@@ -87,7 +89,7 @@ export async function GET(
             getJob(id, session.id),
           ]);
           for (const f of fresh) {
-            send("finding", f, new Date(f.created_at).toISOString());
+            send("finding", presentFinding(f), new Date(f.created_at).toISOString());
             lastIso = f.created_at;
           }
           send("status", { status: j?.status, costUsd: j?.cost_usd });

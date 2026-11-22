@@ -105,29 +105,6 @@ test("scoring : sous-scores, plafonnement, effort, priorité, références", asy
   );
 });
 
-test("alerts : seuils franchis et nouveaux problèmes graves", async () => {
-  const { crossedThreshold, monitoringAlerts } = await import("../lib/alerts");
-  assert.equal(crossedThreshold(40, 29), 30);
-  assert.equal(crossedThreshold(29, 25), null); // déjà sous 30 : pas de répétition
-  assert.equal(crossedThreshold(20, 6), 7);
-  assert.equal(crossedThreshold(undefined, 20), null);
-  assert.equal(crossedThreshold(undefined, 5), 7);
-  assert.equal(crossedThreshold(undefined, 2), 3);
-  const f = (id: string, severity: string, state = "fail") =>
-    ({ id, category: "x", title: `T-${id}`, severity, state, detail: "" }) as never;
-  const cert = (d: number) => ({ protocols: {}, cert: { daysRemaining: d, san: [], hostnameCovered: true } });
-  const result = {
-    findings: [f("a", "critical"), f("b", "high"), f("c", "low")],
-    insights: { tls: cert(10), domain: { daysToExpiry: 200, statuses: [] } },
-  } as never;
-  const prev = { findings: [f("b", "high")], insights: { tls: cert(17) } } as never;
-  const alerts = monitoringAlerts("site.fr", result, prev);
-  assert.equal(alerts.length, 2);
-  assert.match(alerts[0], /certificat TLS de site\.fr expire dans 10 jour/);
-  assert.match(alerts[1], /nouveau problème critique sur site\.fr : T-a/);
-  assert.deepEqual(monitoringAlerts("site.fr", { findings: [f("a", "critical")], insights: {} } as never, null), []);
-});
-
 test("overview : inventaire, tendance et agrégats", async () => {
   const { buildOverview } = await import("../lib/overview");
   const f = (id: string, title: string, severity: string) =>

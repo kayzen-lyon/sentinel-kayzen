@@ -217,12 +217,13 @@ export default function DashboardShell({
             <DropdownMenu>
               <DropdownMenuTrigger
                 className="flex h-9 items-center gap-2 rounded-md pl-1 pr-2 outline-none hover:bg-hover focus-visible:ring-2 focus-visible:ring-brand/40"
-                aria-label="Menu utilisateur"
               >
+                {/* Nom accessible = texte visible + précision (WCAG 2.5.3 : l'étiquette contient le nom visible). */}
                 <span className="flex size-7 items-center justify-center rounded-md bg-brand text-xs font-semibold text-white">
                   {initials || "?"}
                 </span>
                 <span className="hidden max-w-[10rem] truncate text-sm font-medium text-fg md:block">{display}</span>
+                <span className="sr-only">, menu utilisateur</span>
                 <ChevronsUpDown className="hidden size-4 text-muted sm:block" aria-hidden="true" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-60">

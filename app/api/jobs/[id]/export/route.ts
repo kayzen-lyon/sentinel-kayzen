@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
 import { getJob, listFindings, type JobFindingRow } from "@/lib/jobs";
+import { exportFinding, exportJob } from "@/lib/proofs";
 import { dedupeFindings, findingsToCsv, findingsToJUnit, type NormFinding } from "@/lib/findingsFormat";
 
 export const runtime = "nodejs";
@@ -68,7 +69,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   const job = await getJob(id, session.id);
   if (!job) return NextResponse.json({ error: "Job introuvable." }, { status: 404 });
 
-  const findings = await listFindings(id);
+  // Exports (outillage, IA) : jamais de preuve d'exploitation ni de rapport, secrets masqués.
+  const findings = (await listFindings(id)).map(exportFinding);
   const format = new URL(req.url).searchParams.get("format") || "json";
   const base = `sentinel-pentest-${id.slice(0, 8)}`;
 
@@ -93,7 +95,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         "content-disposition": `attachment; filename="${base}.junit.xml"`,
       },
     });
-  return new Response(JSON.stringify({ job, findings }, null, 2), {
+  return new Response(JSON.stringify({ job: exportJob(job), findings }, null, 2), {
     headers: {
       "content-type": "application/json; charset=utf-8",
       "content-disposition": `attachment; filename="${base}.json"`,

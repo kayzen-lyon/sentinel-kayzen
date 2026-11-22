@@ -1,4 +1,5 @@
 import { ensureSchema, query } from "./db";
+import { redactDeep, redactSecrets } from "./redact";
 
 /** Journal d'audit : trace horodatée des actions sensibles (conformité / gouvernance). */
 
@@ -34,8 +35,9 @@ export async function logAudit(e: AuditEvent): Promise<void> {
         e.actorId ?? null,
         e.actorEmail ?? null,
         e.action,
-        e.target ?? null,
-        e.meta ? JSON.stringify(e.meta) : null,
+        // Le journal ne doit jamais conserver un secret en clair.
+        redactSecrets(e.target ?? null),
+        e.meta ? JSON.stringify(redactDeep(e.meta)) : null,
       ]
     );
   } catch {

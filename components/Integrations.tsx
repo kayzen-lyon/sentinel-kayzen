@@ -1,3 +1,4 @@
+import { HOME_SECTIONS } from "@/lib/homeSections";
 const ITEMS = [
   {
     title: "GitHub App",
@@ -33,7 +34,7 @@ const ITEMS = [
 
 export default function Integrations() {
   return (
-    <section id="integrations" className="border-t border-border py-24">
+    <section id={HOME_SECTIONS.integrations.id} className="border-t border-border py-24">
       <div className="container-x">
         <div className="mx-auto max-w-2xl text-center">
           <span className="eyebrow">L'écosystème</span>
@@ -41,7 +42,7 @@ export default function Integrations() {
             className="mt-4 font-heading font-bold text-fg"
             data-size="4xl"
           >
-            Sentinel s'intègre dans votre chaîne, pas l'inverse
+            {HOME_SECTIONS.integrations.title}
           </h2>
           <p className="mt-4 text-lg text-muted">
             De la pull request au ticket, du canal Slack à votre IDE : la sécurité

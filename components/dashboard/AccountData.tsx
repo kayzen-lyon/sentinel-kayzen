@@ -42,7 +42,7 @@ export default function AccountData() {
       <p className="mt-1.5 max-w-2xl text-sm text-muted">
         Vous pouvez à tout moment récupérer une copie de vos données ou supprimer votre
         compte. Ces droits sont décrits dans la{" "}
-        <Link href="/confidentialite" className="text-brand underline underline-offset-2">
+        <Link href="/confidentialite" className="text-brand-light underline underline-offset-2">
           politique de confidentialité
         </Link>
         .

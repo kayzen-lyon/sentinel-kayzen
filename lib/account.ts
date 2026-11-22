@@ -1,4 +1,6 @@
 import { ensureSchema, query } from "./db";
+import { stripProofs } from "./proofs";
+import { redactDeep } from "./redact";
 
 /**
  * Droits des personnes en libre-service (RGPD art. 15, 17 et 20) :
@@ -50,8 +52,10 @@ export async function exportUserData(userId: string): Promise<Record<string, unk
     organizations: memberships,
     verified_domains: domains,
     scans,
-    pentests: jobs,
-    pentest_findings: findings,
+    // Ni preuve d'exploitation ni rapport (qui les cite) dans un fichier exporté : ils restent
+    // consultables dans le tableau de bord, après authentification.
+    pentests: jobs.map((j) => ({ ...j, report_md: null })),
+    pentest_findings: findings.map((f) => ({ ...f, payload: redactDeep(stripProofs(f.payload)) })),
     scheduled_scans: schedules,
     api_keys: apiKeys,
   };

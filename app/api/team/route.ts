@@ -61,6 +61,7 @@ export async function GET() {
     invitations,
     audit,
     requireApproval: Boolean(org?.require_approval),
+    evidenceRetentionDays: org?.evidence_retention_days ?? null,
     // Jamais l'URL complète (elle vaut un secret) : seulement un aperçu.
     slackHint: hint(integ.slack_url),
     webhookHint: hint(integ.webhook_url),

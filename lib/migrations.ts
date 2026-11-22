@@ -311,4 +311,47 @@ export const MIGRATIONS: Migration[] = [
     ALTER TABLE scans ADD COLUMN IF NOT EXISTS insights jsonb;
   `,
   },
+  {
+    id: "008_pentest_authorizations_retention",
+    sql: `
+    -- Autorisation écrite du client, exigée avant tout pentest actif (lib/authorizations.ts).
+    -- Une autorisation n'est jamais supprimée : la révocation est datée (trace légale).
+    CREATE TABLE IF NOT EXISTS pentest_authorizations (
+      id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      org_id             uuid NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+      host               text NOT NULL,
+      include_subdomains boolean NOT NULL DEFAULT false,
+      starts_at          timestamptz NOT NULL,
+      ends_at            timestamptz NOT NULL,
+      signer_name        text NOT NULL,
+      signer_title       text NOT NULL,
+      accepted_at        timestamptz NOT NULL,
+      recorded_by        uuid REFERENCES users(id) ON DELETE SET NULL,
+      recorded_by_email  text,
+      created_at         timestamptz NOT NULL DEFAULT now(),
+      revoked_at         timestamptz,
+      revoked_by         uuid REFERENCES users(id) ON DELETE SET NULL,
+      CHECK (ends_at > starts_at)
+    );
+    CREATE INDEX IF NOT EXISTS pentest_authorizations_org_idx
+      ON pentest_authorizations (org_id, ends_at DESC);
+
+    -- Durée de conservation des preuves et rapports de pentest, en jours.
+    -- NULL (défaut) = aucune purge : la durée est à fixer avec un juriste.
+    ALTER TABLE organizations ADD COLUMN IF NOT EXISTS evidence_retention_days integer;
+    ALTER TABLE organizations DROP CONSTRAINT IF EXISTS organizations_evidence_retention_check;
+    ALTER TABLE organizations ADD CONSTRAINT organizations_evidence_retention_check
+      CHECK (evidence_retention_days IS NULL OR evidence_retention_days > 0);
+    ALTER TABLE jobs ADD COLUMN IF NOT EXISTS evidence_purged_at timestamptz;
+  `,
+  },
+  {
+    id: "009_surveillance_surface",
+    sql: `
+    -- Surveillance de surface d'attaque (lib/surveillance.ts) : dernier instantané mesuré
+    -- et journal des changements (plus récent d'abord, plafonné à 300 entrées par cible).
+    ALTER TABLE scheduled_scans ADD COLUMN IF NOT EXISTS last_snapshot jsonb;
+    ALTER TABLE scheduled_scans ADD COLUMN IF NOT EXISTS journal jsonb NOT NULL DEFAULT '[]'::jsonb;
+  `,
+  },
 ];

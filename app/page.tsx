@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
+import OnThisPage from "@/components/OnThisPage";
 import Problem from "@/components/Problem";
 import Features from "@/components/Features";
 import HowItWorks from "@/components/HowItWorks";
@@ -13,16 +14,23 @@ import GroupReel from "@/components/GroupReel";
 import Faq from "@/components/Faq";
 import CtaFinal from "@/components/CtaFinal";
 import Footer from "@/components/Footer";
-import { FAQ } from "@/lib/faq";
+import { FAQ, faqPlain } from "@/lib/faq";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+
+// Mot-clé cible dans le title (≤ 60 caractères) et la description (120 à 160).
+const HOME_TITLE = "Pentest IA et test d'intrusion | Sentinel by Kayzen";
+const HOME_DESCRIPTION =
+  "Pentest IA et test d'intrusion automatisé : des agents exploitent vos failles et les prouvent par un PoC. Scan passif gratuit, audit managé par Kayzen à Lyon.";
 
 export const metadata: Metadata = {
+  title: { absolute: HOME_TITLE },
+  description: HOME_DESCRIPTION,
   alternates: { canonical: "/" },
   openGraph: {
     url: "/",
-    title: "Sentinel by Kayzen — Pentest IA autonome",
-    description:
-      "Des agents IA qui trouvent, exploitent et prouvent vos vulnérabilités par des PoC réels. Audit managé + plateforme self-service.",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
   },
 };
 
@@ -68,7 +76,7 @@ const jsonLd = {
       mainEntity: FAQ.map((item) => ({
         "@type": "Question",
         name: item.q,
-        acceptedAnswer: { "@type": "Answer", text: item.a },
+        acceptedAnswer: { "@type": "Answer", text: faqPlain(item.a) },
       })),
     },
   ],
@@ -81,16 +89,20 @@ const jsonLdHtml = JSON.stringify(jsonLd)
   .replace(/>/g, "\\u003e")
   .replace(/&/g, "\\u0026");
 
-export default function Page() {
+export default async function Page() {
+  // Nonce CSP de la requête (posé par proxy.ts), comme pour le script d'initialisation du layout.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <>
       <script
         type="application/ld+json"
+        nonce={nonce}
         dangerouslySetInnerHTML={{ __html: jsonLdHtml }}
       />
       <Header />
       <main>
         <Hero />
+        <OnThisPage />
         <Problem />
         <Engines />
         <Features />

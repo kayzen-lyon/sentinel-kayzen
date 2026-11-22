@@ -5,6 +5,7 @@ import { canManage, getRole, setRequireApproval } from "@/lib/orgs";
 import { setIntegrations } from "@/lib/notify";
 import { logAudit } from "@/lib/audit";
 import { getActiveOrg } from "@/lib/activeorg";
+import { parseRetentionDays, setEvidenceRetention } from "@/lib/retention";
 
 export const runtime = "nodejs";
 
@@ -21,7 +22,22 @@ export async function POST(req: Request) {
     requireApproval?: boolean;
     slackUrl?: string;
     webhookUrl?: string;
+    evidenceRetentionDays?: number | string | null;
   };
+
+  // Durée de conservation des preuves/rapports : null = pas de purge (aucune valeur par défaut).
+  if (body.evidenceRetentionDays !== undefined) {
+    const parsed = parseRetentionDays(body.evidenceRetentionDays);
+    if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: 400 });
+    await setEvidenceRetention(orgId, parsed.value);
+    await logAudit({
+      orgId,
+      actorId: session.id,
+      actorEmail: session.email,
+      action: "team.evidence_retention",
+      meta: { days: parsed.value },
+    });
+  }
 
   // Réglage des intégrations sortantes (si fourni)
   if (body.slackUrl !== undefined || body.webhookUrl !== undefined) {

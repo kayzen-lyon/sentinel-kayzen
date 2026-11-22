@@ -4,6 +4,7 @@
    la liste défile à côté ; en dessous de 1024 px, les étapes restent des cartes empilées.
    Défilement natif : on ne fait que lire la position, jamais intercepter la molette. */
 import { useEffect, useRef, useState } from "react";
+import { HOME_SECTIONS } from "@/lib/homeSections";
 
 const STEPS = [
   {
@@ -71,12 +72,12 @@ export default function HowItWorks() {
   const step = STEPS[active];
 
   return (
-    <section className="apv-scene">
+    <section id={HOME_SECTIONS.deroule.id} className="apv-scene">
       <div className="container-x">
         <div className="apv-scene-head">
           <span className="eyebrow">Le déroulé</span>
           <h2 className="mt-4 font-heading font-bold text-fg" data-size="4xl">
-            Opérationnel en moins de 10 minutes
+            {HOME_SECTIONS.deroule.title}
           </h2>
         </div>
 

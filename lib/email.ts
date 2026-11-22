@@ -5,6 +5,8 @@
  * Variables : RESEND_API_KEY, RESEND_FROM (ex. "Sentinel <notifications@votre-domaine.fr>").
  */
 
+import { redactSecrets } from "./redact";
+
 export const emailConfigured = Boolean(process.env.RESEND_API_KEY);
 
 export async function sendEmail(
@@ -49,11 +51,13 @@ export function pentestReportEmail(opts: {
   findings: { title: string | null; severity: string | null; cvss: number | null }[];
   reportMd?: string | null;
 }): string {
+  // Un e-mail quitte Sentinel : secrets masqués dans les titres et le rapport.
+  const reportMd = redactSecrets(opts.reportMd);
   const rows = opts.findings
     .map(
       (f) =>
         `<tr>
-           <td style="padding:6px 10px;border-bottom:1px solid #eee">${esc(f.title || "")}</td>
+           <td style="padding:6px 10px;border-bottom:1px solid #eee">${esc(redactSecrets(f.title || ""))}</td>
            <td style="padding:6px 10px;border-bottom:1px solid #eee;text-transform:uppercase">${esc(f.severity || "")}</td>
            <td style="padding:6px 10px;border-bottom:1px solid #eee">${f.cvss ?? ""}</td>
          </tr>`
@@ -72,10 +76,10 @@ export function pentestReportEmail(opts: {
       <tbody>${rows || '<tr><td colspan="3" style="padding:10px">Aucune vulnérabilité.</td></tr>'}</tbody>
     </table>
     ${
-      opts.reportMd
+      reportMd
         ? `<h3 style="margin-top:24px">Rapport exécutif</h3>
            <pre style="white-space:pre-wrap;font-family:inherit;font-size:13px;background:#f6f7f9;padding:12px;border-radius:8px">${esc(
-             opts.reportMd.slice(0, 8000)
+             reportMd.slice(0, 8000)
            )}</pre>`
         : ""
     }
@@ -100,6 +104,23 @@ export function invitationEmail(opts: {
     </p>
     <p style="color:#666;font-size:13px">Ce lien est valable ${opts.days} jours et ne fonctionne qu'avec cette adresse e-mail.
        Si vous n'attendiez pas cette invitation, ignorez ce message.</p>
+    <p style="margin-top:24px;color:#666;font-size:12px">Envoyé par Sentinel by Kayzen.</p>
+  </div>`;
+}
+
+/** Gabarit HTML d'une alerte de surveillance (changements importants ou critiques). */
+export function surveillanceEmail(opts: {
+  host: string;
+  changes: { gravite: string; message: string }[];
+}): string {
+  const items = opts.changes
+    .map((c) => `<li style="margin:6px 0"><strong>${c.gravite === "critique" ? "Critique" : "Important"}</strong> — ${esc(c.message)}</li>`)
+    .join("");
+  return `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:auto;color:#111">
+    <h2 style="color:#b7481f">Surveillance de ${esc(opts.host)} : changement détecté</h2>
+    <p>Le dernier contrôle de surface d'attaque a relevé :</p>
+    <ul style="padding-left:18px">${items}</ul>
+    <p style="color:#666;font-size:13px">Le journal complet est disponible dans Sentinel, rubrique Surveillance.</p>
     <p style="margin-top:24px;color:#666;font-size:12px">Envoyé par Sentinel by Kayzen.</p>
   </div>`;
 }

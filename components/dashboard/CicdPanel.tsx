@@ -102,7 +102,7 @@ export default function CicdPanel() {
 
         <p className="mt-6 rounded-lg border border-border bg-bg-elev/40 px-4 py-3 text-sm text-muted">
           Pour un pentest complet déclenché depuis Sentinel (et non dans votre CI), utilisez
-          l'onglet <Link href="/dashboard/pentest" className="text-brand-light">Pentest autonome</Link>.
+          l'onglet <Link href="/dashboard/pentest" className="text-brand-light underline underline-offset-2">Pentest autonome</Link>.
         </p>
       </main>
     </div>

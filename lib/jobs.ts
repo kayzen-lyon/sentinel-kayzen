@@ -1,4 +1,6 @@
 import { ensureSchema, query } from "./db";
+import { PROOF_FIELDS, sealProofs, sealReport } from "./proofs";
+import { redactDeep, redactSecrets } from "./redact";
 
 export type JobStatus =
   | "pending_approval"
@@ -101,6 +103,13 @@ export async function createGithubJob(
  */
 export async function listJobs(userId: string, orgId?: string): Promise<JobRow[]> {
   await ensureSchema();
+  // Une liste n'a pas besoin du rapport (chiffré, potentiellement porteur de preuves) :
+  // il n'est servi que par le détail d'un job.
+  const rows = await listJobRows(userId, orgId);
+  return rows.map((j) => ({ ...j, report_md: null }));
+}
+
+async function listJobRows(userId: string, orgId?: string): Promise<JobRow[]> {
   if (orgId)
     return query<JobRow>(
       `SELECT * FROM jobs
@@ -117,13 +126,17 @@ export async function listJobs(userId: string, orgId?: string): Promise<JobRow[]
   );
 }
 
-/** Accès à un job si l'utilisateur en est propriétaire ou membre de son organisation. */
+/**
+ * Accès à un job (et donc à son rapport et à ses preuves) : membre ACTUEL de son organisation ;
+ * pour un ancien job sans organisation, son seul auteur. Un auteur retiré de l'organisation
+ * n'y a plus accès.
+ */
 export async function getJob(id: string, userId: string): Promise<JobRow | null> {
   await ensureSchema();
   const rows = await query<JobRow>(
     `SELECT * FROM jobs
      WHERE id = $1
-       AND (user_id = $2
+       AND ((org_id IS NULL AND user_id = $2)
             OR org_id IN (SELECT org_id FROM org_members WHERE user_id = $2))`,
     [id, userId]
   );
@@ -209,8 +222,9 @@ export async function updateJobSystem(
   }
   if (patch.runName !== undefined) push("run_name", patch.runName);
   if (patch.costUsd !== undefined) push("cost_usd", patch.costUsd);
-  if (patch.reportMd !== undefined) push("report_md", patch.reportMd);
-  if (patch.error !== undefined) push("error", patch.error);
+  // Rapport chiffré au repos (il cite les preuves d'exploitation) ; erreur secrets masqués.
+  if (patch.reportMd !== undefined) push("report_md", sealReport(patch.reportMd));
+  if (patch.error !== undefined) push("error", redactSecrets(patch.error));
   if (patch.agentsGraph !== undefined)
     push("agents_graph", JSON.stringify(patch.agentsGraph));
   if (!sets.length) return;
@@ -245,15 +259,26 @@ export async function upsertFindingsSystem(
       [
         jobId,
         f.nativeId,
-        f.title ?? null,
+        redactSecrets(f.title ?? null),
         f.severity ?? null,
         typeof f.cvss === "number" ? f.cvss : null,
-        f.payload ? JSON.stringify(f.payload) : null,
+        // Preuves chiffrées au repos (déchiffrées seulement après getJob, membre de l'organisation) ;
+        // les autres champs du payload sont stockés secrets masqués.
+        f.payload ? JSON.stringify(sealProofs(redactNonProof(f.payload))) : null,
       ]
     );
     if (rows[0]?.id) inserted++;
   }
   return inserted;
+}
+
+/** Masque les secrets des champs hors preuve (les preuves brutes sont chiffrées, non altérées). */
+function redactNonProof(payload: unknown): unknown {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) return redactDeep(payload);
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(payload as Record<string, unknown>))
+    out[k] = (PROOF_FIELDS as readonly string[]).includes(k) ? v : redactDeep(v);
+  return out;
 }
 
 export type SeverityCounts = { critical: number; high: number; medium: number; low: number; info: number };
