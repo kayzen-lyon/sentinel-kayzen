@@ -9,6 +9,18 @@ import { listDomains } from "@/lib/domains";
 import { getActiveOrg } from "@/lib/activeorg";
 import { getOrgPlan, getUsage, PLANS } from "@/lib/plans";
 import { formatDateTime } from "@/lib/format";
+import { AlertTriangle, ArrowRight, Crosshair, Globe, ShieldCheck, type LucideIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Vue d'ensemble",
@@ -44,18 +56,19 @@ const SEVERITIES: { key: keyof SeverityCounts; label: string; tone: string }[] =
   { key: "info", label: "Informations", tone: "border-strong" },
 ];
 
-// Petites icônes (tracé unique) pour les pastilles des indicateurs clés.
-const KPI_ICON = {
-  shield: "M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6l7-3zM9.3 11.8l1.9 1.9 3.6-3.9",
-  alert: "M10.3 4.2 2.6 17.9A1.9 1.9 0 0 0 4.3 20.8h15.4a1.9 1.9 0 0 0 1.7-2.9L13.7 4.2a1.9 1.9 0 0 0-3.4 0zM12 9.5v4M12 17h.01",
-  target: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 12h.01",
-  globe: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z",
-} as const;
+// Icônes des indicateurs clés (lucide, comme shadcn/ui).
+const KPI_ICON: Record<"shield" | "alert" | "target" | "globe", LucideIcon> = {
+  shield: ShieldCheck,
+  alert: AlertTriangle,
+  target: Crosshair,
+  globe: Globe,
+};
 
 function dateShort(iso: string): string {
   return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
 }
 
+/** Carte d'indicateur (bloc « section cards » de shadcn/ui). */
 function Kpi({
   label,
   value,
@@ -73,39 +86,33 @@ function Kpi({
   icon: keyof typeof KPI_ICON;
   href: string;
 }) {
+  const Icon = KPI_ICON[icon];
   return (
-    <Link href={href} className="card block p-5 transition-shadow hover:shadow-[var(--shadow-e3)]">
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-subtle">{label}</p>
-        <span
-          className="flex h-10 w-10 flex-none items-center justify-center rounded-xl"
-          data-tint="soft"
-          data-tone={chipTone}
-          aria-hidden="true"
-        >
-          <svg viewBox="0 0 24 24" className="h-[19px] w-[19px]" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-            <path d={KPI_ICON[icon]} />
-          </svg>
-        </span>
-      </div>
-      <p
-        className="mt-3 font-heading text-3xl font-bold tabular-nums text-fg"
-        data-tint={valueTone ? "fg" : undefined}
-        data-tone={valueTone}
-      >
-        {value}
-      </p>
-      <p className="mt-1 text-sm text-muted">{sub}</p>
+    <Link href={href} className="group/kpi rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-brand/40">
+      <Card className="@container/card h-full gap-4 bg-linear-to-t from-brand/5 to-card transition-colors group-hover/kpi:border-border-strong">
+        <CardHeader>
+          <CardDescription>{label}</CardDescription>
+          <CardTitle
+            className="font-heading text-2xl font-semibold tabular-nums @[250px]/card:text-3xl"
+            data-tint={valueTone ? "fg" : undefined}
+            data-tone={valueTone}
+          >
+            {value}
+          </CardTitle>
+          <CardAction>
+            <Badge tone={chipTone} className="rounded-md p-1.5" aria-hidden="true">
+              <Icon className="!size-4" />
+            </Badge>
+          </CardAction>
+        </CardHeader>
+        <CardFooter className="text-sm text-muted">{sub}</CardFooter>
+      </Card>
     </Link>
   );
 }
 
 function Pill({ tone, children }: { tone: string; children: React.ReactNode }) {
-  return (
-    <span className="inline-flex flex-none items-center rounded-full px-2.5 py-1 text-xs font-semibold" data-tint="soft" data-tone={tone}>
-      {children}
-    </span>
-  );
+  return <Badge tone={tone}>{children}</Badge>;
 }
 
 export default async function OverviewPage() {
@@ -115,11 +122,13 @@ export default async function OverviewPage() {
   if (!dbConfigured)
     return (
       <main className="container-x py-8 lg:py-10">
-        <h1 className="font-heading text-3xl font-bold text-fg">Vue d&apos;ensemble</h1>
+        <h1 className="font-heading text-2xl font-semibold tracking-tight text-fg">Vue d&apos;ensemble</h1>
         <p className="mt-4 rounded-lg border border-warn/30 bg-warn/10 px-4 py-2.5 text-sm text-warn">
           Mode démo : la base n&apos;est pas connectée, aucun historique n&apos;est conservé.
         </p>
-        <Link href="/dashboard/scan" className="btn btn-primary mt-6">Lancer un scan</Link>
+        <Button asChild className="mt-6">
+          <Link href="/dashboard/scan">Lancer un scan</Link>
+        </Button>
       </main>
     );
 
@@ -199,20 +208,24 @@ export default async function OverviewPage() {
     <main className="container-x py-8 lg:py-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-heading text-3xl font-bold text-fg">Vue d&apos;ensemble</h1>
-          <p className="mt-1.5 text-muted">
+          <h1 className="font-heading text-2xl font-semibold tracking-tight text-fg">Vue d&apos;ensemble</h1>
+          <p className="mt-1 text-sm text-muted">
             Bonjour {session.name || session.email} — voici l&apos;état de sécurité de vos cibles.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href="/dashboard/pentest" className="btn btn-ghost">Pentest autonome</Link>
-          <Link href="/dashboard/scan" className="btn btn-primary">Nouveau scan</Link>
+          <Button asChild variant="outline">
+            <Link href="/dashboard/pentest">Pentest autonome</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/dashboard/scan">Nouveau scan</Link>
+          </Button>
         </div>
       </div>
 
       {onboarding && (
-        <section aria-labelledby="demarrage" className="card mt-6 p-5">
-          <h2 id="demarrage" className="font-heading text-lg font-semibold text-fg">
+        <section aria-labelledby="demarrage" className="card mt-6 p-6">
+          <h2 id="demarrage" className="font-semibold leading-none text-fg">
             Bien démarrer
           </h2>
           <ol className="mt-3 grid gap-3 md:grid-cols-3">
@@ -298,9 +311,9 @@ export default async function OverviewPage() {
       </section>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-        <section aria-labelledby="evolution" className="card p-5">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 id="evolution" className="font-heading text-lg font-semibold text-fg">
+        <section aria-labelledby="evolution" className="card p-6">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 id="evolution" className="font-semibold leading-none text-fg">
               Évolution du score
             </h2>
             {primaryHost && <span className="truncate text-sm text-subtle">{primaryHost}</span>}
@@ -333,14 +346,16 @@ export default async function OverviewPage() {
           )}
         </section>
 
-        <section aria-labelledby="gravite" className="card p-5">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 id="gravite" className="font-heading text-lg font-semibold text-fg">
+        <section aria-labelledby="gravite" className="card p-6">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 id="gravite" className="font-semibold leading-none text-fg">
               Vulns par gravité
             </h2>
-            <Link href="/dashboard/pentest" className="text-sm font-medium text-brand-light hover:underline">
-              Pentests →
-            </Link>
+            <Button asChild variant="ghost" size="sm" className="-my-1.5">
+              <Link href="/dashboard/pentest">
+                Pentests <ArrowRight aria-hidden="true" />
+              </Link>
+            </Button>
           </div>
           {openTotal === 0 ? (
             <p className="mt-3 text-sm text-muted">
@@ -372,12 +387,14 @@ export default async function OverviewPage() {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <section aria-labelledby="scans" className="card p-5">
-          <div className="flex items-baseline justify-between gap-2">
-            <h2 id="scans" className="font-heading text-lg font-semibold text-fg">Derniers scans</h2>
-            <Link href="/dashboard/scan" className="text-sm font-medium text-brand-light hover:underline">
-              Tout voir →
-            </Link>
+        <section aria-labelledby="scans" className="card p-6">
+          <div className="flex items-center justify-between gap-2">
+            <h2 id="scans" className="font-semibold leading-none text-fg">Derniers scans</h2>
+            <Button asChild variant="ghost" size="sm" className="-my-1.5">
+              <Link href="/dashboard/scan">
+                Tout voir <ArrowRight aria-hidden="true" />
+              </Link>
+            </Button>
           </div>
           {scans.length === 0 ? (
             <p className="mt-3 text-sm text-muted">Aucun scan pour l&apos;instant.</p>
@@ -404,12 +421,14 @@ export default async function OverviewPage() {
           )}
         </section>
 
-        <section aria-labelledby="pentests" className="card p-5">
-          <div className="flex items-baseline justify-between gap-2">
-            <h2 id="pentests" className="font-heading text-lg font-semibold text-fg">Derniers pentests</h2>
-            <Link href="/dashboard/pentest" className="text-sm font-medium text-brand-light hover:underline">
-              Tout voir →
-            </Link>
+        <section aria-labelledby="pentests" className="card p-6">
+          <div className="flex items-center justify-between gap-2">
+            <h2 id="pentests" className="font-semibold leading-none text-fg">Derniers pentests</h2>
+            <Button asChild variant="ghost" size="sm" className="-my-1.5">
+              <Link href="/dashboard/pentest">
+                Tout voir <ArrowRight aria-hidden="true" />
+              </Link>
+            </Button>
           </div>
           {jobs.length === 0 ? (
             <p className="mt-3 text-sm text-muted">
