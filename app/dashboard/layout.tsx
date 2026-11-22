@@ -1,6 +1,7 @@
 import WithdrawalLink from "@/components/WithdrawalLink";
 import VerifyEmailBanner from "@/components/dashboard/VerifyEmailBanner";
 import DashboardShell from "@/components/dashboard/DashboardShell";
+import { headers } from "next/headers";
 import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
 import { emailConfigured } from "@/lib/email";
@@ -29,8 +30,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
     }
   }
 
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <>
+      {/* Charte du tableau de bord posée dès l'analyse du HTML : pas d'éclair de l'ancienne couleur.
+          DashboardShell la retire en quittant l'espace (navigation côté client). */}
+      <script nonce={nonce} dangerouslySetInnerHTML={{ __html: "document.documentElement.dataset.espace='dashboard'" }} />
       <DashboardShell
         user={{ email: session.email, name: session.name ?? null }}
         planLabel={planLabel}

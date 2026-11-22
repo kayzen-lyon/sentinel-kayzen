@@ -385,7 +385,7 @@ export default async function OverviewPage() {
                 {SEVERITIES.map((s) => (
                   <li key={s.key} className="flex items-center gap-2 text-sm">
                     <span className="h-2.5 w-2.5 flex-none rounded-full" data-tint="dot" data-tone={s.tone} aria-hidden="true" />
-                    <span className="text-muted">{s.label}</span>
+                    <span className="text-muted" data-sev={s.key}>{s.label}</span>
                     <span className="ml-auto font-semibold tabular-nums text-fg">{findings[s.key]}</span>
                   </li>
                 ))}

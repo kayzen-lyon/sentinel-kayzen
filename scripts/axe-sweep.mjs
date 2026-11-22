@@ -58,10 +58,14 @@ const browser = await chromium.launch();
 const results = [];
 let total = 0;
 
-async function newContext(themeName) {
+async function newContext(themeName, cookies = []) {
   const t = THEMES[themeName];
   // bypassCSP : l'injection d'axe-core est un script en ligne que la CSP par nonce bloquerait.
-  const ctx = await browser.newContext({ bypassCSP: true, viewport: { width: 1366, height: 900 } });
+  const ctx = await browser.newContext({
+    bypassCSP: true,
+    viewport: { width: 1366, height: 900 },
+    storageState: { cookies, origins: [] },
+  });
   await ctx.addInitScript(
     ([theme, a11y]) => {
       try {
@@ -74,11 +78,16 @@ async function newContext(themeName) {
   return ctx;
 }
 
-async function login(ctx) {
+/** Une seule connexion par balayage (la connexion est limitée en débit) : cookie réutilisé ensuite. */
+async function login() {
+  const ctx = await browser.newContext();
   const res = await ctx.request.post(`${BASE}/api/auth/login`, {
     data: { email: EMAIL, password: PASSWORD },
   });
   if (!res.ok()) throw new Error(`Connexion de démo refusée (${res.status()}) : lancez scripts/seed-demo.ts`);
+  const { cookies } = await ctx.storageState();
+  await ctx.close();
+  return cookies;
 }
 
 async function extraRoutes(ctx) {
@@ -126,9 +135,9 @@ async function audit(page, path, themeName) {
   for (const v of r) console.log(`         - ${v.id} (${v.count}) : ${v.nodes[0]?.target}`);
 }
 
+const session = await login();
 for (const themeName of Object.keys(THEMES)) {
-  const ctx = await newContext(themeName);
-  await login(ctx);
+  const ctx = await newContext(themeName, session);
   const routes = [...DASHBOARD, ...(await extraRoutes(ctx))];
   for (const path of routes) {
     const page = await ctx.newPage();

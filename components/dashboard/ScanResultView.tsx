@@ -95,7 +95,7 @@ export default function ScanResultView({
             <div className="mt-3 flex flex-wrap gap-2">
               {SEV_ORDER.map((sev) =>
                 s.counts[sev] ? (
-                  <span key={sev} className="rounded-full px-2.5 py-1 text-xs font-semibold" data-tint="soft" data-tone={SEV[sev].color}>
+                  <span key={sev} className="rounded-full px-2.5 py-1 text-xs font-semibold" data-tint="soft" data-tone={SEV[sev].color} data-sev={sev}>
                     {s.counts[sev]} {SEV[sev].label.toLowerCase()}
                   </span>
                 ) : null
@@ -653,7 +653,7 @@ function FindingRow({ f, isNew }: { f: Finding; isNew?: boolean }) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-heading text-base font-semibold text-fg">{f.title}</h3>
-            <span className="rounded-full px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-wide" data-tint="soft" data-tone={color}>
+            <span className="rounded-full px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-wide" data-tint="soft" data-tone={color} data-sev={f.state === "pass" ? undefined : f.severity}>
               {f.state === "pass" ? "OK" : SEV[f.severity].label}
             </span>
             <span className="text-xs text-subtle">· {f.category}</span>

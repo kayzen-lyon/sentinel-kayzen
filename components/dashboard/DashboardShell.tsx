@@ -1,6 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- petit logo local ; next/image impose un style en ligne que la CSP interdit */
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -106,6 +107,14 @@ export default function DashboardShell({
   const pathname = usePathname() || "/dashboard";
   const router = useRouter();
 
+  // Charte « noir, gris et rouge carmin » : active dans l'espace connecté seulement (globals.css).
+  useEffect(() => {
+    document.documentElement.dataset.espace = "dashboard";
+    return () => {
+      delete document.documentElement.dataset.espace;
+    };
+  }, []);
+
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/");
@@ -123,7 +132,7 @@ export default function DashboardShell({
 
   return (
     <SidebarProvider>
-      <Sidebar aria-label="Navigation de la console">
+      <Sidebar aria-label="Navigation de la console" className="dark charte-sombre">
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
