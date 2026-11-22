@@ -8,6 +8,7 @@ import {
   ChevronsUpDown,
   Code2,
   CreditCard,
+  FileSignature,
   Globe,
   LayoutDashboard,
   LogOut,
@@ -69,6 +70,7 @@ const NAV: { title: string; items: NavItem[] }[] = [
       { href: "/dashboard/pentest", label: "Pentest autonome", icon: Crosshair },
       { href: "/dashboard/monitoring", label: "Surveillance", icon: Activity },
       { href: "/dashboard/domaines", label: "Domaines", icon: Globe },
+      { href: "/dashboard/autorisations", label: "Autorisations", icon: FileSignature },
     ],
   },
   {

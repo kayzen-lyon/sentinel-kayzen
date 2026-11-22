@@ -1,4 +1,6 @@
 import { ensureSchema, query } from "./db";
+import { masquerProfond, masquerSecrets } from "./masquage";
+import { ouvrirPreuves, sansPreuves, scellerConstat } from "./preuves";
 
 export type JobStatus =
   | "pending_approval"
@@ -44,6 +46,8 @@ export type JobFindingRow = {
   cvss: number | null;
   status: FindingStatus;
   payload: unknown;
+  /** Une preuve d'exploitation chiffrée existe (visible seulement dans le rapport authentifié). */
+  has_proof?: boolean;
   /** Réponses à la grille de triage en 7 questions (lib/triage.ts). */
   triage: (boolean | null)[] | null;
   created_at: string;
@@ -163,22 +167,45 @@ export async function getJobSystem(id: string): Promise<JobRow | null> {
   return rows[0] ?? null;
 }
 
+/**
+ * Constats d'un job, SANS preuves d'exploitation : forme de toutes les API, des exports et du MCP.
+ * Les preuves (chiffrées au repos) ne sortent que par listFindingsAvecPreuves, pour le rapport.
+ */
 export async function listFindings(
   jobId: string,
   sinceIso?: string
 ): Promise<JobFindingRow[]> {
   await ensureSchema();
-  if (sinceIso) {
-    return query<JobFindingRow>(
-      `SELECT * FROM job_findings WHERE job_id = $1 AND created_at > $2
-       ORDER BY created_at ASC`,
-      [jobId, sinceIso]
-    );
-  }
-  return query<JobFindingRow>(
+  const rows = sinceIso
+    ? await query<JobFindingRow>(
+        `SELECT * FROM job_findings WHERE job_id = $1 AND created_at > $2
+         ORDER BY created_at ASC`,
+        [jobId, sinceIso]
+      )
+    : await query<JobFindingRow>(
+        `SELECT * FROM job_findings WHERE job_id = $1 ORDER BY created_at ASC`,
+        [jobId]
+      );
+  return rows.map((r) => {
+    const { payload, aPreuve } = sansPreuves(r.payload);
+    return { ...r, payload: masquerProfond(payload), has_proof: aPreuve };
+  });
+}
+
+/** Constats avec leurs preuves déchiffrées et masquées (rapport authentifié uniquement). */
+export async function listFindingsAvecPreuves(
+  jobId: string
+): Promise<(JobFindingRow & { preuves: Record<string, unknown> | null })[]> {
+  await ensureSchema();
+  const rows = await query<JobFindingRow>(
     `SELECT * FROM job_findings WHERE job_id = $1 ORDER BY created_at ASC`,
     [jobId]
   );
+  return rows.map((r) => {
+    const { payload, aPreuve } = sansPreuves(r.payload);
+    const preuves = ouvrirPreuves(r.payload);
+    return { ...r, payload: masquerProfond(payload), has_proof: aPreuve, preuves: preuves ? masquerProfond(preuves) : null };
+  });
 }
 
 /** Met à jour l'état d'un job (contexte worker). */
@@ -209,8 +236,8 @@ export async function updateJobSystem(
   }
   if (patch.runName !== undefined) push("run_name", patch.runName);
   if (patch.costUsd !== undefined) push("cost_usd", patch.costUsd);
-  if (patch.reportMd !== undefined) push("report_md", patch.reportMd);
-  if (patch.error !== undefined) push("error", patch.error);
+  if (patch.reportMd !== undefined) push("report_md", patch.reportMd == null ? null : masquerSecrets(patch.reportMd));
+  if (patch.error !== undefined) push("error", patch.error == null ? null : masquerSecrets(patch.error));
   if (patch.agentsGraph !== undefined)
     push("agents_graph", JSON.stringify(patch.agentsGraph));
   if (!sets.length) return;
@@ -245,10 +272,11 @@ export async function upsertFindingsSystem(
       [
         jobId,
         f.nativeId,
-        f.title ?? null,
+        f.title ? masquerSecrets(f.title) : null,
         f.severity ?? null,
         typeof f.cvss === "number" ? f.cvss : null,
-        f.payload ? JSON.stringify(f.payload) : null,
+        // Secrets masqués, puis preuves d'exploitation chiffrées (AES-256-GCM) avant stockage.
+        f.payload ? JSON.stringify(scellerConstat(masquerProfond(f.payload)) ?? masquerProfond(f.payload)) : null,
       ]
     );
     if (rows[0]?.id) inserted++;

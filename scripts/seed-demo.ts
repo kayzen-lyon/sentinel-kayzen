@@ -59,6 +59,14 @@ async function main() {
     [user.id, orgId]
   );
 
+  // Autorisation écrite fictive (document de démonstration), valable un an autour d'aujourd'hui.
+  await query(
+    `INSERT INTO autorisations_test (org_id, client, perimetre, debut, fin, document_nom, document_type, document_sha256, document, created_by)
+     VALUES ($1,'Client de démonstration',ARRAY['demo.sentinel.test'], current_date - 180, current_date + 180,
+             'autorisation-demo.pdf','application/pdf', encode(sha256('demo'::bytea),'hex'), 'demo'::bytea, $2)`,
+    [orgId, user.id]
+  );
+
   const scores = [58, 64, 71, 77, 83];
   for (let i = 0; i < scores.length; i++) {
     const findings = [

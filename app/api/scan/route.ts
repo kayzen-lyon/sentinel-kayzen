@@ -8,6 +8,7 @@ import { isHostVerified } from "@/lib/domains";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { canLaunch } from "@/lib/orgs";
 import { getActiveOrg } from "@/lib/activeorg";
+import { refusSansAutorisation } from "@/lib/autorisations";
 import { checkQuota } from "@/lib/plans";
 
 export const runtime = "nodejs";
@@ -59,9 +60,11 @@ export async function POST(req: Request) {
       const quota = await checkQuota(active.orgId, "passiveScans").catch(() => null);
       if (quota) return NextResponse.json({ error: quota }, { status: 402 });
     }
+    // Approfondi = test actif : propriété vérifiée ET autorisation écrite du client en cours.
     deep = active
       ? canLaunch(active.role) &&
-        (await isHostVerified(active.orgId, check.url.hostname).catch(() => false))
+        (await isHostVerified(active.orgId, check.url.hostname).catch(() => false)) &&
+        !(await refusSansAutorisation(active.orgId, check.url.hostname).catch(() => "erreur"))
       : false;
   }
 

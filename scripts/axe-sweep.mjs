@@ -31,6 +31,7 @@ const DASHBOARD = [
   "/dashboard/pentest",
   "/dashboard/monitoring",
   "/dashboard/domaines",
+  "/dashboard/autorisations",
   "/dashboard/cicd",
   "/dashboard/integrations",
   "/dashboard/team",
@@ -135,10 +136,12 @@ async function audit(page, path, themeName) {
   for (const v of r) console.log(`         - ${v.id} (${v.count}) : ${v.nodes[0]?.target}`);
 }
 
-const session = await login();
+// PUBLIC_ONLY=1 : pages publiques seulement (site en ligne, sans compte de démo).
+const PUBLIC_ONLY = process.env.PUBLIC_ONLY === "1";
+const session = PUBLIC_ONLY ? [] : await login();
 for (const themeName of Object.keys(THEMES)) {
   const ctx = await newContext(themeName, session);
-  const routes = [...DASHBOARD, ...(await extraRoutes(ctx))];
+  const routes = PUBLIC_ONLY ? [] : [...DASHBOARD, ...(await extraRoutes(ctx))];
   for (const path of routes) {
     const page = await ctx.newPage();
     await audit(page, path, themeName);

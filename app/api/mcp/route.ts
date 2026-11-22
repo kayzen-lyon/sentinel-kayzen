@@ -6,6 +6,7 @@ import { validateTargetUrl } from "@/lib/ssrf";
 import { runScan } from "@/lib/scanner";
 import { createScanRecord, completeScan, listScans } from "@/lib/scans";
 import { isHostVerified } from "@/lib/domains";
+import { refusSansAutorisation } from "@/lib/autorisations";
 import { pentestEmailBlock } from "@/lib/emailgate";
 import { checkQuota } from "@/lib/plans";
 import { createJob, getJob, listFindings } from "@/lib/jobs";
@@ -96,7 +97,9 @@ async function callTool(
         const quota = await checkQuota(personalOrg, "passiveScans").catch(() => null);
         if (quota) return { ...text(`Refusé : ${quota}`), isError: true };
       }
-      const deep = await isHostVerified(personalOrg, check.url.hostname).catch(() => false);
+      const deep =
+        (await isHostVerified(personalOrg, check.url.hostname).catch(() => false)) &&
+        !(await refusSansAutorisation(personalOrg, check.url.hostname).catch(() => "erreur"));
       const scanId = await createScanRecord(userId, check.url.toString(), deep, personalOrg).catch(
         () => null
       );
@@ -166,6 +169,8 @@ async function callTool(
           ),
           isError: true,
         };
+      const refus = await refusSansAutorisation(orgId, check.url.hostname);
+      if (refus) return { ...text(`Refusé : ${refus}`), isError: true };
       // Même quota que la voie web (2 lancements offensifs / heure).
       const rl = await checkRateLimit(`job:${userId}`, 2, 3600);
       if (!rl.allowed)
