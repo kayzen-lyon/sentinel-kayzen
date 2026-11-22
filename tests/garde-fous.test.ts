@@ -23,13 +23,14 @@ test("masquerSecrets : jetons à préfixe connu, préfixe conservé", () => {
   const gh = "ghp_" + "a".repeat(36);
   const out = masquerSecrets(`jeton ${gh} trouvé`);
   assert.equal(out, `jeton ghp_${MASQUE} trouvé`);
-  assert.ok(!masquerSecrets("AKIAABCDEFGHIJKLMNOP").includes("EFGH"));
+  assert.ok(!masquerSecrets("AKIA" + "ABCDEFGHIJKLMNOP").includes("EFGH"));
   assert.ok(masquerSecrets("sk_live_" + "x".repeat(24)).startsWith("sk_l"));
 });
 
 test("masquerSecrets : affectations, en-têtes, URL et clés privées", () => {
   assert.equal(masquerSecrets("password=Sup3rS3cret!"), `password=Sup3${MASQUE}`);
-  assert.equal(masquerSecrets('{"api_key": "abcdef123456"}'), `{"api_key": "abcd${MASQUE}"}`);
+  const valeur = "abcdef" + "123456"; // concaténé : pas de faux secret littéral pour gitleaks
+  assert.equal(masquerSecrets(`{"api_key": "${valeur}"}`), `{"api_key": "abcd${MASQUE}"}`);
   assert.equal(masquerSecrets("Authorization: Bearer abc.def.ghi"), `Authorization: Bearer abc.${MASQUE}`);
   assert.equal(masquerSecrets("postgres://admin:hunter22@db.exemple.fr/x"), `postgres://admin:${MASQUE}@db.exemple.fr/x`);
   const pem = "-----BEGIN RSA PRIVATE KEY-----\nMIIEow\n-----END RSA PRIVATE KEY-----";
@@ -37,7 +38,7 @@ test("masquerSecrets : affectations, en-têtes, URL et clés privées", () => {
 });
 
 test("masquerSecrets : idempotent et sans effet sur un texte ordinaire", () => {
-  const une = masquerSecrets("token=abcdef123456 et ghp_" + "b".repeat(36));
+  const une = masquerSecrets("token=" + "abcdef" + "123456 et ghp_" + "b".repeat(36));
   assert.equal(masquerSecrets(une), une);
   const ordinaire = "Le jeton de session est régénéré à la connexion (token rotation).";
   assert.equal(masquerSecrets(ordinaire), ordinaire);
