@@ -1429,6 +1429,8 @@ html[data-espace="dashboard"] :is(table, .tabular-nums) {
     white-space: pre-wrap;
     word-break: break-word;
   }
+}
+
 /* Texte sur fond de marque : un seul jeton (--on-brand) au lieu du blanc codé en dur. */
 .bg-brand.text-white {
   color: rgb(var(--on-brand));
