@@ -129,14 +129,13 @@ Légende : **[S]** scan standard (toute URL) · **[A]** scan approfondi (domaine
 
 ## État d'avancement (22 novembre 2026)
 
-Livré : 98 des 100 points ci-dessus, plus quatre ajouts hors liste —
-enrichissement des CVE (exploitation active CISA KEV, probabilité EPSS), énumération des
-sous-domaines sur trois sources publiques, commande « Vérifier vous-même » par constat et
-rattachement au guide de test OWASP WSTG.
+Livré : les 100 points ci-dessus (92 et 93 ajoutés le 22 novembre avec le blog), plus quatre
+ajouts hors liste — enrichissement des CVE (exploitation active CISA KEV, probabilité EPSS),
+énumération des sous-domaines sur trois sources publiques, commande « Vérifier vous-même » par
+constat et rattachement au guide de test OWASP WSTG.
 
-Restent à faire :
-- 92. Comparaison de deux scans au choix (seule la comparaison avec le scan précédent existe).
-- 93. Courbe d'évolution par catégorie (seule la courbe du score global existe).
+- 92 : sélecteur « Comparer avec le scan du… » sur la page Scanner (tous les scans de la cible).
+- 93 : évolution de chaque sous-score moyen depuis le scan précédent, dans la vue d'ensemble.
 
 Limites connues :
 - 3 : seule la suite de chiffrement négociée est évaluée, pas la liste complète des suites acceptées.

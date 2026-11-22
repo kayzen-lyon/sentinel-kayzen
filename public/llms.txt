@@ -5,6 +5,13 @@
 - [Sentinel by Kayzen — Pentest IA autonome & cybersécurité offensive](https://sentinel.kayzen-lyon.com/) : Sentinel déploie des agents IA qui pensent comme de vrais hackers : ils exécutent votre code, trouvent les failles et les prouvent par des PoC réels. Audit managé + plateforme self-service. Une entité du groupe Kayzen (Lyon).
 - [Rétractation](https://sentinel.kayzen-lyon.com/retractation) : Se rétracter d'un contrat conclu avec Sentinel by Kayzen, en ligne, sans motif.
 
+## Cours de cybersécurité (gratuits, en français)
+- [Tous les cours](https://sentinel.kayzen-lyon.com/blog) : cours courts avec quiz pour se former et sensibiliser à la cybersécurité.
+- [Les bons réflexes](https://sentinel.kayzen-lyon.com/blog/parcours/fondamentaux) : mots de passe, double authentification, hameçonnage, sauvegardes, smartphone (grand public).
+- [Protéger son entreprise](https://sentinel.kayzen-lyon.com/blog/parcours/entreprise) : mesures essentielles pour TPE/PME, RGPD, NIS 2, rançongiciel, gestion d'incident.
+- [Sécuriser son site web](https://sentinel.kayzen-lyon.com/blog/parcours/site-web) : HTTPS, en-têtes de sécurité, CSP, cookies, WordPress, DNS, surveillance.
+- [Développeurs et tests d'intrusion](https://sentinel.kayzen-lyon.com/blog/parcours/developpeurs) : XSS, injections SQL, contrôle d'accès, CSRF, SSRF, API, sécurité des IA.
+
 ## Fonctionnalités
 - Pentest autonome : des agents IA exploitent les failles d'un domaine dont la propriété est vérifiée et livrent des preuves rejouables.
 - Scan approfondi : en-têtes, TLS, DNS, expositions, CVE, secrets oubliés dans le JavaScript client (masqués) et carte de surface des points d'entrée.

@@ -20,6 +20,7 @@ const COLS: { title: string; links: { label: string; href: string }[] }[] = [
       { label: "Plateforme", href: "/#plateforme" },
       { label: "Couverture OWASP", href: "/#couverture" },
       { label: "Tarifs", href: "/#tarifs" },
+      { label: "Cours de cybersécurité", href: "/blog" },
       { label: "FAQ", href: "/#faq" },
       { label: "Contact & devis", href: "/#contact" },
     ],
