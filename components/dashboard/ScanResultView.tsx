@@ -267,7 +267,7 @@ function Synthese({ result, comparison }: { result: ScanResult; comparison?: Sca
       )}
 
       {compliance.length > 0 && (
-        <details className="card p-5">
+        <details open className="card p-5">
           <summary className="cursor-pointer font-semibold text-fg">
             Exigences de conformité concernées ({compliance.length})
           </summary>
@@ -582,7 +582,8 @@ function HeadersPanel({ i }: { i?: ScanInsights }) {
 
 /** Carte de surface : points d'entrée cartographiés et classes d'attaque indicatives. */
 function SurfaceMap({ items }: { items: SurfaceItem[] }) {
-  const [all, setAll] = useState(false);
+  // Liste complète par défaut ; « Réduire » reste disponible pour les longues cartes.
+  const [all, setAll] = useState(true);
   const shown = all ? items : items.slice(0, 12);
   return (
     <div className="mt-3 overflow-x-auto rounded-lg border border-border">

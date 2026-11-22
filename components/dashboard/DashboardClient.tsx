@@ -347,6 +347,18 @@ export default function DashboardClient({
                       <div className="no-print mb-4 flex items-center gap-3 rounded-lg border border-border bg-bg-elev/40 px-4 py-3">
                         <span className="text-xs font-medium text-muted">Évolution du score</span>
                         <Sparkline values={history} />
+                        {/* Valeurs de la courbe, pour les lecteurs d'écran (la courbe est décorative). */}
+                        <table className="sr-only">
+                          <caption>Scores des derniers scans, du plus ancien au plus récent</caption>
+                          <tbody>
+                            {history.map((v, i) => (
+                              <tr key={i}>
+                                <th scope="row">Scan {i + 1}</th>
+                                <td>{v}/100</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                         <span className="text-xs text-subtle">
                           {history.length} scan{history.length > 1 ? "s" : ""}
                         </span>

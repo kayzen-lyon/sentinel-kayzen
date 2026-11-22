@@ -1348,3 +1348,8 @@ html[data-espace='dashboard'] .bg-risk {
   -webkit-mask: url("/icons/alerte.svg") center / contain no-repeat;
   mask: url("/icons/alerte.svg") center / contain no-repeat;
 }
+
+/* Tableaux de vulnérabilités et de valeurs : chiffres alignés en colonnes. */
+html[data-espace='dashboard'] table {
+  font-variant-numeric: tabular-nums;
+}
