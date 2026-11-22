@@ -304,4 +304,11 @@ export const MIGRATIONS: Migration[] = [
     ALTER TABLE job_findings ADD COLUMN IF NOT EXISTS triage jsonb;
   `,
   },
+  {
+    id: "007_scan_insights",
+    sql: `
+    -- Données enrichies du scan (certificat, DNS, e-mail, tiers, sous-scores…) : historique et dashboard.
+    ALTER TABLE scans ADD COLUMN IF NOT EXISTS insights jsonb;
+  `,
+  },
 ];

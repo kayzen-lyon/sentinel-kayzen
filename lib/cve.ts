@@ -186,5 +186,54 @@ export async function correlateCves(
       cves: await lookupComponentCves(component),
     }))
   );
-  return results.filter((r) => r.cves.length > 0);
+  const hits = results.filter((r) => r.cves.length > 0);
+  await enrichExploitation(hits.flatMap((r) => r.cves)).catch(() => {});
+  return hits;
+}
+
+// --- Priorisation : exploitation réelle (CISA KEV) et probabilité d'exploitation (FIRST EPSS) ---
+// Flux publics et gratuits. Idée reprise de CVEngine (GPL : aucune ligne de code reprise).
+
+let kevCache: { ids: Set<string>; at: number } | null = null;
+
+async function kevIds(): Promise<Set<string>> {
+  if (kevCache && Date.now() - kevCache.at < 12 * 3600 * 1000) return kevCache.ids;
+  const r = await fetch("https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json", {
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!r.ok) return kevCache?.ids ?? new Set();
+  const d = (await r.json()) as { vulnerabilities?: { cveID?: string }[] };
+  kevCache = { ids: new Set((d.vulnerabilities ?? []).map((v) => v.cveID || "")), at: Date.now() };
+  return kevCache.ids;
+}
+
+/** Lit la réponse EPSS de FIRST : identifiant CVE → probabilité (0 à 1). */
+export function parseEpss(data: unknown): Map<string, number> {
+  const out = new Map<string, number>();
+  const rows = (data as { data?: { cve?: string; epss?: string }[] })?.data ?? [];
+  for (const row of rows) {
+    const v = Number(row.epss);
+    if (row.cve && Number.isFinite(v)) out.set(row.cve, v);
+  }
+  return out;
+}
+
+/** Ajoute `kev` et `epss` aux CVE (au mieux : une source indisponible n'empêche pas l'autre). */
+export async function enrichExploitation(refs: CveRef[]): Promise<void> {
+  const ids = [...new Set(refs.map((r) => r.id).filter((id) => /^CVE-\d{4}-\d+$/.test(id)))].slice(0, 60);
+  if (!ids.length) return;
+  const [kev, epss] = await Promise.all([
+    kevIds().catch(() => new Set<string>()),
+    fetch(`https://api.first.org/data/v1/epss?cve=${ids.join(",")}`, { signal: AbortSignal.timeout(6000) })
+      .then((r) => (r.ok ? r.json() : null))
+      .then(parseEpss)
+      .catch(() => new Map<string, number>()),
+  ]);
+  for (const ref of refs) {
+    if (kev.has(ref.id)) ref.kev = true;
+    const p = epss.get(ref.id);
+    if (p !== undefined) ref.epss = p;
+  }
+  // Exploitées activement d'abord, puis par probabilité d'exploitation, puis par CVSS.
+  refs.sort((a, b) => Number(b.kev ?? false) - Number(a.kev ?? false) || (b.epss ?? 0) - (a.epss ?? 0) || (b.cvss ?? 0) - (a.cvss ?? 0));
 }

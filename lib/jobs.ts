@@ -275,3 +275,21 @@ export async function openFindingsBySeverity(orgId: string): Promise<SeverityCou
   }
   return out;
 }
+
+export type RemediationStats = { total: number; fixed: number; open: number; avgOpenAgeDays: number | null };
+
+/** Taux de correction et âge moyen des vulnérabilités ouvertes d'une organisation. */
+export async function remediationStats(orgId: string): Promise<RemediationStats> {
+  await ensureSchema();
+  const rows = await query<{ total: number; fixed: number; open: number; age: number | null }>(
+    `SELECT count(*) FILTER (WHERE f.status <> 'false_positive')::int AS total,
+            count(*) FILTER (WHERE f.status = 'fixed')::int AS fixed,
+            count(*) FILTER (WHERE f.status = 'open')::int AS open,
+            (avg(extract(epoch FROM now() - f.created_at)) FILTER (WHERE f.status = 'open') / 86400)::float AS age
+       FROM job_findings f JOIN jobs j ON j.id = f.job_id
+      WHERE j.org_id = $1`,
+    [orgId]
+  );
+  const r = rows[0];
+  return { total: r?.total ?? 0, fixed: r?.fixed ?? 0, open: r?.open ?? 0, avgOpenAgeDays: r?.age != null ? Math.round(r.age) : null };
+}

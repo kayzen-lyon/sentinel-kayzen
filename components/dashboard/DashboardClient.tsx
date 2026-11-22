@@ -42,6 +42,7 @@ export default function DashboardClient({
   const [result, setResult] = useState<ScanResult | null>(null);
   const [resultDeep, setResultDeep] = useState(false);
   const [scans, setScans] = useState<HistoryItem[]>(initialScans);
+  const [historyFilter, setHistoryFilter] = useState("");
   const [comparison, setComparison] = useState<ScanComparison | null>(null);
 
   /** Compare `current` au scan terminé précédent de la même cible, pris dans `older`. */
@@ -138,6 +139,7 @@ export default function DashboardClient({
           score: data.scan.score,
           summary: data.scan.summary,
           findings: data.scan.findings,
+          insights: data.scan.insights ?? undefined,
         };
         setResult(opened);
         void compareWithPrevious(opened, older);
@@ -168,9 +170,9 @@ export default function DashboardClient({
   function exportCsv() {
     if (!result) return;
     const esc = (v: string) => `"${(v || "").replace(/"/g, '""')}"`;
-    const header = "titre,gravite,etat,categorie,detail,recommandation,conformite";
+    const header = "titre,gravite,etat,categorie,effort,owasp,cwe,wstg,detail,recommandation,conformite";
     const rows = result.findings.map((f) =>
-      [f.title, f.severity, f.state, f.category, f.detail, f.recommendation || "", f.state === "pass" ? "" : controlsLabel(controlsFor(f.id, f.category))]
+      [f.title, f.severity, f.state, f.category, f.effort || "", f.owasp || "", f.cwe || "", f.wstg || "", f.detail, f.recommendation || "", f.state === "pass" ? "" : controlsLabel(controlsFor(f.id, f.category))]
         .map(esc)
         .join(",")
     );
@@ -199,6 +201,9 @@ export default function DashboardClient({
       `${cases}\n  </testsuite>\n</testsuites>\n`;
     download(xml, "application/xml;charset=utf-8", "junit.xml");
   }
+
+  // Filtre de l'historique par cible
+  const historyHosts = [...new Set(scans.map((x) => prettyHost(x.target_url)))].sort();
 
   // Historique des scores pour le domaine courant (sparkline)
   const history = result
@@ -338,7 +343,7 @@ export default function DashboardClient({
                         <Link href="/dashboard/domaines" className="font-medium text-brand-light hover:underline">
                           Domaines
                         </Link>{" "}
-                        pour débloquer le scan approfondi (TLS, SPF/DMARC, contenu mixte…).
+                        pour débloquer le scan approfondi : fichiers et consoles exposés, sous-domaines et prise de contrôle, secrets dans le JavaScript, WordPress, pages d'erreur…
                       </p>
                     )}
                     <ScanResultView result={result} comparison={comparison} />
@@ -366,8 +371,25 @@ export default function DashboardClient({
                 {scans.length === 0 ? (
                   <p className="mt-3 text-sm text-subtle">Vos scans apparaîtront ici.</p>
                 ) : (
+                  <>
+                  {historyHosts.length > 1 && (
+                    <>
+                      <label htmlFor="hist-filter" className="sr-only">Filtrer par cible</label>
+                      <select
+                        id="hist-filter"
+                        value={historyFilter}
+                        onChange={(e) => setHistoryFilter(e.target.value)}
+                        className="input mt-3 !py-1.5 text-sm"
+                      >
+                        <option value="">Toutes les cibles ({scans.length})</option>
+                        {historyHosts.map((h) => (
+                          <option key={h} value={h}>{h}</option>
+                        ))}
+                      </select>
+                    </>
+                  )}
                   <ul className="mt-3 space-y-2">
-                    {scans.map((item) => (
+                    {scans.filter((x) => !historyFilter || prettyHost(x.target_url) === historyFilter).map((item) => (
                       <li
                         key={item.id ?? `${item.created_at}-${item.target_url}`}
                         className="group relative"
@@ -403,6 +425,7 @@ export default function DashboardClient({
                       </li>
                     ))}
                   </ul>
+                  </>
                 )}
               </aside>
             </div>

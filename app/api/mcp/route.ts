@@ -39,7 +39,8 @@ const TOOLS = [
     name: "passive_scan",
     description:
       "Analyse passive et non-intrusive de la posture de sécurité d'une URL (en-têtes, TLS, " +
-      "cookies, CORS, expositions). Renvoie une note A→F, un score /100 et les findings.",
+      "cookies, CORS, expositions, DNS, e-mail, tiers). Renvoie une note A→F, un score /100, les findings " +
+      "et les données enrichies (sous-scores, certificat, SPF/DKIM/DMARC, domaine, hébergeur).",
     inputSchema: {
       type: "object",
       properties: { url: { type: "string", description: "URL cible (http/https)" } },
@@ -108,7 +109,26 @@ async function callTool(
         counts: result.summary.counts,
         findings: result.findings
           .filter((f) => f.state === "fail" || f.state === "warn")
-          .map((f) => ({ title: f.title, severity: f.severity, detail: f.detail })),
+          .map((f) => ({
+            title: f.title,
+            severity: f.severity,
+            detail: f.detail,
+            recommendation: f.recommendation,
+            effort: f.effort,
+            wstg: f.wstg,
+            verify: f.repro,
+          })),
+        // Données enrichies : résumé, sous-scores, certificat, e-mail, domaine, hébergeur.
+        summary: result.insights?.summary,
+        categoryScores: result.insights?.categoryScores,
+        quickWins: result.insights?.quickWins,
+        certificate: result.insights?.tls?.cert
+          ? { issuer: result.insights.tls.cert.issuer, daysRemaining: result.insights.tls.cert.daysRemaining }
+          : undefined,
+        tlsProtocols: result.insights?.tls?.protocols,
+        email: result.insights?.email,
+        domain: result.insights?.domain,
+        hosting: result.insights?.hosting,
       });
     }
 

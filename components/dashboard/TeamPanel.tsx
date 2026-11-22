@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatDateTime } from "@/lib/format";
+import { ACTION_LABEL } from "@/lib/auditLabels";
 
 type Role = "owner" | "admin" | "member" | "viewer";
 type Member = {
@@ -32,26 +33,6 @@ const ROLE_LABEL: Record<Role, string> = {
   viewer: "Lecteur",
 };
 
-const ACTION_LABEL: Record<string, string> = {
-  "auth.login": "Connexion",
-  "auth.signup": "Création de compte",
-  "domain.verified": "Domaine vérifié",
-  "pentest.launch": "Pentest lancé",
-  "pentest.pending": "Pentest en attente d'approbation",
-  "pentest.approved": "Pentest approuvé",
-  "pentest.rejected": "Pentest rejeté",
-  "finding.status": "Statut de vulnérabilité modifié",
-  "finding.triage": "Grille de triage renseignée",
-  "team.add_member": "Membre ajouté",
-  "team.invite": "Invitation envoyée",
-  "team.invite_revoked": "Invitation annulée",
-  "team.invite_accepted": "Invitation acceptée",
-  "team.set_role": "Rôle modifié",
-  "team.remove_member": "Membre retiré",
-  "team.require_approval": "Politique d'approbation modifiée",
-  "team.integrations": "Notifications configurées",
-  "scan.regression": "Régression de sécurité détectée",
-};
 
 /**
  * Champ d'URL secrète : vide par défaut avec l'aperçu de la valeur enregistrée.

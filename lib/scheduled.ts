@@ -2,7 +2,8 @@ import { ensureSchema, query } from "./db";
 import { validateTargetUrl } from "./ssrf";
 import { isHostVerified } from "./domains";
 import { canLaunch, getRole } from "./orgs";
-import { runScan } from "./scanner";
+import { runScan, type ScanResult } from "./scanner";
+import { monitoringAlerts } from "./alerts";
 import { createScanRecord, completeScan, failScan } from "./scans";
 import { notifyOrg } from "./notify";
 import { logAudit } from "./audit";
@@ -100,8 +101,33 @@ export async function runDueScheduledScans(): Promise<{ ran: number; alerts: num
     );
 
     try {
+      // Scan précédent de la même cible : base de comparaison des alertes.
+      const prevRows = await query<{ findings: ScanResult["findings"] | null; insights: ScanResult["insights"] | null }>(
+        `SELECT findings, insights FROM scans
+          WHERE user_id = $1 AND target_url = $2 AND status = 'done' AND id <> $3
+          ORDER BY created_at DESC LIMIT 1`,
+        [s.user_id, check.url.toString(), scanId]
+      ).catch(() => []);
       const result = await runScan(check.url, { deep });
       if (scanId) await completeScan(scanId, result).catch(() => {});
+
+      // Alertes : échéances franchies (certificat, domaine) et nouveaux problèmes graves.
+      const extra = monitoringAlerts(check.url.hostname, result, prevRows[0] ?? null);
+      if (extra.length) {
+        alerts += extra.length;
+        await notifyOrg(s.org_id, {
+          event: "scan.alert",
+          text: `Sentinel — surveillance de ${check.url.hostname} : ${extra.join(" ; ")}.`,
+          data: { target: check.url.toString(), alerts: extra, scanId },
+        });
+        await logAudit({
+          orgId: s.org_id,
+          actorId: s.user_id,
+          action: "scan.alert",
+          target: check.url.hostname,
+          meta: { alerts: extra },
+        });
+      }
 
       const prev = s.last_score;
       const now = result.score;

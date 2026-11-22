@@ -12,6 +12,7 @@ export type ScanRow = {
   deep: boolean | null;
   summary: ScanResult["summary"] | null;
   findings: ScanResult["findings"] | null;
+  insights?: ScanResult["insights"] | null;
   error: string | null;
   created_at: string;
   completed_at: string | null;
@@ -38,7 +39,7 @@ export async function completeScan(
 ): Promise<void> {
   await query(
     `UPDATE scans SET status='done', final_url=$2, grade=$3, score=$4,
-       summary=$5, findings=$6, completed_at=now() WHERE id=$1`,
+       summary=$5, findings=$6, insights=$7, completed_at=now() WHERE id=$1`,
     [
       id,
       result.summary.finalUrl,
@@ -46,6 +47,7 @@ export async function completeScan(
       result.score,
       JSON.stringify(result.summary),
       JSON.stringify(result.findings),
+      result.insights ? JSON.stringify(result.insights) : null,
     ]
   );
 }
@@ -108,4 +110,16 @@ export async function latestSurface(
     if (f?.surface?.length) return f.surface;
   }
   return null;
+}
+
+/** Scans terminés récents avec leurs constats et données enrichies (vue d'ensemble). */
+export async function listScansDetailed(userId: string, orgId: string | null, limit = 60): Promise<ScanRow[]> {
+  await ensureSchema();
+  return query<ScanRow>(
+    `SELECT id, target_url, final_url, status, grade, score, deep, summary, findings, insights, error, created_at, completed_at
+       FROM scans
+      WHERE status = 'done' AND (user_id = $1 OR ($2::uuid IS NOT NULL AND org_id = $2))
+      ORDER BY created_at DESC LIMIT $3`,
+    [userId, orgId, limit]
+  );
 }
