@@ -1155,3 +1155,57 @@ a:focus-visible .link-grow::after { transform: scaleX(1); }
 .dash-shadcn .input:focus-visible {
   box-shadow: 0 0 0 3px rgb(var(--brand) / 0.2);
 }
+
+/* ============================================================
+   Blog de cours : encadrés, code, listes numérotées
+   ============================================================ */
+.blog-prose {
+  font-size: 1.0625rem;
+}
+.blog-prose ol.blog-ol {
+  list-style: decimal;
+  padding-left: 1.4rem;
+  margin-bottom: 1rem;
+}
+.blog-prose .blog-pre {
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(var(--border));
+  background-color: rgb(var(--navy-deep));
+  color: #e6edf6;
+  padding: 1rem 1.1rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.blog-prose .blog-pre code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: pre;
+}
+.blog-code-inline {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  padding: 0.1em 0.35em;
+  border-radius: 0.3rem;
+  background-color: rgb(var(--bg-elev));
+  color: rgb(var(--fg));
+}
+.blog-callout {
+  margin: 1.5rem 0;
+  border-left-width: 4px;
+  border-left-style: solid;
+  border-radius: 0.6rem;
+  padding: 0.9rem 1.1rem;
+}
+.blog-callout .blog-callout-title {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.blog-callout .blog-callout-body {
+  margin: 0;
+  color: rgb(var(--fg));
+}

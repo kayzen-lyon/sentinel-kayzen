@@ -44,6 +44,8 @@ export default function DashboardClient({
   const [scans, setScans] = useState<HistoryItem[]>(initialScans);
   const [historyFilter, setHistoryFilter] = useState("");
   const [comparison, setComparison] = useState<ScanComparison | null>(null);
+  // Scan affiché (pour proposer la comparaison avec n'importe quel autre scan de la même cible).
+  const [currentKey, setCurrentKey] = useState<string | null>(null);
 
   /** Compare `current` au scan terminé précédent de la même cible, pris dans `older`. */
   async function compareWithPrevious(current: ScanResult, older: HistoryItem[]) {
@@ -95,6 +97,7 @@ export default function DashboardClient({
         const r: ScanResult = data.result;
         setResult(r);
         setResultDeep(Boolean(data.deep));
+        setCurrentKey(data.id ?? null);
         void compareWithPrevious(r, scans);
         setScans((prev) => [
           {
@@ -120,6 +123,7 @@ export default function DashboardClient({
 
   async function openHistory(item: HistoryItem) {
     const older = scans.slice(scans.indexOf(item) + 1);
+    setCurrentKey(item.id ?? item.created_at);
     if (item.result) {
       setResult(item.result);
       setResultDeep(Boolean(item.deep));
@@ -201,6 +205,17 @@ export default function DashboardClient({
       `${cases}\n  </testsuite>\n</testsuites>\n`;
     download(xml, "application/xml;charset=utf-8", "junit.xml");
   }
+
+  // Comparaison au choix : tous les autres scans terminés de la même cible.
+  const compareChoices = result
+    ? scans.filter(
+        (x) =>
+          x.status === "done" &&
+          prettyHost(x.target_url) === prettyHost(result.targetUrl) &&
+          (x.id ?? x.created_at) !== currentKey &&
+          x.result !== result
+      )
+    : [];
 
   // Filtre de l'historique par cible
   const historyHosts = [...new Set(scans.map((x) => prettyHost(x.target_url)))].sort();
@@ -345,6 +360,27 @@ export default function DashboardClient({
                         </Link>{" "}
                         pour débloquer le scan approfondi : fichiers et consoles exposés, sous-domaines et prise de contrôle, secrets dans le JavaScript, WordPress, pages d'erreur…
                       </p>
+                    )}
+                    {compareChoices.length > 0 && (
+                      <div className="no-print mb-4 flex flex-wrap items-center gap-2 text-sm">
+                        <label htmlFor="compare-with" className="text-muted">Comparer avec le scan du</label>
+                        <select
+                          id="compare-with"
+                          className="input !w-auto !py-1.5 text-sm"
+                          value={comparison?.baselineDate ?? ""}
+                          onChange={(e) => {
+                            const chosen = compareChoices.find((x) => x.created_at === e.target.value);
+                            if (chosen) void compareWithPrevious(result, [chosen]);
+                          }}
+                        >
+                          {!comparison && <option value="">— choisir —</option>}
+                          {compareChoices.map((x) => (
+                            <option key={x.id ?? x.created_at} value={x.created_at}>
+                              {formatDate(x.created_at)} · {x.grade ?? "—"} ({x.score ?? "?"}/100)
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     )}
                     <ScanResultView result={result} comparison={comparison} />
                   </div>

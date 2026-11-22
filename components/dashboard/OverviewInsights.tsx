@@ -131,7 +131,7 @@ export default function OverviewInsights({
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         {cats.length > 0 && (
-          <Section id="souscores" title="Sous-scores moyens" hint="Moyenne par catégorie sur l'ensemble de vos cibles.">
+          <Section id="souscores" title="Sous-scores moyens" hint="Moyenne par catégorie sur l'ensemble de vos cibles, et évolution depuis le scan précédent.">
             <ul className="space-y-3">
               {cats.map((k) => {
                 const v = o.categoryAverages[k] as number;
@@ -139,7 +139,15 @@ export default function OverviewInsights({
                   <li key={k} className="text-sm">
                     <span className="flex justify-between">
                       <span className="text-muted">{CATEGORY_LABELS[k]}</span>
-                      <span className="font-semibold tabular-nums" data-tint="fg" data-tone={scoreTone(v)}>{v}/100</span>
+                      <span className="tabular-nums">
+                        {o.categoryDeltas[k] ? (
+                          <span className="mr-2 text-xs" data-tint="fg" data-tone={(o.categoryDeltas[k] as number) > 0 ? "safe" : "risk"}>
+                            {(o.categoryDeltas[k] as number) > 0 ? "▲ +" : "▼ "}
+                            {o.categoryDeltas[k]}
+                          </span>
+                        ) : null}
+                        <span className="font-semibold" data-tint="fg" data-tone={scoreTone(v)}>{v}/100</span>
+                      </span>
                     </span>
                     <svg viewBox="0 0 100 4" preserveAspectRatio="none" className="mt-1 block h-1.5 w-full overflow-hidden rounded-full bg-hover" aria-hidden="true">
                       <rect x="0" y="0" height="4" width={v} data-tint="fill" data-tone={scoreTone(v)} />

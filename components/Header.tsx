@@ -11,6 +11,7 @@ const NAV = [
   { label: "Plateforme", href: "/#plateforme" },
   { label: "Couverture", href: "/#couverture" },
   { label: "Tarifs", href: "/#tarifs" },
+  { label: "Cours", href: "/blog" },
   { label: "FAQ", href: "/#faq" },
   { label: "Contact", href: "/#contact" },
 ];

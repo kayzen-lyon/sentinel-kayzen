@@ -154,6 +154,8 @@ test("overview : inventaire, tendance et agrégats", async () => {
   assert.equal(o.targets.find((t) => t.host === "a.fr")?.certDays, 12);
   assert.equal(o.targets[0].spf, "absent");
   assert.equal(o.categoryAverages.headers, 70);
+  // a.fr : scan précédent sans sous-scores → pas d'évolution calculable
+  assert.equal(o.categoryDeltas.headers, undefined);
   assert.deepEqual([...o.topProblems[0].hosts].sort(), ["a.fr", "b.fr"]);
   assert.deepEqual(o.quickWins[0], { title: "CSP absente", hosts: 2 });
   assert.equal(o.totals.problems, 3);
@@ -166,4 +168,13 @@ test("cve : lecture EPSS", async () => {
   assert.equal(m.get("CVE-2021-44228"), 0.99999);
   assert.equal(m.size, 1);
   assert.equal(parseEpss(null).size, 0);
+});
+
+test("overview : évolution des sous-scores par catégorie", async () => {
+  const { buildOverview } = await import("../lib/overview");
+  const scan = (id: string, created: string, headers: number) =>
+    ({ id, target_url: "https://a.fr/", grade: "B", score: 80, created_at: created, findings: [], insights: { categoryScores: { headers } } }) as never;
+  const o = buildOverview([scan("2", "2026-11-20", 90), scan("1", "2026-11-10", 75)]);
+  assert.equal(o.categoryAverages.headers, 90);
+  assert.equal(o.categoryDeltas.headers, 15);
 });

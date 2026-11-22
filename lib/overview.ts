@@ -41,6 +41,8 @@ export type TargetRow = {
 export type Overview = {
   targets: TargetRow[];
   categoryAverages: Partial<Record<CategoryKey, number>>;
+  /** Évolution de chaque sous-score moyen par rapport au scan précédent de chaque cible. */
+  categoryDeltas: Partial<Record<CategoryKey, number>>;
   topProblems: { title: string; severity: Severity; hosts: string[]; effort?: string }[];
   quickWins: { title: string; hosts: number }[];
   byCategory: { key: CategoryKey; problems: number }[];
@@ -119,14 +121,27 @@ export function buildOverview(scans: ScanLite[]): Overview {
     for (const q of i?.quickWins ?? []) wins.set(q, (wins.get(q) ?? 0) + 1);
   }
 
+  // Moyennes des scans précédents (mêmes cibles) pour mesurer l'évolution par catégorie.
+  const prevSum: Partial<Record<CategoryKey, { sum: number; n: number }>> = {};
+  for (const s of previous.values())
+    for (const [k, v] of Object.entries(s.insights?.categoryScores ?? {}) as [CategoryKey, number][]) {
+      const c = (prevSum[k] ??= { sum: 0, n: 0 });
+      c.sum += v;
+      c.n++;
+    }
   const categoryAverages: Partial<Record<CategoryKey, number>> = {};
   for (const [k, v] of Object.entries(catSum) as [CategoryKey, { sum: number; n: number }][])
     categoryAverages[k] = Math.round(v.sum / v.n);
+
+  const categoryDeltas: Partial<Record<CategoryKey, number>> = {};
+  for (const [k, v] of Object.entries(prevSum) as [CategoryKey, { sum: number; n: number }][])
+    if (categoryAverages[k] !== undefined) categoryDeltas[k] = (categoryAverages[k] as number) - Math.round(v.sum / v.n);
 
   targets.sort((a, b) => (a.score ?? 0) - (b.score ?? 0));
   return {
     targets,
     categoryAverages,
+    categoryDeltas,
     topProblems: [...probs.values()]
       .sort((a, b) => b.priority - a.priority || b.hosts.length - a.hosts.length)
       .slice(0, 10)

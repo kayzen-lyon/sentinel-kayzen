@@ -25,6 +25,13 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
+  // Les cours du blog sont lus sur disque à l'exécution : on les embarque dans les fonctions.
+  outputFileTracingIncludes: {
+    "/blog": ["./content/cours/**/*.md"],
+    "/blog/[slug]": ["./content/cours/**/*.md"],
+    "/blog/parcours/[track]": ["./content/cours/**/*.md"],
+    "/sitemap.xml": ["./content/cours/**/*.md"],
+  },
   reactStrictMode: true,
   poweredByHeader: false,
   async headers() {
