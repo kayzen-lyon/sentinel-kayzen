@@ -336,4 +336,23 @@ export const MIGRATIONS: Migration[] = [
     CREATE INDEX IF NOT EXISTS autorisations_test_org_idx ON autorisations_test (org_id, fin DESC);
   `,
   },
+  {
+    id: "009_rapports",
+    sql: `
+    -- Rapports de test d'intrusion (lib/rapports.ts) : seulement des RÉFÉRENCES à des scans et
+    -- pentests enregistrés ; le contenu est réassemblé côté serveur à chaque consultation.
+    -- expire_le : durée de conservation configurable (RAPPORTS_CONSERVATION_JOURS), NULL = non fixée.
+    CREATE TABLE IF NOT EXISTS rapports (
+      id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      org_id     uuid REFERENCES organizations(id) ON DELETE CASCADE,
+      user_id    uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      titre      text NOT NULL,
+      scan_ids   uuid[] NOT NULL DEFAULT '{}',
+      job_ids    uuid[] NOT NULL DEFAULT '{}',
+      cree_le    timestamptz NOT NULL DEFAULT now(),
+      expire_le  timestamptz
+    );
+    CREATE INDEX IF NOT EXISTS rapports_org_idx ON rapports (org_id, cree_le DESC);
+  `,
+  },
 ];
