@@ -845,55 +845,6 @@ a:focus-visible .link-grow::after { transform: scaleX(1); }
   .site-chrome--smart, .link-grow::after, .spot-dark::before { transition: none; }
 }
 
-/* ── Animation du hero (HeroMotion), reprise de Nexus : boucle CSS de 10 s ─── */
-.hm-cycle { --d: 10s; }
-@keyframes hm-type { 0%, 4% { width: 0 } 16%, 100% { width: 10ch } }
-@keyframes hm-caret { 0%, 49% { opacity: 1 } 50%, 100% { opacity: 0 } }
-@keyframes hm-bar { 0%, 16% { transform: scaleX(0) } 52%, 100% { transform: scaleX(1) } }
-@keyframes hm-label-run { 0%, 15% { opacity: 0 } 18%, 50% { opacity: 1 } 53%, 100% { opacity: 0 } }
-@keyframes hm-label-done { 0%, 52% { opacity: 0 } 56%, 94% { opacity: 1 } 100% { opacity: 0 } }
-/* Anneau : circonference 2*pi*34 = 213.63 ; note 82/100 -> reste 18 % = 38.45 */
-@keyframes hm-ring { 0%, 50% { stroke-dashoffset: 213.63 } 66%, 94% { stroke-dashoffset: 38.45 } 100% { stroke-dashoffset: 213.63 } }
-@keyframes hm-score { 0%, 58% { opacity: 0; transform: scale(0.85) } 66%, 94% { opacity: 1; transform: none } 100% { opacity: 0 } }
-@keyframes hm-float { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
-@keyframes hm-flow { to { background-position: 12px 0 } }
-@keyframes hm-row-0 { 0%, 20% { opacity: 0; transform: translateY(6px) } 24%, 94% { opacity: 1; transform: none } 100% { opacity: 0 } }
-@keyframes hm-row-1 { 0%, 26% { opacity: 0; transform: translateY(6px) } 30%, 94% { opacity: 1; transform: none } 100% { opacity: 0 } }
-@keyframes hm-row-2 { 0%, 32% { opacity: 0; transform: translateY(6px) } 36%, 94% { opacity: 1; transform: none } 100% { opacity: 0 } }
-@keyframes hm-row-3 { 0%, 38% { opacity: 0; transform: translateY(6px) } 42%, 94% { opacity: 1; transform: none } 100% { opacity: 0 } }
-@keyframes hm-row-4 { 0%, 44% { opacity: 0; transform: translateY(6px) } 48%, 94% { opacity: 1; transform: none } 100% { opacity: 0 } }
-
-.hm-type { animation: hm-type var(--d) steps(10, end) infinite; }
-.hm-caret { animation: hm-caret 1s step-end infinite; }
-.hm-bar { transform-origin: left; animation: hm-bar var(--d) cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-.hm-label-run { animation: hm-label-run var(--d) linear infinite; }
-.hm-label-done { animation: hm-label-done var(--d) linear infinite; }
-.hm-row { opacity: 0; animation-duration: var(--d); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); animation-iteration-count: infinite; }
-.hm-row-0 { animation-name: hm-row-0; }
-.hm-row-1 { animation-name: hm-row-1; }
-.hm-row-2 { animation-name: hm-row-2; }
-.hm-row-3 { animation-name: hm-row-3; }
-.hm-row-4 { animation-name: hm-row-4; }
-.hm-ring { stroke-dasharray: 213.63; animation: hm-ring var(--d) cubic-bezier(0.22, 1, 0.36, 1) infinite; }
-.hm-score { animation: hm-score var(--d) ease-out infinite; }
-.hm-float { animation: hm-float 5s ease-in-out infinite; }
-.hm-float-2 { animation: hm-float 6s ease-in-out 1s infinite; }
-.hm-flow {
-  background: repeating-linear-gradient(90deg, rgb(var(--brand)) 0 6px, transparent 6px 12px);
-  animation: hm-flow 0.8s linear infinite;
-}
-
-/* Animations reduites (reglage systeme) : etat final fixe, rien ne bouge. */
-@media (prefers-reduced-motion: reduce) {
-  .hm-type, .hm-caret, .hm-bar, .hm-label-run, .hm-label-done, .hm-row,
-  .hm-ring, .hm-score, .hm-float, .hm-float-2, .hm-flow { animation: none !important; }
-  .hm-type { width: 10ch; }
-  .hm-caret, .hm-label-run { opacity: 0; }
-  .hm-bar { transform: none; }
-  .hm-label-done, .hm-row, .hm-score { opacity: 1; transform: none; }
-  .hm-ring { stroke-dashoffset: 38.45; }
-}
-
 /* -- Remplacants des styles en ligne (la CSP interdit desormais unsafe-inline) -- */
 [data-tone="safe"] { --tone: var(--safe); }
 [data-tone="safe-light"] { --tone: var(--safe-light); }

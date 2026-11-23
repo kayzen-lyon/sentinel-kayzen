@@ -1,3 +1,5 @@
+import ComparatifOffres from "@/components/ComparatifOffres";
+
 const PLANS = [
   {
     name: "Audit",
@@ -119,6 +121,7 @@ export default function Pricing() {
           * Selon l'offre. Le compte gratuit inclut 30 scans passifs par mois et 1 domaine ; le pentest autonome fait partie de l'offre Plateforme. Tarifs indicatifs HT — un devis précis est établi après
           cadrage du périmètre.
         </p>
+        <ComparatifOffres />
       </div>
     </section>
   );

@@ -13,16 +13,20 @@ import GroupReel from "@/components/GroupReel";
 import Faq from "@/components/Faq";
 import CtaFinal from "@/components/CtaFinal";
 import Footer from "@/components/Footer";
+import EnBref from "@/components/EnBref";
 import { FAQ } from "@/lib/faq";
+import { DESCRIPTION_ACCUEIL, TITRE_ACCUEIL } from "@/lib/accueil";
 import type { Metadata } from "next";
 
+// Title (≤ 60 caractères) et description (120 à 160) avec le mot-clé : tests/accueil.test.ts.
 export const metadata: Metadata = {
+  title: { absolute: TITRE_ACCUEIL },
+  description: DESCRIPTION_ACCUEIL,
   alternates: { canonical: "/" },
   openGraph: {
     url: "/",
-    title: "Sentinel by Kayzen — Pentest IA autonome",
-    description:
-      "Des agents IA qui trouvent, exploitent et prouvent vos vulnérabilités par des PoC réels. Audit managé + plateforme self-service.",
+    title: TITRE_ACCUEIL,
+    description: DESCRIPTION_ACCUEIL,
   },
 };
 
@@ -91,6 +95,7 @@ export default function Page() {
       <Header />
       <main>
         <Hero />
+        <EnBref />
         <Problem />
         <Engines />
         <Features />
