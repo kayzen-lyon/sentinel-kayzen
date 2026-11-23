@@ -40,7 +40,15 @@ const WORKFLOW_YAML = [
   "          # Le niveau gratuit de Gemini peut répondre lentement aux heures chargées.",
   '          LLM_PREFLIGHT_TIMEOUT: "120"',
   "        # Exit code 2 si des vulnérabilités sont trouvées → le check PR échoue.",
-  "        run: strix -n -t ./ --scan-mode quick",
+  "        # Modèle saturé : essai des modèles de secours.",
+  "        run: |",
+  "          set -o pipefail",
+  '          for modele in "$STRIX_LLM" gemini/gemini-3.6-flash gemini/gemini-3.5-flash-lite; do',
+  "            code=0",
+  '            STRIX_LLM="$modele" strix -n -t ./ --scan-mode quick 2>&1 | tee "$RUNNER_TEMP/strix.log" || code=$?',
+  '            if [ "$code" -ne 1 ] || ! grep -qE "LLM CONNECTION FAILED|ServiceUnavailableError" "$RUNNER_TEMP/strix.log"; then exit "$code"; fi',
+  "          done",
+  "          exit 1",
 ].join("\n");
 
 export default function CicdPanel() {

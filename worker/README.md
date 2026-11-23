@@ -33,7 +33,11 @@ Settings → Secrets and variables → Actions → **New repository secret** :
 | `GEMINI_API_KEY` | clé **gratuite** Google AI Studio (https://aistudio.google.com/apikey) |
 
 Variables optionnelles (onglet *Variables*) : `STRIX_MODEL` (défaut `gemini/gemini-3.8-flash`),
-`STRIX_MAX_BUDGET_USD` (défaut `0.50`).
+`STRIX_MAX_BUDGET_USD` (défaut `0.50`). Si le modèle est saturé, `gemini-3.6-flash` puis
+`gemini-3.5-flash-lite` sont essayés.
+
+> **Confidentialité** : au niveau gratuit de Gemini, Google utilise les contenus envoyés pour améliorer
+> ses produits. Pour un client réel, utilisez une clé d'un projet au niveau payant.
 
 ## 3. Créer un PAT GitHub (déclenchement)
 
