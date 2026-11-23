@@ -24,7 +24,7 @@ permissions:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     env:
       JOB_ID: ${{ github.event.client_payload.jobId }}
       TARGET: ${{ github.event.client_payload.target }}
@@ -58,10 +58,9 @@ jobs:
           ./nuclei -version
 
       - name: Install Nuclei templates
-        # Indispensable sur un runner vierge : sans templates, le scan échoue
-        # avec « no templates provided ». -disable-update-check ne télécharge PAS
-        # les templates, il ne fait que désactiver la vérification de version.
-        run: ./nuclei -update-templates -disable-update-check
+        # Sans « -disable-update-check » : combiné à « -update-templates », il empêche le
+        # téléchargement des modèles et le scan s'arrête aussitôt.
+        run: ./nuclei -update-templates && test -n "$(find "$HOME/nuclei-templates" -name '*.yaml' -print -quit)"
 
       - name: Install testssl.sh
         run: |
@@ -70,7 +69,7 @@ jobs:
       - name: Nuclei scan (non destructif, limité en débit)
         run: |
           set +e
-          ./nuclei -u "$TARGET" \
+          timeout 25m ./nuclei -u "$TARGET" \
             -jsonl -o nuclei.jsonl \
             -severity low,medium,high,critical \
             -exclude-tags dos,intrusive,fuzz \
@@ -82,8 +81,11 @@ jobs:
       - name: testssl.sh scan
         run: |
           set +e
+          # Seulement en HTTPS ; sans terminal, testssl.sh attendrait une réponse indéfiniment.
           HOST=$(echo "$TARGET" | sed -E 's#^https?://##; s#/.*$##')
-          ./testssl.sh/testssl.sh --jsonfile testssl.json --quiet --sneaky --warnings off "$HOST" || true
+          case "$TARGET" in
+            https://*) timeout 10m ./testssl.sh/testssl.sh --jsonfile testssl.json --quiet --sneaky --warnings off "$HOST" < /dev/null ;;
+          esac
           echo "OSS_EXIT=${NUCLEI_EXIT:-0}" >> "$GITHUB_ENV"
           set -e
 
