@@ -17,6 +17,7 @@ export async function runMaintenance(): Promise<{
   secretsResealed: number;
   preuvesScellees: number;
   rapportsPurges: number;
+  preuvesPurgees: number;
 }> {
   await ensureSchema();
   const purged = await query<{ id: string }>(
@@ -39,9 +40,21 @@ export async function runMaintenance(): Promise<{
 
   const resealed = await resealLegacySecrets();
   const preuves = await scellerPreuvesAnciennes();
-  // Rapports : purgés seulement si RAPPORTS_CONSERVATION_JOURS est défini (sinon expire_le reste NULL).
   const rapports = await purgerRapportsExpires();
-  return { rateEventsPurged: purged.length, jobsTimedOut: stuck.length, secretsResealed: resealed, preuvesScellees: preuves, rapportsPurges: rapports };
+  return { rateEventsPurged: purged.length, jobsTimedOut: stuck.length, secretsResealed: resealed, preuvesScellees: preuves, rapportsPurges: rapports, preuvesPurgees: await purgerPreuves() };
+}
+
+/**
+ * Preuves d'exploitation : effacées après 12 mois, le constat reste. Données les plus sensibles,
+ * donc durée plus courte que le rapport ; même plafond que les journaux (CNIL : 6 à 12 mois).
+ */
+async function purgerPreuves(): Promise<number> {
+  const r = await query<{ id: string }>(
+    `UPDATE job_findings SET payload = payload - '${CHAMP_PREUVES}'
+      WHERE jsonb_typeof(payload) = 'object' AND payload ? '${CHAMP_PREUVES}'
+        AND created_at < now() - interval '12 months' RETURNING id`
+  );
+  return r.length;
 }
 
 /** Chiffre (et masque) les preuves d'exploitation stockées en clair avant lib/preuves.ts. */

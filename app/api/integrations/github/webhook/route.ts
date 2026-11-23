@@ -8,7 +8,7 @@ import {
 } from "@/lib/ghinstall";
 import { createGithubJob } from "@/lib/jobs";
 import { checkQuota } from "@/lib/plans";
-import { appBaseUrl, dispatchWorkerRun, githubConfigured } from "@/lib/github";
+import { appBaseUrl, dispatchWorkerRun, githubConfigured, moteurIaActif } from "@/lib/github";
 import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
@@ -71,6 +71,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, unlinked: true });
     }
 
+    // L'analyse du code d'une PR exige le moteur IA (le moteur open source vise un site en ligne),
+    // et la confirmation du responsable des dépôts.
+    if (!moteurIaActif()) return NextResponse.json({ ok: true, skipped: "moteur-ia-inactif" });
+    if (!link.confirme_le) {
+      await postCommitStatus(
+        inst.id,
+        repo.owner.login,
+        repo.name,
+        pr.head.sha,
+        "error",
+        "Analyse non lancée : confirmez l'installation dans Sentinel, page Intégrations."
+      ).catch(() => {});
+      return NextResponse.json({ ok: true, skipped: "non-confirmee" });
+    }
+
     // Offre : pas de pentest sur PR si le plan ou le quota de l'organisation ne le permet pas.
     const quota = link.org_id
       ? await checkQuota(link.org_id, "pentests").catch(() => null)
@@ -121,6 +136,7 @@ export async function POST(req: Request) {
         instruction:
           `Analyse de sécurité de la pull request #${pr.number} du dépôt ` +
           `${repo.owner.login}/${repo.name}. Concentre-toi sur les vulnérabilités introduites.`,
+        engine: "strix",
       }).catch(() => {});
     }
 

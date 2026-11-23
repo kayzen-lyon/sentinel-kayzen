@@ -63,9 +63,16 @@ export default function Page() {
       <h2>Durée de conservation</h2>
       <ul>
         <li>
-          <strong>Compte et contenus associés</strong> (scans, pentests et rapports, domaines
+          <strong>Compte et contenus associés</strong> (scans, pentests, domaines
           vérifiés, clés API, surveillances) : conservés tant que votre compte existe, puis
           effacés dès que vous le supprimez.
+        </li>
+        <li>
+          <strong>Rapports de test d'intrusion</strong> : 5 ans au plus (délai de prescription de
+          l'article 2224 du Code civil), et effacés plus tôt si vous supprimez votre compte.
+        </li>
+        <li>
+          <strong>Preuves d'exploitation</strong> : 12 mois, puis suppression automatique.
         </li>
         <li>
           <strong>Journal d'audit</strong> de votre organisation : 12 mois, puis suppression
@@ -140,8 +147,8 @@ export default function Page() {
         <li><strong>Resend</strong> — envoi des rapports et e-mails transactionnels.</li>
         <li><strong>GitHub</strong> — exécution des runners d'analyse (GitHub Actions).</li>
         <li>
-          <strong>Google</strong> (API Gemini) — moteur d'agents Strix, uniquement lors
-          d'un pentest lancé volontairement sur un domaine dont vous êtes propriétaire.
+          <strong>Google</strong> (API Gemini) — moteur d'agents Strix, désactivé par défaut :
+          les pentests utilisent des outils open source, sans envoi à une IA.
         </li>
       </ul>
       <p>

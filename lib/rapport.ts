@@ -94,6 +94,7 @@ export type ScanSource = {
 
 export type PentestSource = {
   id: string;
+  engine?: "strix" | "oss";
   target_url: string;
   mode: string;
   created_at: string;
@@ -234,6 +235,8 @@ export type ModeleRapport = {
     outils: string[];
     scans: { id: string; cible: string; date: string; approfondi: boolean; score: number | null }[];
     pentests: { id: string; cible: string; mode: string; debut: string | null; fin: string | null }[];
+    /** Au moins un pentest mené par le moteur IA (Strix). */
+    ia: boolean;
     nonTeste: string[];
   };
 };
@@ -770,9 +773,11 @@ export function construireRapport(
     methode: {
       outils: [
         ...(scans.length ? ["Scanner Sentinel (en-têtes HTTP, TLS, cookies, exposition, surface JavaScript)"] : []),
-        ...(pentests.length ? ["Moteur de pentest autonome Strix (agents IA, exploitation contrôlée)"] : []),
+        ...(pentests.some((p) => p.engine !== "oss") ? ["Moteur de pentest autonome Strix (agents IA, exploitation contrôlée)"] : []),
+        ...(pentests.some((p) => p.engine === "oss") ? ["Nuclei et testssl.sh (moteurs open source, tests non destructifs)"] : []),
       ],
       scans: scans.map((s) => ({ id: s.id, cible: hote(s.target_url), date: s.created_at, approfondi: Boolean(s.deep), score: s.score })),
+      ia: pentests.some((p) => p.engine !== "oss"),
       pentests: pentests.map((p) => ({ id: p.id, cible: hote(p.target_url), mode: p.mode, debut: p.started_at, fin: p.completed_at })),
       nonTeste,
     },

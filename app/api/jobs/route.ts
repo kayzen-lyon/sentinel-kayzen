@@ -5,7 +5,7 @@ import { validateTargetUrl } from "@/lib/ssrf";
 import { isHostVerified } from "@/lib/domains";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { createJob, listJobs, updateJobSystem, type JobMode } from "@/lib/jobs";
-import { appBaseUrl, dispatchWorkerRun, githubConfigured, type ScanEngine } from "@/lib/github";
+import { appBaseUrl, dispatchWorkerRun, choisirMoteur, githubConfigured } from "@/lib/github";
 import { canLaunch, canManage, getOrg } from "@/lib/orgs";
 import { getActiveOrg } from "@/lib/activeorg";
 import { refusSansAutorisation } from "@/lib/autorisations";
@@ -89,13 +89,14 @@ export async function POST(req: Request) {
   const refus = await refusSansAutorisation(orgId, check.url.hostname);
   if (refus) return NextResponse.json({ error: refus }, { status: 403 });
 
-  const playbook = getPlaybook(body.playbook);
+  // Les playbooks sont des consignes pour le moteur IA : le moteur open source ne les suit pas.
+  const playbook = choisirMoteur(body.engine) === "strix" ? getPlaybook(body.playbook) : null;
   const mode: JobMode = playbook
     ? playbook.mode
     : body.mode === "deep"
       ? "deep"
       : "standard";
-  const engine: ScanEngine = body.engine === "oss" ? "oss" : "strix";
+  const engine = choisirMoteur(body.engine);
   // Ciblage : la carte de surface du dernier scan approfondi de ce domaine oriente Strix
   // vers les points d'entrée prioritaires (chemins de l'hôte vérifié uniquement).
   const surface =
@@ -115,6 +116,7 @@ export async function POST(req: Request) {
     check.url.toString(),
     mode,
     orgId,
+    engine,
     needsApproval ? "pending_approval" : "queued",
     playbook?.id ?? null,
     instruction
@@ -125,7 +127,7 @@ export async function POST(req: Request) {
     actorEmail: session.email,
     action: needsApproval ? "pentest.pending" : "pentest.launch",
     target: check.url.hostname,
-    meta: { mode, jobId },
+    meta: { mode, engine, jobId },
   });
 
   if (needsApproval) {
@@ -143,7 +145,7 @@ export async function POST(req: Request) {
       jobId,
       queuedOnly: true,
       message:
-        "Job enregistré. Runner Strix non configuré : l'exécution sera lancée par l'équipe " +
+        "Job enregistré. Runner non configuré : l'exécution sera lancée par l'équipe " +
         "(audit managé) ou après configuration du runner GitHub Actions.",
     });
   }

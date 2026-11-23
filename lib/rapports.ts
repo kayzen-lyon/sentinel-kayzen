@@ -31,12 +31,13 @@ export type RapportRow = {
 };
 
 /**
- * Durée de conservation des rapports, en jours (variable RAPPORTS_CONSERVATION_JOURS).
- * Non fixée par défaut : c'est une question juridique ouverte (RGPD, contrat client).
+ * Durée de conservation des rapports, en jours. Le RGPD (art. 5.1.e) ne fixe pas de chiffre :
+ * 5 ans par défaut, délai de prescription de droit commun (Code civil, art. 2224), au-delà
+ * duquel le rapport ne sert plus de preuve. RAPPORTS_CONSERVATION_JOURS permet un autre choix.
  */
-export function dureeConservationJours(): number | null {
+export function dureeConservationJours(): number {
   const n = Number(process.env.RAPPORTS_CONSERVATION_JOURS);
-  return Number.isInteger(n) && n > 0 ? n : null;
+  return Number.isInteger(n) && n > 0 ? n : 5 * 365;
 }
 
 async function sourcesScans(ids: string[]): Promise<(SourceEnregistree & { row: ScanSource })[]> {
@@ -52,7 +53,7 @@ async function sourcesScans(ids: string[]): Promise<(SourceEnregistree & { row: 
 async function sourcesPentests(ids: string[]): Promise<(SourceEnregistree & { row: Omit<PentestSource, "findings"> })[]> {
   if (!ids.length) return [];
   const rows = await query<SourceEnregistree & Omit<PentestSource, "findings">>(
-    `SELECT id, user_id, org_id, status, created_at, target_url, mode, started_at, completed_at
+    `SELECT id, user_id, org_id, status, created_at, target_url, mode, started_at, completed_at, engine
        FROM jobs WHERE id = ANY($1::uuid[])`,
     [ids]
   );
@@ -93,7 +94,7 @@ export async function creerRapport(
   const titre = demande.titre.trim().slice(0, 140) || "Rapport de test d'intrusion";
   const rows = await query<{ id: string }>(
     `INSERT INTO rapports (org_id, user_id, titre, scan_ids, job_ids, expire_le)
-     VALUES ($1,$2,$3,$4,$5, CASE WHEN $6::int IS NULL THEN NULL ELSE now() + make_interval(days => $6::int) END)
+     VALUES ($1,$2,$3,$4,$5, now() + make_interval(days => $6::int))
      RETURNING id`,
     [orgId, userId, titre, scanIds, jobIds, duree]
   );
@@ -214,6 +215,10 @@ export async function sourcesEligibles(userId: string): Promise<{
 /** Purge des rapports arrivés à expiration (maintenance quotidienne). */
 export async function purgerRapportsExpires(): Promise<number> {
   await ensureSchema();
+  // Rapports créés avant que la durée soit fixée.
+  await query(`UPDATE rapports SET expire_le = cree_le + make_interval(days => $1::int) WHERE expire_le IS NULL`, [
+    dureeConservationJours(),
+  ]);
   const r = await query<{ id: string }>(`DELETE FROM rapports WHERE expire_le IS NOT NULL AND expire_le < now() RETURNING id`);
   return r.length;
 }

@@ -1,4 +1,5 @@
 import { ensureSchema, query } from "./db";
+import type { ScanEngine } from "./github";
 import { masquerProfond, masquerSecrets } from "./masquage";
 import { ouvrirPreuves, sansPreuves, scellerConstat } from "./preuves";
 
@@ -25,6 +26,7 @@ export type JobRow = {
   agents_graph: unknown;
   playbook: string | null;
   instruction: string | null;
+  engine: ScanEngine;
   gh_installation_id: string | null;
   gh_owner: string | null;
   gh_repo: string | null;
@@ -66,15 +68,16 @@ export async function createJob(
   targetUrl: string,
   mode: JobMode,
   orgId: string | null,
+  engine: ScanEngine,
   status: JobStatus = "queued",
   playbook: string | null = null,
   instruction: string | null = null
 ): Promise<string> {
   await ensureSchema();
   const rows = await query<{ id: string }>(
-    `INSERT INTO jobs (user_id, target_url, mode, status, org_id, playbook, instruction)
-     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-    [userId, targetUrl, mode, status, orgId, playbook, instruction]
+    `INSERT INTO jobs (user_id, target_url, mode, status, org_id, playbook, instruction, engine)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+    [userId, targetUrl, mode, status, orgId, playbook, instruction, engine]
   );
   return rows[0].id;
 }

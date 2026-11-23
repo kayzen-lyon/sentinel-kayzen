@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth";
 import { dbConfigured } from "@/lib/db";
 import { approveJob, getJob, updateJobSystem } from "@/lib/jobs";
 import { canManage, getRole } from "@/lib/orgs";
-import { appBaseUrl, dispatchWorkerRun, githubConfigured } from "@/lib/github";
+import { appBaseUrl, dispatchWorkerRun, choisirMoteur, githubConfigured } from "@/lib/github";
 import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
@@ -59,6 +59,7 @@ export async function POST(
         mode: job.mode,
         ingestUrl: `${appBaseUrl(req)}/api/jobs/ingest`,
         instruction: job.instruction ?? undefined,
+        engine: choisirMoteur(job.engine),
       });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Échec du déclenchement du runner.";
