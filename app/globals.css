@@ -1366,7 +1366,7 @@ html[data-espace='dashboard'] table {
 
 /* Liens dans le texte du tableau de bord : soulignés en permanence, la couleur seule ne
    suffit pas à les distinguer du texte voisin. [WCAG 1.4.1 ; RGAA 10.6] */
-html[data-espace='dashboard'] :is(p, li) a:not([data-slot='button']):not(.btn) {
+html[data-espace='dashboard'] p a:not([data-slot='button']):not(.btn) {
   text-decoration: underline;
   text-underline-offset: 2px;
 }

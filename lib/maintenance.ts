@@ -1,5 +1,7 @@
 import { ensureSchema, query } from "./db";
 import { isEncrypted, seal } from "./secretbox";
+import { masquerProfond } from "./masquage";
+import { CHAMP_PREUVES, scellerConstat, separerPreuves } from "./preuves";
 
 /**
  * Entretien quotidien (appelé par le cron) :
@@ -12,6 +14,7 @@ export async function runMaintenance(): Promise<{
   rateEventsPurged: number;
   jobsTimedOut: number;
   secretsResealed: number;
+  preuvesScellees: number;
 }> {
   await ensureSchema();
   const purged = await query<{ id: string }>(
@@ -33,7 +36,26 @@ export async function runMaintenance(): Promise<{
   await query(`DELETE FROM org_invitations WHERE expires_at < now() - interval '30 days'`);
 
   const resealed = await resealLegacySecrets();
-  return { rateEventsPurged: purged.length, jobsTimedOut: stuck.length, secretsResealed: resealed };
+  const preuves = await scellerPreuvesAnciennes();
+  return { rateEventsPurged: purged.length, jobsTimedOut: stuck.length, secretsResealed: resealed, preuvesScellees: preuves };
+}
+
+/** Chiffre (et masque) les preuves d'exploitation stockées en clair avant lib/preuves.ts. */
+async function scellerPreuvesAnciennes(): Promise<number> {
+  const rows = await query<{ id: string; payload: unknown }>(
+    `SELECT id, payload FROM job_findings
+      WHERE jsonb_typeof(payload) = 'object' AND NOT (payload ? '${CHAMP_PREUVES}') LIMIT 500`
+  );
+  let n = 0;
+  for (const r of rows) {
+    if (!separerPreuves(r.payload).preuves) continue;
+    await query(`UPDATE job_findings SET payload = $2 WHERE id = $1`, [
+      r.id,
+      JSON.stringify(scellerConstat(masquerProfond(r.payload))),
+    ]);
+    n++;
+  }
+  return n;
 }
 
 type SecretRow = {

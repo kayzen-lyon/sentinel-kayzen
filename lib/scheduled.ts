@@ -1,6 +1,7 @@
 import { ensureSchema, query } from "./db";
 import { validateTargetUrl } from "./ssrf";
 import { isHostVerified } from "./domains";
+import { refusSansAutorisation } from "./autorisations";
 import { canLaunch, getRole } from "./orgs";
 import { runScan, type ScanResult } from "./scanner";
 import { monitoringAlerts } from "./alerts";
@@ -88,6 +89,21 @@ export async function runDueScheduledScans(): Promise<{ ran: number; alerts: num
     const check = await validateTargetUrl(s.target_url);
     if (!check.ok) {
       await query(`UPDATE scheduled_scans SET last_run_at = now() WHERE id = $1`, [s.id]);
+      continue;
+    }
+
+    // GARDE-FOU : chaque passage du cron exige une autorisation écrite du client en cours de
+    // validité pour cet hôte. Sans elle, rien n'est lancé ; le refus est journalisé.
+    const refus = await refusSansAutorisation(s.org_id, check.url.hostname).catch((e) => String(e));
+    if (refus) {
+      await query(`UPDATE scheduled_scans SET last_run_at = now() WHERE id = $1`, [s.id]);
+      await logAudit({
+        orgId: s.org_id,
+        actorId: s.user_id,
+        action: "scan.blocked",
+        target: check.url.hostname,
+        meta: { raison: refus },
+      }).catch(() => {});
       continue;
     }
 

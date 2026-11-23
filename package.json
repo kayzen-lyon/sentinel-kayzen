@@ -9,7 +9,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --import tsx --test tests/unit.test.ts tests/insights.test.ts tests/blog.test.ts",
+    "test": "node --import tsx --test tests/unit.test.ts tests/insights.test.ts tests/blog.test.ts tests/garde-fous.test.ts",
     "lint:fix": "eslint . --fix",
     "db:local": "node scripts/dev-db.mjs",
     "seed:demo": "tsx scripts/seed-demo.ts",

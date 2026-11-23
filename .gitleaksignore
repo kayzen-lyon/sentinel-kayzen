@@ -1,0 +1,5 @@
+# Faux secrets des tests de masquage (tests/garde-fous.test.ts), introduits par le commit 75db41b
+# puis construits par concaténation (970a9d6). Valeurs fictives, jamais valides.
+75db41bce7d72b0c05729c3dfc45f5d221ce9beb:tests/garde-fous.test.ts:aws-access-token:26
+75db41bce7d72b0c05729c3dfc45f5d221ce9beb:tests/garde-fous.test.ts:generic-api-key:32
+75db41bce7d72b0c05729c3dfc45f5d221ce9beb:tests/garde-fous.test.ts:generic-api-key:40

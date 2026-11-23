@@ -21,7 +21,8 @@ export async function exportUserData(userId: string): Promise<Record<string, unk
       [userId]
     ),
     query(
-      `SELECT f.job_id, f.native_id, f.title, f.severity, f.cvss, f.status, f.payload, f.created_at
+      // Preuves d'exploitation chiffrées exclues de l'export (lib/preuves.ts).
+      `SELECT f.job_id, f.native_id, f.title, f.severity, f.cvss, f.status, f.payload - '_preuves' AS payload, f.created_at
          FROM job_findings f JOIN jobs j ON j.id = f.job_id
         WHERE j.user_id = $1 ORDER BY f.created_at`,
       [userId]

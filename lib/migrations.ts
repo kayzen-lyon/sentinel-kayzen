@@ -311,4 +311,29 @@ export const MIGRATIONS: Migration[] = [
     ALTER TABLE scans ADD COLUMN IF NOT EXISTS insights jsonb;
   `,
   },
+  {
+    id: "008_autorisations_test",
+    sql: `
+    -- Autorisations écrites des clients (lib/autorisations.ts) : document signé, périmètre et dates,
+    -- vérifiées côté serveur avant chaque test actif et chaque passage du cron. Une révocation
+    -- conserve la ligne (trace) mais ne couvre plus rien.
+    CREATE TABLE IF NOT EXISTS autorisations_test (
+      id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      org_id          uuid NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+      client          text NOT NULL,
+      perimetre       text[] NOT NULL,
+      debut           date NOT NULL,
+      fin             date NOT NULL,
+      document_nom    text NOT NULL,
+      document_type   text NOT NULL,
+      document_sha256 text NOT NULL,
+      document        bytea NOT NULL,
+      created_by      uuid REFERENCES users(id) ON DELETE SET NULL,
+      created_at      timestamptz NOT NULL DEFAULT now(),
+      revoked_at      timestamptz,
+      CHECK (debut <= fin)
+    );
+    CREATE INDEX IF NOT EXISTS autorisations_test_org_idx ON autorisations_test (org_id, fin DESC);
+  `,
+  },
 ];

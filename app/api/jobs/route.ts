@@ -8,6 +8,7 @@ import { createJob, listJobs, updateJobSystem, type JobMode } from "@/lib/jobs";
 import { appBaseUrl, dispatchWorkerRun, githubConfigured, type ScanEngine } from "@/lib/github";
 import { canLaunch, canManage, getOrg } from "@/lib/orgs";
 import { getActiveOrg } from "@/lib/activeorg";
+import { refusSansAutorisation } from "@/lib/autorisations";
 import { checkQuota } from "@/lib/plans";
 import { logAudit } from "@/lib/audit";
 import { getPlaybook } from "@/lib/playbooks";
@@ -84,6 +85,9 @@ export async function POST(req: Request) {
       },
       { status: 403 }
     );
+  // GARDE-FOU : autorisation écrite du client en cours de validité, couvrant cet hôte.
+  const refus = await refusSansAutorisation(orgId, check.url.hostname);
+  if (refus) return NextResponse.json({ error: refus }, { status: 403 });
 
   const playbook = getPlaybook(body.playbook);
   const mode: JobMode = playbook
