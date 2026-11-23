@@ -135,3 +135,21 @@ export async function safeFetch(
   }
   return null;
 }
+
+/**
+ * Adresses IP publiques d'un hôte, ou null si l'une d'elles est privée/réservée (ou si la
+ * résolution échoue). À utiliser pour toute connexion TCP/TLS directe : on se connecte ensuite
+ * à CES adresses, pas au nom (pas de seconde résolution exploitable par rebinding DNS).
+ */
+export async function adressesPubliques(host: string): Promise<string[] | null> {
+  try {
+    if (net.isIP(host)) return (net.isIPv4(host) ? isPrivateIPv4(host) : isPrivateIPv6(host)) ? null : [host];
+    const records = await lookup(host, { all: true });
+    if (!records.length) return null;
+    for (const r of records)
+      if ((r.family === 4 && isPrivateIPv4(r.address)) || (r.family === 6 && isPrivateIPv6(r.address))) return null;
+    return records.map((r) => r.address);
+  } catch {
+    return null;
+  }
+}

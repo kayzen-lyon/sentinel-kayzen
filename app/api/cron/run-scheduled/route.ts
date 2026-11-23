@@ -2,10 +2,12 @@ import { NextResponse } from "next/server";
 import { dbConfigured } from "@/lib/db";
 import { runDueScheduledScans } from "@/lib/scheduled";
 import { runMaintenance } from "@/lib/maintenance";
+import { controlerSurfacesDues } from "@/lib/attaque/surveillance";
 import { timingSafeEqual } from "node:crypto";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+// 300 s : durée maximale par défaut des fonctions Vercel (Fluid Compute), y compris sur l'offre Hobby.
+export const maxDuration = 300;
 
 /**
  * Point d'entrée Cron (Vercel) : exécute les surveillances planifiées dues.
@@ -21,9 +23,12 @@ export async function GET(req: Request) {
   if (!dbConfigured)
     return NextResponse.json({ error: "Base non configurée." }, { status: 503 });
 
+  const debut = Date.now();
   const result = await runDueScheduledScans();
+  // Surface d'attaque : budget de temps restant (marge de 30 s), plus anciennes d'abord.
+  const surface = await controlerSurfacesDues(Math.max(0, 270_000 - (Date.now() - debut))).catch(() => null);
   const maintenance = await runMaintenance().catch(() => null);
-  return NextResponse.json({ ok: true, ...result, maintenance });
+  return NextResponse.json({ ok: true, ...result, surface, maintenance });
 }
 
 /** Comparaison en temps constant (évite de deviner le secret à la milliseconde près). */
