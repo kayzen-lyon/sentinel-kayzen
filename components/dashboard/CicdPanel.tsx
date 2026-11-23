@@ -17,19 +17,21 @@ const WORKFLOW_YAML = [
   "  securite:",
   "    runs-on: ubuntu-latest",
   "    timeout-minutes: 20",
+  "    env:",
+  "      BASE: ${{ github.event.pull_request.base.sha }}",
   "    steps:",
   "      - uses: actions/checkout@v4",
   "        with:",
   "          fetch-depth: 0",
   "",
   "      - name: Secrets oubliés dans le code (Gitleaks)",
-  '        run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 git /repo --redact',
+  '        run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 git /repo --redact --log-opts="$BASE..HEAD"',
   "",
   "      - name: Failles dans le code (Semgrep)",
   "        if: always()",
   "        run: |",
   "          pipx install semgrep",
-  "          semgrep scan --config p/default --config p/owasp-top-ten --error --metrics=off",
+  "          semgrep scan --config p/default --config p/owasp-top-ten --severity ERROR --baseline-commit \"$BASE\" --error --metrics=off",
   "",
   "      - name: Dépendances vulnérables (OSV-Scanner)",
   "        if: always()",
@@ -56,8 +58,8 @@ export default function CicdPanel() {
           Scan de sécurité sur les Pull Requests
         </h1>
         <p className="mt-2 max-w-2xl text-muted">
-          À chaque pull request, ce workflow cherche les secrets oubliés, les failles du code et les
-          dépendances vulnérables, et fait échouer le contrôle s'il en trouve. Outils open source :
+          À chaque pull request, ce workflow cherche les secrets et les failles graves ajoutés par
+          la pull request, ainsi que les dépendances vulnérables, et échoue s'il en trouve. Outils open source :
           <strong className="text-fg"> aucune clé, aucun compte</strong>, et votre code reste sur GitHub.
         </p>
 
