@@ -12,7 +12,7 @@ jobs:
     # Les PR de Dependabot n'ont pas accès aux secrets : le scan y échouerait à coup sûr.
     if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,4 +33,20 @@ jobs:
           # Le niveau gratuit de Gemini peut répondre lentement aux heures chargées.
           LLM_PREFLIGHT_TIMEOUT: "120"
         # Exit code 2 si des vulnérabilités sont trouvées → le check PR échoue.
-        run: strix -n -t ./ --scan-mode quick
+        # Si le modèle est saturé (à la connexion ou en cours de scan), on essaie les modèles de
+        # secours, en deux passes. Tout autre échec, y compris des vulnérabilités, arrête le job.
+        run: |
+          set -o pipefail
+          for passe in 1 2; do
+            for modele in "$STRIX_LLM" gemini/gemini-3.6-flash gemini/gemini-3.5-flash-lite; do
+              echo "Passe $passe, modèle $modele"
+              code=0
+              STRIX_LLM="$modele" strix -n -t ./ --scan-mode quick 2>&1 | tee "$RUNNER_TEMP/strix.log" || code=$?
+              if [ "$code" -ne 1 ] || ! grep -qE "LLM CONNECTION FAILED|ServiceUnavailableError" "$RUNNER_TEMP/strix.log"; then
+                exit "$code"
+              fi
+            done
+            if [ "$passe" -eq 1 ]; then sleep 60; fi
+          done
+          echo "::error::Aucun modèle Gemini disponible : le scan n'a pas eu lieu."
+          exit 1
