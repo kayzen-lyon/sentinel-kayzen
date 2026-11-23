@@ -2,6 +2,7 @@ import { ensureSchema, query } from "./db";
 import { isEncrypted, seal } from "./secretbox";
 import { masquerProfond } from "./masquage";
 import { CHAMP_PREUVES, scellerConstat, separerPreuves } from "./preuves";
+import { purgerRapportsExpires } from "./rapports";
 
 /**
  * Entretien quotidien (appelé par le cron) :
@@ -15,6 +16,7 @@ export async function runMaintenance(): Promise<{
   jobsTimedOut: number;
   secretsResealed: number;
   preuvesScellees: number;
+  rapportsPurges: number;
 }> {
   await ensureSchema();
   const purged = await query<{ id: string }>(
@@ -37,7 +39,9 @@ export async function runMaintenance(): Promise<{
 
   const resealed = await resealLegacySecrets();
   const preuves = await scellerPreuvesAnciennes();
-  return { rateEventsPurged: purged.length, jobsTimedOut: stuck.length, secretsResealed: resealed, preuvesScellees: preuves };
+  // Rapports : purgés seulement si RAPPORTS_CONSERVATION_JOURS est défini (sinon expire_le reste NULL).
+  const rapports = await purgerRapportsExpires();
+  return { rateEventsPurged: purged.length, jobsTimedOut: stuck.length, secretsResealed: resealed, preuvesScellees: preuves, rapportsPurges: rapports };
 }
 
 /** Chiffre (et masque) les preuves d'exploitation stockées en clair avant lib/preuves.ts. */

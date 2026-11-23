@@ -1,0 +1,145 @@
+/* Feuille de style du document de rapport (écran et impression A4), reprise du gabarit
+   DocumentRapport de Nexus. Statique : la CSP de Sentinel interdit les <style> en ligne,
+   et aucun texte variable n'entre dans le CSS (pied de page fixe). */
+.doc { --marine:#0f1115; --marine-2:#1e222b; --terra:#be123c; --terra-clair:#fb7185; --or:#92400e; --vert:#166534; --rouge:#b91c1c;
+  --encre:#0f172a; --gris:#475569; --filet:#e2e8f0; --fond:#f4f6f9; --papier:#ffffff;
+  color:var(--encre); font-family:var(--font-jakarta),system-ui,sans-serif; font-size:10.5pt; line-height:1.55;
+  /* Le document est toujours clair, quel que soit le thème du tableau de bord. */
+  color-scheme:light; }
+.doc * { box-sizing:border-box; }
+.doc h1,.doc h2,.doc h3,.doc h4 { font-family:var(--font-outfit),var(--font-jakarta),sans-serif; color:var(--marine); line-height:1.2; margin:0; }
+.doc p { margin:0 0 .7em; }
+.doc a { color:var(--marine-2); text-decoration:underline; text-underline-offset:2px; }
+.doc-feuille { background:var(--papier); max-width:210mm; margin:0 auto 24px; padding:18mm 16mm; box-shadow:0 6px 30px rgba(20,35,59,.12); }
+
+/* Couverture */
+.doc-couverture { background:var(--marine); color:#fff; max-width:210mm; margin:0 auto 24px; min-height:297mm; padding:22mm 18mm; display:flex; flex-direction:column; position:relative; overflow:hidden; box-shadow:0 6px 30px rgba(20,35,59,.25); }
+.doc-couverture::before { content:""; position:absolute; right:-70mm; top:-70mm; width:190mm; height:190mm; border-radius:50%; border:26mm solid rgba(225,29,72,.18); }
+.doc-couverture::after { content:""; position:absolute; left:0; bottom:0; width:100%; height:5mm; background:linear-gradient(90deg,#e11d48 0 62%,#9f1239 62% 100%); }
+.doc-couverture .marque { display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.14em; font-size:10pt; }
+.doc-couverture .surtitre { margin-top:56mm; text-transform:uppercase; letter-spacing:.2em; font-size:9.5pt; color:#fda4af; font-weight:600; }
+.doc-couverture h1 { color:#fff; font-size:38pt; font-weight:800; margin-top:5mm; max-width:150mm; }
+.doc-couverture .site { margin-top:9mm; font-size:19pt; font-weight:600; word-break:break-all; }
+.doc-couverture .trait { width:28mm; height:1.6mm; background:var(--terra-clair); margin:9mm 0; }
+.doc-couverture .meta { font-size:10.5pt; color:#d6dceb; }
+.doc-couverture .meta strong { color:#fff; font-weight:600; }
+.doc-couverture .bas { margin-top:auto; display:flex; justify-content:space-between; align-items:flex-end; gap:12mm; padding-bottom:8mm; position:relative; z-index:1; }
+.doc-couverture .score { text-align:center; }
+.doc-couverture .score .valeur { font-family:var(--font-outfit),sans-serif; font-size:44pt; font-weight:800; line-height:1; }
+.doc-couverture .score .sur { font-size:13pt; color:#d6dceb; }
+.doc-couverture .score .lib { font-size:9pt; letter-spacing:.12em; text-transform:uppercase; color:#d6dceb; margin-top:2mm; }
+.doc-couverture .emetteur { font-size:9.5pt; color:#d6dceb; line-height:1.5; }
+.doc-couverture .emetteur strong { color:#fff; }
+
+/* Titres */
+.doc-chapitre { border-bottom:.6mm solid var(--marine); padding-bottom:3mm; margin-bottom:7mm; display:flex; align-items:baseline; gap:5mm; }
+.doc-chapitre .num { font-family:var(--font-outfit),sans-serif; font-size:30pt; font-weight:800; color:var(--terra); line-height:1; }
+.doc-chapitre h2 { font-size:19pt; font-weight:700; }
+.doc h3 { font-size:12.5pt; font-weight:700; margin:5mm 0 2mm; }
+.doc h4 { font-size:10.5pt; font-weight:700; margin:4mm 0 1.5mm; }
+.doc .rapport-carte h4 { margin:0; }
+.doc .chapo { font-size:11.5pt; color:var(--gris); margin-bottom:5mm; }
+
+/* Sommaire */
+.doc-sommaire { list-style:none; padding:0; margin:0; }
+.doc-sommaire li { display:flex; gap:4mm; align-items:baseline; padding:2.2mm 0; border-bottom:.2mm solid var(--filet); }
+.doc-sommaire .n { width:10mm; font-family:var(--font-outfit),sans-serif; font-weight:800; color:var(--terra); }
+.doc-sommaire a { text-decoration:none; color:var(--encre); font-weight:600; }
+.doc-sommaire .d { color:var(--gris); font-size:9.5pt; margin-left:auto; text-align:right; }
+
+/* Tableaux */
+.doc table { width:100%; border-collapse:collapse; margin:2mm 0 5mm; font-size:9.5pt; }
+.doc caption { text-align:left; font-weight:700; color:var(--marine); padding-bottom:1.5mm; font-size:9.5pt; }
+.doc th { text-align:left; font-weight:600; color:#fff; background:var(--marine-2); padding:1.8mm 2.5mm; }
+.doc td, .doc tbody th { padding:1.6mm 2.5mm; border-bottom:.2mm solid var(--filet); vertical-align:top; }
+.doc tbody th { background:none; color:var(--encre); font-weight:500; }
+.doc tbody tr:nth-child(even) td, .doc tbody tr:nth-child(even) th { background:var(--fond); }
+.doc .num-col { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.doc .url { word-break:break-all; }
+.doc .petit { font-size:8.3pt; }
+
+/* Graphique à barres */
+.doc-barres { margin:2mm 0 6mm; }
+.doc-barres .ligne { display:grid; grid-template-columns:34mm 1fr 22mm; align-items:center; gap:3mm; margin:1.2mm 0; font-size:9pt; }
+.doc-barres .piste { background:var(--fond); height:4.6mm; border-radius:1mm; overflow:hidden; }
+.doc-barres .barre { height:100%; background:var(--marine-2); border-radius:1mm; min-width:.4mm; }
+.doc-barres .barre.alerte { background:var(--terra); }
+.doc-barres .val { text-align:right; font-variant-numeric:tabular-nums; }
+
+/* Encadrés */
+.doc-bilan { display:grid; grid-template-columns:repeat(3,1fr); gap:3mm; margin:4mm 0 5mm; }
+.doc-bilan > div { border:.25mm solid var(--filet); border-radius:2mm; padding:3mm; }
+.doc-bilan dt { font-size:8.5pt; color:var(--gris); }
+.doc-bilan dd { margin:0; font-family:var(--font-outfit),sans-serif; font-size:17pt; font-weight:800; color:var(--marine); }
+.doc-reco { border-left:1.2mm solid var(--terra); background:#fff1f2; padding:3.5mm 4.5mm; border-radius:0 2mm 2mm 0; margin:4mm 0; }
+.doc-reco h4 { margin:0 0 1.5mm; color:var(--terra); text-transform:uppercase; letter-spacing:.08em; font-size:8.8pt; }
+.doc-reco ul { margin:0; padding-left:5mm; }
+.doc-note { border:.25mm dashed var(--gris); border-radius:2mm; padding:3mm 4mm; color:var(--gris); font-size:9.5pt; margin:3mm 0; }
+.doc-probleme { border:.25mm solid var(--filet); border-radius:2mm; padding:3mm 4mm; margin:2.5mm 0; }
+.doc-probleme h4 { margin:0; font-size:11pt; }
+.doc-probleme .tete { display:flex; justify-content:space-between; gap:4mm; align-items:flex-start; }
+.doc-pastille { display:inline-block; border-radius:10mm; padding:.6mm 3mm; font-size:8.3pt; font-weight:700; white-space:nowrap; }
+.doc-pastille.critical { background:#fbe4e2; color:var(--rouge); }
+.doc-pastille.warning { background:#fbefd6; color:var(--or); }
+.doc-pastille.info { background:#e6ebf3; color:var(--marine-2); }
+.doc-pastille.ok { background:#dff1e8; color:var(--vert); }
+.doc ul.liste { margin:1mm 0 0; padding-left:5mm; }
+.doc ul { list-style:disc; }
+.doc ol.doc-sommaire { list-style:none; }
+.doc li { margin:.6mm 0; }
+.doc .muet { color:var(--gris); }
+.doc .deux { display:grid; grid-template-columns:1fr 1fr; gap:6mm; }
+.doc dl.fiche { display:grid; grid-template-columns:52mm 1fr; gap:1.2mm 4mm; margin:0 0 4mm; }
+.doc dl.fiche dt { color:var(--gris); }
+.doc dl.fiche dd { margin:0; }
+.doc-outils { max-width:210mm; margin:0 auto 16px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between; font-family:var(--font-jakarta),sans-serif; }
+
+@media screen and (max-width: 820px) {
+  .doc-feuille { padding:8mm 5mm; }
+  .doc-couverture { min-height:auto; padding:14mm 8mm 16mm; }
+  .doc-couverture .surtitre { margin-top:20mm; }
+  .doc-couverture h1 { font-size:26pt; }
+  .doc .deux, .doc-bilan { grid-template-columns:1fr; }
+  .doc-barres .ligne { grid-template-columns:30mm 1fr 16mm; }
+  .doc table { display:block; overflow-x:auto; }
+}
+
+@page { size:A4; margin:17mm 15mm 19mm;
+  @bottom-left { content:"Sentinel by Kayzen · Rapport de test d’intrusion confidentiel"; font-family:Arial,sans-serif; font-size:8pt; color:#475569; }
+  @bottom-right { content:"Page " counter(page) " sur " counter(pages); font-family:Arial,sans-serif; font-size:8pt; color:#475569; }
+}
+@page :first { margin:0; @bottom-left { content:none; } @bottom-right { content:none; } }
+
+@media print {
+  html, body { background:#fff !important; height:auto !important; overflow:visible !important; }
+  /* Seul le document s'imprime : ni menu, ni boutons flottants du site. */
+  body :not(:has(.doc)):not(.doc):not(.doc *) { display:none !important; }
+  main { padding:0 !important; margin:0 !important; background:#fff !important; min-height:0 !important; }
+  .doc { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+  .doc-feuille { box-shadow:none; max-width:none; margin:0; padding:0; break-before:page; }
+  .doc-feuille.suite { break-before:auto; padding-top:11mm; }
+  .doc-chapitre { break-after:avoid; break-inside:avoid; }
+  .doc .chapo { break-after:avoid; }
+  .doc-couverture { box-shadow:none; max-width:none; margin:0; width:210mm; height:297mm; min-height:0; break-after:page; }
+  .doc h2, .doc h3, .doc h4, .doc caption { break-after:avoid; }
+  .doc tr, .doc-probleme, .doc-reco, .doc-bilan, .doc-barres .ligne, .doc-note { break-inside:avoid; }
+  .doc thead { display:table-header-group; }
+  .doc-reco { break-before:avoid; }
+  .doc a { text-decoration:none; color:inherit; }
+}
+
+/* Ajouts Sentinel (remplacent les attributs style, interdits par la CSP) */
+.doc-couverture .score .lib { display:block; }
+.doc-note.espace { margin-top:8mm; }
+.doc-pastille.critical, .doc-pastille.high { background:#fbe4e2; color:var(--rouge); }
+.doc-pastille.medium { background:#fbefd6; color:var(--or); }
+.doc-pastille.low, .doc-pastille.info { background:#e6ebf3; color:var(--marine-2); }
+.doc-preuve { background:var(--fond); border:.25mm solid var(--filet); border-radius:2mm; padding:3mm; font-family:ui-monospace,Consolas,monospace; font-size:8.3pt; white-space:pre-wrap; word-break:break-all; margin:2mm 0; }
+.doc-risque { border-radius:2mm; padding:4mm 5mm; margin:3mm 0 5mm; border:.4mm solid var(--filet); }
+.doc-risque strong { font-family:var(--font-outfit),sans-serif; font-size:15pt; display:block; }
+.doc-risque.critique, .doc-risque.eleve { border-color:var(--rouge); background:#fff1f2; }
+.doc-risque.critique strong, .doc-risque.eleve strong { color:var(--rouge); }
+.doc-risque.modere { border-color:var(--or); background:#fffbeb; }
+.doc-risque.modere strong { color:var(--or); }
+.doc-outils .actions { display:flex; flex-wrap:wrap; gap:8px; }
+.doc-couverture > * { position:relative; z-index:1; }

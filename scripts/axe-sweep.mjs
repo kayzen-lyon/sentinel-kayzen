@@ -32,6 +32,7 @@ const DASHBOARD = [
   "/dashboard/monitoring",
   "/dashboard/domaines",
   "/dashboard/autorisations",
+  "/dashboard/rapports",
   "/dashboard/cicd",
   "/dashboard/integrations",
   "/dashboard/team",
@@ -98,7 +99,12 @@ async function extraRoutes(ctx) {
   const body = await res.json().catch(() => ({}));
   const jobs = body.jobs || body || [];
   const first = Array.isArray(jobs) ? jobs[0] : null;
-  return first?.id ? [`/dashboard/pentest/${first.id}/report`] : [];
+  const routes = first?.id ? [`/dashboard/pentest/${first.id}/report`] : [];
+  // Premier rapport de test d'intrusion, s'il existe (document en thème clair forcé).
+  const rap = await ctx.request.get(`${BASE}/api/rapports`);
+  const r0 = rap.ok() ? (await rap.json().catch(() => ({}))).rapports?.[0] : null;
+  if (r0?.id) routes.push(`/dashboard/rapports/${r0.id}`);
+  return routes;
 }
 
 async function audit(page, path, themeName) {

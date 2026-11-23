@@ -9,6 +9,7 @@ import {
   Code2,
   CreditCard,
   FileSignature,
+  FileText,
   Globe,
   LayoutDashboard,
   LogOut,
@@ -71,6 +72,7 @@ const NAV: { title: string; items: NavItem[] }[] = [
       { href: "/dashboard/monitoring", label: "Surveillance", icon: Activity },
       { href: "/dashboard/domaines", label: "Domaines", icon: Globe },
       { href: "/dashboard/autorisations", label: "Autorisations", icon: FileSignature },
+      { href: "/dashboard/rapports", label: "Rapports", icon: FileText },
     ],
   },
   {
