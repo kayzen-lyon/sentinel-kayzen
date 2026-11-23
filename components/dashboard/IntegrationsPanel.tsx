@@ -8,12 +8,14 @@ type Installation = {
   installation_id: string;
   account_login: string | null;
   created_at: string;
+  confirme_le: string | null;
 };
 
 export default function IntegrationsPanel() {
   const [configured, setConfigured] = useState(false);
   const [installUrl, setInstallUrl] = useState<string | null>(null);
   const [installations, setInstallations] = useState<Installation[]>([]);
+  const [analysePr, setAnalysePr] = useState(false);
   const [loading, setLoading] = useState(true);
   const [callbackMsg, setCallbackMsg] = useState<
     { kind: "ok" | "warn"; text: string } | null
@@ -55,6 +57,7 @@ export default function IntegrationsPanel() {
         setConfigured(Boolean(d.configured));
         setInstallUrl(d.installUrl || null);
         setInstallations(d.installations || []);
+        setAnalysePr(Boolean(d.analysePr));
       }
       if (tk.ok) {
         const d = await tk.json();
@@ -68,6 +71,20 @@ export default function IntegrationsPanel() {
     })().catch(() => {});
     return () => ac.abort();
   }, []);
+
+  async function confirmer(id: string) {
+    const res = await fetch("/api/integrations/github", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ installationId: Number(id), confirme: true }),
+    });
+    const d = await res.json();
+    if (!res.ok) return toast.error(d.error || "Échec.");
+    setInstallations((l) =>
+      l.map((i) => (i.installation_id === id ? { ...i, confirme_le: d.confirme_le } : i))
+    );
+    toast.success("Installation confirmée.");
+  }
 
   async function saveTickets(e: React.FormEvent) {
     e.preventDefault();
@@ -122,6 +139,12 @@ export default function IntegrationsPanel() {
             commentaire récapitulatif directement sur la PR.
           </p>
 
+          {!loading && !analysePr && (
+            <p className="mt-4 rounded-lg border border-warn/30 bg-warn/10 px-4 py-2.5 text-sm text-warn">
+              L'analyse du code des pull requests est désactivée : elle dépend d'un moteur d'IA. Pour un
+              contrôle gratuit et sans clé à chaque pull request, utilisez le workflow de la page CI/CD.
+            </p>
+          )}
           {loading ? (
             <p className="mt-4 text-sm text-muted">Chargement…</p>
           ) : !configured ? (
@@ -148,7 +171,17 @@ export default function IntegrationsPanel() {
                     </span>
                     <span className="text-xs text-subtle">
                       reliée le {formatDate(i.created_at)}
+                      {i.confirme_le && `, confirmée le ${formatDate(i.confirme_le)}`}
                     </span>
+                    {!i.confirme_le && (
+                      <button
+                        type="button"
+                        className="btn btn-ghost text-xs"
+                        onClick={() => confirmer(i.installation_id)}
+                      >
+                        Je suis responsable de ces dépôts et j'autorise leur analyse
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>

@@ -396,11 +396,32 @@ test("compliance : secrets JS rattachés", async () => {
   assert.deepEqual(controlsFor("js-secret-cle-d-acces-aws", "Divulgation").pci, ["8.6.2", "3.6.1"]);
 });
 
-test("CI/CD : le modèle proposé aux clients suit le workflow du dépôt", async () => {
+test("CI/CD : le workflow proposé aux clients ne demande aucune clé", async () => {
   const { readFileSync } = await import("node:fs");
-  const model = (txt: string) => txt.match(/gemini\/gemini-[0-9a-z.-]+/)?.[0];
-  const repo = model(readFileSync(".github/workflows/strix-security.yml", "utf8"));
-  const panel = model(readFileSync("components/dashboard/CicdPanel.tsx", "utf8"));
-  assert.ok(repo);
-  assert.equal(panel, repo);
+  const panel = readFileSync("components/dashboard/CicdPanel.tsx", "utf8");
+  assert.ok(!/secrets\.|API_KEY|gemini/i.test(panel));
+});
+
+test("choisirMoteur : open source par défaut, Strix seulement si demandé et actif", async () => {
+  const { choisirMoteur } = await import("../lib/github");
+  const avant = process.env.MOTEUR_IA;
+  delete process.env.MOTEUR_IA;
+  assert.equal(choisirMoteur("strix"), "oss");
+  assert.equal(choisirMoteur(undefined), "oss");
+  process.env.MOTEUR_IA = "1";
+  assert.equal(choisirMoteur("strix"), "strix");
+  assert.equal(choisirMoteur("oss"), "oss");
+  if (avant === undefined) delete process.env.MOTEUR_IA;
+  else process.env.MOTEUR_IA = avant;
+});
+
+test("dureeConservationJours : 5 ans par défaut, variable prise en compte", async () => {
+  const { dureeConservationJours } = await import("../lib/rapports");
+  const avant = process.env.RAPPORTS_CONSERVATION_JOURS;
+  delete process.env.RAPPORTS_CONSERVATION_JOURS;
+  assert.equal(dureeConservationJours(), 1825);
+  process.env.RAPPORTS_CONSERVATION_JOURS = "90";
+  assert.equal(dureeConservationJours(), 90);
+  if (avant === undefined) delete process.env.RAPPORTS_CONSERVATION_JOURS;
+  else process.env.RAPPORTS_CONSERVATION_JOURS = avant;
 });

@@ -392,4 +392,14 @@ export const MIGRATIONS: Migration[] = [
     CREATE INDEX IF NOT EXISTS surface_journal_org_idx ON surface_journal (org_id, date DESC, id DESC);
   `,
   },
+  {
+    id: "011_moteur_et_confirmation_github",
+    sql: `
+    -- Moteur choisi au lancement : un pentest soumis à approbation repart avec le même moteur.
+    ALTER TABLE jobs ADD COLUMN IF NOT EXISTS engine text NOT NULL DEFAULT 'strix'
+      CHECK (engine IN ('strix','oss'));
+    -- GitHub App : le responsable confirme qu'il peut faire analyser ces dépôts.
+    ALTER TABLE gh_installations ADD COLUMN IF NOT EXISTS confirme_le timestamptz;
+  `,
+  },
 ];

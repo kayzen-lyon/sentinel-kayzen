@@ -5,50 +5,35 @@ import Link from "next/link";
 
 // Assemblé ligne par ligne pour garder les `${{ ... }}` littéraux (pas d'interpolation JS).
 const WORKFLOW_YAML = [
-  "name: strix-security",
+  "name: sentinel-securite",
   "",
   "on:",
   "  pull_request:",
   "",
   "permissions:",
   "  contents: read",
-  "  pull-requests: write",
   "",
   "jobs:",
-  "  security-scan:",
-  "    # Les PR de Dependabot n'ont pas accès aux secrets : le scan y échouerait à coup sûr.",
-  "    if: github.actor != 'dependabot[bot]'",
+  "  securite:",
   "    runs-on: ubuntu-latest",
-  "    timeout-minutes: 30",
+  "    timeout-minutes: 20",
   "    steps:",
   "      - uses: actions/checkout@v4",
   "        with:",
   "          fetch-depth: 0",
   "",
-  "      - uses: actions/setup-python@v5",
-  '        with:',
-  '          python-version: "3.12"',
+  "      - name: Secrets oubliés dans le code (Gitleaks)",
+  '        run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 git /repo --redact',
   "",
-  "      - name: Install Strix",
-  "        run: pip install strix-agent",
-  "",
-  "      - name: Run Strix on the pull request",
-  "        env:",
-  "          STRIX_LLM: ${{ vars.STRIX_MODEL || 'gemini/gemini-3.8-flash' }}",
-  "          LLM_API_KEY: ${{ secrets.GEMINI_API_KEY }}",
-  "          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}",
-  "          # Le niveau gratuit de Gemini peut répondre lentement aux heures chargées.",
-  '          LLM_PREFLIGHT_TIMEOUT: "120"',
-  "        # Exit code 2 si des vulnérabilités sont trouvées → le check PR échoue.",
-  "        # Modèle saturé : essai des modèles de secours.",
+  "      - name: Failles dans le code (Semgrep)",
+  "        if: always()",
   "        run: |",
-  "          set -o pipefail",
-  '          for modele in "$STRIX_LLM" gemini/gemini-3.6-flash gemini/gemini-3.5-flash-lite; do',
-  "            code=0",
-  '            STRIX_LLM="$modele" strix -n -t ./ --scan-mode quick 2>&1 | tee "$RUNNER_TEMP/strix.log" || code=$?',
-  '            if [ "$code" -ne 1 ] || ! grep -qE "LLM CONNECTION FAILED|ServiceUnavailableError" "$RUNNER_TEMP/strix.log"; then exit "$code"; fi',
-  "          done",
-  "          exit 1",
+  "          pipx install semgrep",
+  "          semgrep scan --config p/default --config p/owasp-top-ten --error --metrics=off",
+  "",
+  "      - name: Dépendances vulnérables (OSV-Scanner)",
+  "        if: always()",
+  '        run: docker run --rm -v "$PWD:/src" ghcr.io/google/osv-scanner:v2.7.1 scan source -r /src --allow-no-lockfiles',
 ].join("\n");
 
 export default function CicdPanel() {
@@ -71,33 +56,26 @@ export default function CicdPanel() {
           Scan de sécurité sur les Pull Requests
         </h1>
         <p className="mt-2 max-w-2xl text-muted">
-          Ajoutez le moteur <strong className="text-fg">Strix</strong> à votre CI : à chaque
-          pull request, Sentinel analyse le code modifié et <strong className="text-fg">bloque
-          la fusion</strong> si des vulnérabilités sont détectées. 100 % gratuit (runner GitHub
-          Actions + LLM à tier gratuit).
+          À chaque pull request, ce workflow cherche les secrets oubliés, les failles du code et les
+          dépendances vulnérables, et fait échouer le contrôle s'il en trouve. Outils open source :
+          <strong className="text-fg"> aucune clé, aucun compte</strong>, et votre code reste sur GitHub.
         </p>
 
         <ol className="mt-6 space-y-2 text-sm text-muted">
           <li>
             <strong className="text-fg">1.</strong> Dans votre dépôt, créez le fichier{" "}
-            <code className="text-brand-light">.github/workflows/strix-security.yml</code> avec
+            <code className="text-brand-light">.github/workflows/sentinel-securite.yml</code> avec
             le contenu ci-dessous.
           </li>
           <li>
-            <strong className="text-fg">2.</strong> Ajoutez le secret{" "}
-            <code className="text-brand-light">GEMINI_API_KEY</code> (clé gratuite Google AI
-            Studio) dans <em>Settings → Secrets and variables → Actions</em>.
-          </li>
-          <li>
-            <strong className="text-fg">3.</strong> Ouvrez une PR : le check « strix-security »
-            apparaît et échoue si des vulnérabilités sont trouvées.
+            <strong className="text-fg">2.</strong> Ouvrez une PR : le check « securite » apparaît.
           </li>
         </ol>
 
         <div className="card mt-6 p-4">
           <div className="no-print mb-2 flex items-center justify-between">
             <span className="text-sm font-semibold text-subtle">
-              .github/workflows/strix-security.yml
+              .github/workflows/sentinel-securite.yml
             </span>
             <button onClick={copy} className="btn btn-ghost !py-1.5 text-xs">
               {copied ? "Copié ✓" : "Copier"}

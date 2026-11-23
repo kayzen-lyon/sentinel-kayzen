@@ -19,6 +19,19 @@ export const githubConfigured = Boolean(
 /** Moteur d'exécution : Strix (agents IA) ou la suite OSS déterministe (Nuclei + testssl.sh). */
 export type ScanEngine = "strix" | "oss";
 
+/**
+ * Moteur IA (Strix) : fermé sauf MOTEUR_IA=1. Le niveau gratuit de Gemini réutilise les contenus
+ * envoyés ; le moteur open source, sans clé ni IA, est donc celui de tous les pentests clients.
+ */
+export function moteurIaActif(): boolean {
+  return process.env.MOTEUR_IA === "1";
+}
+
+/** Moteur à utiliser : Strix seulement s'il est demandé ET actif. */
+export function choisirMoteur(demande: unknown): ScanEngine {
+  return demande === "strix" && moteurIaActif() ? "strix" : "oss";
+}
+
 export type DispatchPayload = {
   jobId: string;
   target: string;

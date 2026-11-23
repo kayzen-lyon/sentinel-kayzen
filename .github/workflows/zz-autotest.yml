@@ -1,0 +1,100 @@
+name: autotest
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      JOB_ID: autotest
+      TARGET: http://127.0.0.1:8000
+      INGEST_URL: http://127.0.0.1:9000
+      WORKER_INGEST_SECRET: autotest
+      NUCLEI_VERSION: ${{ vars.NUCLEI_VERSION || '3.11.1' }}
+    steps:
+      - name: Checkout runner repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cible et réception locales
+        run: |
+          mkdir -p /tmp/t/.git
+          printf '[core]\n\trepositoryformatversion = 0\n[remote "origin"]\n\turl = x\n' > /tmp/t/.git/config
+          echo ok > /tmp/t/index.html
+          (cd /tmp/t && nohup python3 -m http.server 8000 >/dev/null 2>&1 &)
+          cat > /tmp/m.py <<'PY'
+          import http.server
+          class H(http.server.BaseHTTPRequestHandler):
+              def do_POST(s):
+                  open("/tmp/recu", "ab").write(s.rfile.read(int(s.headers["content-length"])) + b"\n")
+                  s.send_response(200)
+                  s.end_headers()
+          http.server.HTTPServer(("127.0.0.1", 9000), H).serve_forever()
+          PY
+          (nohup python3 /tmp/m.py >/dev/null 2>&1 &)
+          sleep 2
+
+      - name: Mark job running
+        run: |
+          curl -s -X POST "$INGEST_URL" \
+            -H "content-type: application/json" \
+            -H "x-worker-secret: $WORKER_INGEST_SECRET" \
+            -d "{\"jobId\":\"$JOB_ID\",\"status\":\"running\"}" || true
+
+      - name: Install Nuclei (binaire épinglé)
+        run: |
+          BASE="https://github.com/projectdiscovery/nuclei/releases/download/v${NUCLEI_VERSION}"
+          ZIP="nuclei_${NUCLEI_VERSION}_linux_amd64.zip"
+          curl -sSfLO "$BASE/$ZIP"
+          curl -sSfL "$BASE/nuclei_${NUCLEI_VERSION}_checksums.txt" | grep " $ZIP$" | sha256sum -c -
+          unzip -o "$ZIP" nuclei
+          chmod +x nuclei
+          ./nuclei -version
+
+      - name: Install Nuclei templates
+        # Indispensable sur un runner vierge : sans templates, le scan échoue
+        # avec « no templates provided ». -disable-update-check ne télécharge PAS
+        # les templates, il ne fait que désactiver la vérification de version.
+        run: ./nuclei -update-templates -disable-update-check
+
+      - name: Install testssl.sh
+        run: |
+          git clone --depth 1 --branch 3.2 https://github.com/testssl/testssl.sh.git
+
+      - name: Nuclei scan (non destructif, limité en débit)
+        run: |
+          set +e
+          ./nuclei -u "$TARGET" \
+            -jsonl -o nuclei.jsonl \
+            -severity low,medium,high,critical \
+            -exclude-tags dos,intrusive,fuzz \
+            -rate-limit 50 -timeout 10 -retries 1 \
+            -no-interactsh -disable-update-check
+          echo "NUCLEI_EXIT=$?" >> "$GITHUB_ENV"
+          set -e
+
+      - name: testssl.sh scan
+        run: |
+          set +e
+          HOST=$(echo "$TARGET" | sed -E 's#^https?://##; s#/.*$##')
+          ./testssl.sh/testssl.sh --jsonfile testssl.json --quiet --sneaky --warnings off "$HOST" || true
+          echo "OSS_EXIT=${NUCLEI_EXIT:-0}" >> "$GITHUB_ENV"
+          set -e
+
+      - name: Push findings + statut
+        if: always()
+        run: python push_oss_findings.py
+
+      - name: Verifier
+        run: |
+          cut -c1-900 /tmp/recu
+          grep -q '"status": "done"' /tmp/recu
+          grep -qi 'git-config' /tmp/recu

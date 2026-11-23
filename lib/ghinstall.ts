@@ -8,6 +8,7 @@ export type GhInstallRow = {
   org_id: string | null;
   user_id: string | null;
   created_at: string;
+  confirme_le: string | null;
 };
 
 export async function upsertInstallation(
@@ -55,6 +56,20 @@ export async function linkInstallationToUser(
     [installationId, orgId, userId]
   );
   return rows[0]?.user_id === userId;
+}
+
+/** Confirmation, par le compte relié, qu'il peut faire analyser les dépôts de l'installation. */
+export async function confirmerInstallation(
+  installationId: number,
+  userId: string
+): Promise<GhInstallRow | null> {
+  await ensureSchema();
+  const rows = await query<GhInstallRow>(
+    `UPDATE gh_installations SET confirme_le = COALESCE(confirme_le, now())
+      WHERE installation_id = $1 AND user_id = $2 RETURNING *`,
+    [installationId, userId]
+  );
+  return rows[0] ?? null;
 }
 
 export async function deleteInstallation(installationId: number): Promise<void> {

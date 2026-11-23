@@ -384,7 +384,7 @@ function ChapitreSujet({ x, numero, m, numeroDe }: { x: Sujet; numero: number; m
   );
 }
 
-export default function DocumentRapport({ m, outils, conservation }: { m: ModeleRapport; outils: ReactNode; conservation: number | null }) {
+export default function DocumentRapport({ m, outils, conservation }: { m: ModeleRapport; outils: ReactNode; conservation: number }) {
   const pentest = m.methode.pentests.length > 0;
   const scans = m.methode.scans.length > 0;
   const emis = dateFr(m.genereLe);
@@ -573,8 +573,8 @@ export default function DocumentRapport({ m, outils, conservation }: { m: Modele
           <p className="doc-note espace">
             Document confidentiel, destiné au seul client. Chaque chiffre de ce rapport provient d’un scan ou d’un test
             d’intrusion enregistré dans Sentinel, daté et rattaché au compte du client ; ce qui n’a pas pu être testé est
-            signalé comme tel. Les descriptions des vulnérabilités exploitées sont rédigées par le moteur d’IA Strix ;
-            les chiffres, la notation, les synthèses et le plan d’action sont calculés à partir des résultats.
+            signalé comme tel.{m.methode.ia && " Les descriptions des vulnérabilités exploitées sont rédigées par le moteur d’IA Strix."} Les
+            chiffres, la notation, les synthèses et le plan d’action sont calculés à partir des résultats.
           </p>
         </Feuille>
 
@@ -604,7 +604,7 @@ export default function DocumentRapport({ m, outils, conservation }: { m: Modele
             <dt>Période</dt>
             <dd>{m.periode ? `Du ${dateFr(m.periode.debut)} au ${dateFr(m.periode.fin)}` : "Non renseignée"}</dd>
             <dt>Tests d’intrusion</dt>
-            <dd>{m.methode.pentests.length ? `${m.methode.pentests.length} (exploitation contrôlée, moteur Strix)` : "Aucun"}</dd>
+            <dd>{m.methode.pentests.length ? `${m.methode.pentests.length} (${m.methode.ia ? "exploitation contrôlée, moteur Strix" : "tests non destructifs, Nuclei et testssl.sh"})` : "Aucun"}</dd>
             <dt>Analyses de configuration</dt>
             <dd>
               {m.methode.scans.length
@@ -813,7 +813,7 @@ export default function DocumentRapport({ m, outils, conservation }: { m: Modele
           <p className="doc-note">
             Un test d’intrusion donne une image à un instant donné : l’absence de constat ne prouve pas l’absence de
             vulnérabilité.
-            {pentest &&
+            {m.methode.ia &&
               " Les tests d’intrusion sont menés par des agents d’intelligence artificielle (moteur Strix) ; leurs constats sont relus par un second passage automatique, pas par un auditeur humain, sauf mention contraire."}
           </p>
         </Feuille>
@@ -844,13 +844,19 @@ export default function DocumentRapport({ m, outils, conservation }: { m: Modele
               {pentest && (
                 <>
                   <tr>
-                    <th scope="row">{scans ? "3" : "2"}. Exploitation contrôlée</th>
-                    <td>Agents d’IA du moteur Strix : recherche active de vulnérabilités et preuve de concept pour chacune.</td>
+                    <th scope="row">{scans ? "3" : "2"}. {m.methode.ia ? "Exploitation contrôlée" : "Recherche active de vulnérabilités"}</th>
+                    <td>
+                      {m.methode.ia
+                        ? "Agents d’IA du moteur Strix : recherche active de vulnérabilités et preuve de concept pour chacune."
+                        : "Nuclei (modèles de vulnérabilités connues) et testssl.sh (chiffrement), en mode non destructif et sans exploitation."}
+                    </td>
                   </tr>
-                  <tr>
-                    <th scope="row">{scans ? "4" : "3"}. Relecture contradictoire</th>
-                    <td>Second passage automatique qui confirme, met en doute ou rejette chaque constat et peut recalibrer sa gravité.</td>
-                  </tr>
+                  {m.methode.ia && (
+                    <tr>
+                      <th scope="row">{scans ? "4" : "3"}. Relecture contradictoire</th>
+                      <td>Second passage automatique qui confirme, met en doute ou rejette chaque constat et peut recalibrer sa gravité.</td>
+                    </tr>
+                  )}
                 </>
               )}
               <tr>
@@ -1205,9 +1211,7 @@ export default function DocumentRapport({ m, outils, conservation }: { m: Modele
           </p>
           <h3>Conservation</h3>
           <p>
-            {conservation
-              ? `Ce rapport est supprimé automatiquement ${conservation} jours après sa création.`
-              : "La durée de conservation des rapports et des preuves n’est pas encore fixée : elle relève du contrat client et du RGPD. En attendant, le rapport reste accessible jusqu’à sa suppression par le client."}
+            {`Ce rapport est supprimé automatiquement ${conservation} jours après sa création. Les preuves d’exploitation sont effacées après 12 mois. Le client peut supprimer l’ensemble avant en supprimant son compte.`}
           </p>
           <h3>Portée et responsabilité</h3>
           <p>

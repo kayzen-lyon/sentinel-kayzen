@@ -30,7 +30,7 @@ jobs:
       TARGET: ${{ github.event.client_payload.target }}
       INGEST_URL: ${{ github.event.client_payload.ingestUrl }}
       WORKER_INGEST_SECRET: ${{ secrets.WORKER_INGEST_SECRET }}
-      NUCLEI_VERSION: ${{ vars.NUCLEI_VERSION || '3.3.7' }}
+      NUCLEI_VERSION: ${{ vars.NUCLEI_VERSION || '3.11.1' }}
     steps:
       - name: Checkout runner repo
         uses: actions/checkout@v4
@@ -49,8 +49,11 @@ jobs:
 
       - name: Install Nuclei (binaire épinglé)
         run: |
-          curl -sSfL "https://github.com/projectdiscovery/nuclei/releases/download/v${NUCLEI_VERSION}/nuclei_${NUCLEI_VERSION}_linux_amd64.zip" -o nuclei.zip
-          unzip -o nuclei.zip nuclei
+          BASE="https://github.com/projectdiscovery/nuclei/releases/download/v${NUCLEI_VERSION}"
+          ZIP="nuclei_${NUCLEI_VERSION}_linux_amd64.zip"
+          curl -sSfLO "$BASE/$ZIP"
+          curl -sSfL "$BASE/nuclei_${NUCLEI_VERSION}_checksums.txt" | grep " $ZIP$" | sha256sum -c -
+          unzip -o "$ZIP" nuclei
           chmod +x nuclei
           ./nuclei -version
 
@@ -62,7 +65,7 @@ jobs:
 
       - name: Install testssl.sh
         run: |
-          git clone --depth 1 https://github.com/drwetter/testssl.sh.git
+          git clone --depth 1 --branch 3.2 https://github.com/testssl/testssl.sh.git
 
       - name: Nuclei scan (non destructif, limité en débit)
         run: |

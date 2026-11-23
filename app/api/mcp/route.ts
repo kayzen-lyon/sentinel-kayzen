@@ -12,7 +12,7 @@ import { checkQuota } from "@/lib/plans";
 import { createJob, getJob, listFindings } from "@/lib/jobs";
 import { canManage, ensurePersonalOrg, getOrg, getRole } from "@/lib/orgs";
 import { getPlaybook, PLAYBOOKS } from "@/lib/playbooks";
-import { appBaseUrl, dispatchWorkerRun, githubConfigured } from "@/lib/github";
+import { appBaseUrl, choisirMoteur, dispatchWorkerRun, githubConfigured } from "@/lib/github";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { logAudit } from "@/lib/audit";
 
@@ -56,8 +56,8 @@ const TOOLS = [
   {
     name: "launch_pentest",
     description:
-      "Lance un pentest autonome (moteur Strix) sur un DOMAINE VÉRIFIÉ. Optionnellement un " +
-      "playbook (" +
+      "Lance un pentest autonome (moteur open source Nuclei + testssl.sh) sur un DOMAINE VÉRIFIÉ. " +
+      "Les playbooks ne s'appliquent que si le moteur IA est activé (" +
       PLAYBOOKS.map((p) => p.id).join(", ") +
       "). Renvoie l'identifiant de job.",
     inputSchema: {
@@ -181,7 +181,8 @@ async function callTool(
           isError: true,
         };
 
-      const playbook = getPlaybook(args.playbook ? String(args.playbook) : null);
+      const engine = choisirMoteur(args.playbook ? "strix" : "oss");
+      const playbook = engine === "strix" ? getPlaybook(String(args.playbook)) : null;
       const mode = playbook ? playbook.mode : "standard";
       const instruction = playbook?.instruction ?? null;
 
@@ -196,6 +197,7 @@ async function callTool(
         check.url.toString(),
         mode,
         orgId,
+        engine,
         needsApproval ? "pending_approval" : "queued",
         playbook?.id ?? null,
         instruction
@@ -206,7 +208,7 @@ async function callTool(
         actorEmail: userEmail,
         action: needsApproval ? "pentest.pending" : "pentest.launch",
         target: check.url.hostname,
-        meta: { mode, jobId, via: "mcp" },
+        meta: { mode, engine, jobId, via: "mcp" },
       });
       if (needsApproval)
         return text({
@@ -222,6 +224,7 @@ async function callTool(
           mode,
           ingestUrl: `${appBaseUrl(req)}/api/jobs/ingest`,
           instruction: instruction ?? undefined,
+          engine,
         }).catch(() => {});
       }
       return text({ jobId, status: "queued", queuedOnly: !githubConfigured });
