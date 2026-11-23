@@ -78,6 +78,17 @@ export async function creerRapport(
     ...verifierSources(jobIds, await sourcesPentests(jobIds), { userId, orgIds }, maintenant, "pentest"),
   ];
   if (erreurs.length) return { erreurs };
+  // Même utilisateur, mêmes sources : on rouvre le rapport existant au lieu d'en créer un doublon
+  // (il est réassemblé à chaque consultation, donc toujours à jour).
+  const existant = await query<{ id: string }>(
+    `SELECT id FROM rapports
+      WHERE user_id = $1 AND (expire_le IS NULL OR expire_le > now())
+        AND scan_ids @> $2::uuid[] AND scan_ids <@ $2::uuid[]
+        AND job_ids @> $3::uuid[] AND job_ids <@ $3::uuid[]
+      ORDER BY cree_le DESC LIMIT 1`,
+    [userId, scanIds, jobIds]
+  );
+  if (existant[0]) return { id: existant[0].id };
   const duree = dureeConservationJours();
   const titre = demande.titre.trim().slice(0, 140) || "Rapport de test d'intrusion";
   const rows = await query<{ id: string }>(
