@@ -1,8 +1,10 @@
 import { ensureSchema, query } from "./db";
 import { userOrgIds } from "./orgs";
 import { listFindingsAvecPreuves } from "./jobs";
+import { listAutorisations, normaliserHote, perimetreCouvre } from "./autorisations";
 import {
   AGE_MAX_JOURS,
+  type AutorisationRapport,
   construireRapport,
   verifierSources,
   type ModeleRapport,
@@ -139,7 +141,34 @@ export async function chargerRapport(userId: string, id: string): Promise<{ rapp
       })),
     });
   }
-  return { rapport, modele: construireRapport(rapport.titre, scans, pentests, new Date(rapport.cree_le)) };
+  return {
+    rapport,
+    modele: construireRapport(rapport.titre, scans, pentests, new Date(rapport.cree_le), {
+      id: rapport.id,
+      autorisations: await autorisationsDuRapport(rapport.org_id, [...scans.map((s) => s.target_url), ...pentests.map((p) => p.target_url)]),
+    }),
+  };
+}
+
+/**
+ * Autorisations écrites (non révoquées) qui couvrent au moins une cible du rapport : elles
+ * alimentent le chapitre « Règles d'engagement ». Jamais le document lui-même, seulement ses
+ * références (nom, empreinte SHA-256).
+ */
+async function autorisationsDuRapport(orgId: string | null, urls: string[]): Promise<AutorisationRapport[]> {
+  if (!orgId) return [];
+  const hotes = [...new Set(urls.map((u) => normaliserHote(u)).filter((h): h is string => Boolean(h)))];
+  const toutes = await listAutorisations(orgId).catch(() => []);
+  return toutes
+    .filter((a) => !a.revoked_at && hotes.some((h) => perimetreCouvre(a.perimetre, h)))
+    .map((a) => ({
+      client: a.client,
+      perimetre: a.perimetre,
+      debut: a.debut,
+      fin: a.fin,
+      document: a.document_nom,
+      empreinte: a.document_sha256,
+    }));
 }
 
 export async function supprimerRapport(userId: string, id: string): Promise<boolean> {
