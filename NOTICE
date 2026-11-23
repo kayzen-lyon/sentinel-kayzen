@@ -15,6 +15,11 @@ Copyright (c) 2026 Sachin Sharma
     grille de triage en 7 questions (« 7-Question Gate »), traduite et adaptée au
     contexte d'un audit sur son propre périmètre (lib/triage.ts).
 
+Bird Murmuration Text Animation — https://21st.dev/@kedhareswer/components/murmuration-wordmark
+Auteur : Kedhareswer Naidu
+  - Licence MIT, d'après la page du composant (consultée le 23 novembre 2026) : animation de
+    la nuée du premier écran, adaptée (components/Nuee.tsx).
+
 Idées reprises sans copie de code (implémentations originales) :
   - REAP (hackwither/reap, MIT) : commande de reproduction par constat.
   - BBOT (blacklanternsecurity/bbot, AGPL-3.0) : croisement de sources passives de sous-domaines.
