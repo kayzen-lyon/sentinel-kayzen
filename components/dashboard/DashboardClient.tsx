@@ -121,6 +121,34 @@ export default function DashboardClient({
     }
   }
 
+  // Rapport professionnel (couverture, synthèse, chapitres par sujet, fiches, plan d'action, annexes)
+  // assemblé côté serveur à partir du scan enregistré : jamais à partir des chiffres de cette page.
+  const [rapportEnCours, setRapportEnCours] = useState(false);
+  const scanEnregistre = Boolean(currentKey && /^[0-9a-f-]{36}$/i.test(currentKey));
+  async function rapportComplet() {
+    if (!result || !scanEnregistre || rapportEnCours) return;
+    setRapportEnCours(true);
+    setError(null);
+    try {
+      let hote = result.targetUrl;
+      try {
+        hote = new URL(result.targetUrl).hostname;
+      } catch {
+        /* adresse brute */
+      }
+      const res = await fetch("/api/rapports", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ titre: `Rapport de sécurité — ${hote}`, scanIds: [currentKey], jobIds: [] }),
+      });
+      const d = await res.json().catch(() => ({}));
+      if (res.ok && d.id) window.location.assign(`/dashboard/rapports/${d.id}`);
+      else setError(d.error || "Impossible de préparer le rapport.");
+    } finally {
+      setRapportEnCours(false);
+    }
+  }
+
   async function openHistory(item: HistoryItem) {
     const older = scans.slice(scans.indexOf(item) + 1);
     setCurrentKey(item.id ?? item.created_at);
@@ -339,7 +367,16 @@ export default function DashboardClient({
                           JUnit
                         </button>
                         <button onClick={() => window.print()} className="btn btn-ghost !px-3 !py-1.5 text-xs">
-                          Imprimer / PDF
+                          Imprimer cette page
+                        </button>
+                        <button
+                          onClick={rapportComplet}
+                          disabled={rapportEnCours || !scanEnregistre}
+                          aria-busy={rapportEnCours}
+                          title={scanEnregistre ? undefined : "Disponible pour un scan enregistré dans votre compte"}
+                          className="btn btn-primary !px-3 !py-1.5 text-xs disabled:opacity-60"
+                        >
+                          {rapportEnCours ? "Préparation du rapport…" : "Rapport complet (PDF)"}
                         </button>
                       </div>
                     </div>
