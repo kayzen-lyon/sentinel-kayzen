@@ -1,8 +1,9 @@
-/* Premier écran : le texte à gauche, l'animation d'audit (HeroMotion) posée sur un
-   pan bleu nuit coupé net en biais (styles .apv-hero-* dans globals.css).
-   Aucun dégradé, aucun halo. */
+/* Premier écran : le texte à gauche, la nuée (mots du pentest) posée sur un pan bleu nuit
+   coupé net en biais (styles .apv-hero-* dans globals.css). La nuée est figée si l'utilisateur
+   limite les animations. Chiffres du bandeau : faits vérifiables (lib/accueil.ts). */
 import Link from "next/link";
-import HeroMotion from "@/components/HeroMotion";
+import { Nuee } from "@/components/Nuee";
+import { CONFIANCE, H1_ACCUEIL } from "@/lib/accueil";
 
 export default function Hero() {
   return (
@@ -15,15 +16,15 @@ export default function Hero() {
 
             {/* Pas d'animation d'entrée sur le h1 : c'est l'élément LCP. */}
             <h1 className="leading-[1.06] text-fg" data-size="hero">
-              Des hackers IA qui trouvent vos failles{" "}
-              <span className="gradient-text">avant les vrais.</span>
+              {H1_ACCUEIL.debut}{" "}
+              <span className="gradient-text">{H1_ACCUEIL.fin}</span>
             </h1>
 
             <p className="reveal mt-6 max-w-xl text-fg" data-size="lg" data-delay="120">
               Sentinel déploie des agents autonomes qui exécutent réellement votre
               application, exploitent les vulnérabilités et les prouvent par des{" "}
-              <strong className="font-semibold">PoC concrets</strong> — pas
-              de faux positifs. Un pentest complet en heures, pas en semaines.
+              <strong className="font-semibold">PoC concrets</strong>, relus avant de
+              vous être remontés. Uniquement sur les domaines que vous nous autorisez par écrit à tester.
             </p>
 
             <div className="reveal mt-8 flex flex-col gap-3 sm:flex-row" data-delay="180">
@@ -49,19 +50,21 @@ export default function Hero() {
           </div>
 
           <div className="apv-hero-visual">
-            <HeroMotion />
+            <Nuee
+              words={["PENTEST", "OWASP", "CVE"]}
+              palette={{ skyTop: "#0d1621", skyLow: "#3a1a12", sun: "#e16d47", ink: "#f3bd49" }}
+              anchor={{ x: 0.5, y: 0.5, width: 0.82 }}
+              anchorMobile={{ x: 0.5, y: 0.5, width: 0.86 }}
+              reeds={false}
+              className="h-[320px] rounded-2xl sm:h-[400px] lg:h-[460px]"
+            />
           </div>
         </div>
       </div>
 
       <div className="container-x">
         <dl className="band-dark apv-stats grid grid-cols-2 gap-6 px-6 py-8 md:grid-cols-4 md:px-10">
-          {[
-            ["100+", "vecteurs testés"],
-            ["OWASP", "Top 10 & au-delà"],
-            ["0", "faux positif — chaque faille prouvée"],
-            ["24/7", "surveillance continue"],
-          ].map(([n, l]) => (
+          {CONFIANCE.map(({ valeur: n, libelle: l }) => (
             <div key={l} className="text-center">
               <dt className="font-heading text-3xl font-extrabold text-gold md:text-4xl">{n}</dt>
               <dd className="mt-1 text-sm text-muted">{l}</dd>

@@ -4,7 +4,15 @@ import { useState } from "react";
 import { FAQ as QA } from "@/lib/faq";
 
 export default function Faq() {
-  const [open, setOpen] = useState<number | null>(0);
+  // Toutes les réponses ouvertes par défaut ; on mémorise seulement celles qu'on a repliées.
+  const [replies, setReplies] = useState<Set<number>>(() => new Set());
+  const basculer = (i: number) =>
+    setReplies((s) => {
+      const n = new Set(s);
+      if (n.has(i)) n.delete(i);
+      else n.add(i);
+      return n;
+    });
 
   return (
     <section id="faq" className="border-t border-border py-24">
@@ -21,13 +29,14 @@ export default function Faq() {
 
         <div className="mx-auto mt-12 max-w-3xl divide-y divide-border rounded-2xl border border-border bg-card">
           {QA.map((item, i) => {
-            const isOpen = open === i;
+            const isOpen = !replies.has(i);
             return (
               <div key={item.q}>
                 <button
                   className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
-                  onClick={() => setOpen(isOpen ? null : i)}
+                  onClick={() => basculer(i)}
                   aria-expanded={isOpen}
+                  aria-controls={`faq-reponse-${i}`}
                 >
                   <span className="font-heading text-base font-semibold text-fg">
                     {item.q}
@@ -43,6 +52,7 @@ export default function Faq() {
                   </span>
                 </button>
                 <div
+                  id={`faq-reponse-${i}`}
                   className={`grid transition-[grid-template-rows] duration-300 ease-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
                 >
                   <div className="overflow-hidden">
