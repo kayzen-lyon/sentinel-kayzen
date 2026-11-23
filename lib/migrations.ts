@@ -355,4 +355,41 @@ export const MIGRATIONS: Migration[] = [
     CREATE INDEX IF NOT EXISTS rapports_org_idx ON rapports (org_id, cree_le DESC);
   `,
   },
+  {
+    id: "010_surveillance_surface",
+    sql: `
+    -- Surveillance quotidienne de la surface d'attaque (lib/attaque/) : cibles, un instantané
+    -- JSON par passage (les 30 derniers par cible) et journal des changements (300 par org.).
+    CREATE TABLE IF NOT EXISTS surface_cibles (
+      id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      org_id           uuid NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+      user_id          uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      hote             text NOT NULL,
+      actif            boolean NOT NULL DEFAULT true,
+      dernier_controle timestamptz,
+      dernier_statut   text,
+      cree_le          timestamptz NOT NULL DEFAULT now(),
+      UNIQUE (org_id, hote)
+    );
+    CREATE TABLE IF NOT EXISTS surface_instantanes (
+      id       bigserial PRIMARY KEY,
+      cible_id uuid NOT NULL REFERENCES surface_cibles(id) ON DELETE CASCADE,
+      cree_le  timestamptz NOT NULL DEFAULT now(),
+      donnees  jsonb NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS surface_instantanes_cible_idx ON surface_instantanes (cible_id, cree_le DESC);
+    CREATE TABLE IF NOT EXISTS surface_journal (
+      id       bigserial PRIMARY KEY,
+      org_id   uuid NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+      cible_id uuid REFERENCES surface_cibles(id) ON DELETE SET NULL,
+      hote     text NOT NULL,
+      date     timestamptz NOT NULL,
+      gravite  text NOT NULL CHECK (gravite IN ('critique','important','info')),
+      type     text NOT NULL,
+      phrase   text NOT NULL,
+      lu       boolean NOT NULL DEFAULT false
+    );
+    CREATE INDEX IF NOT EXISTS surface_journal_org_idx ON surface_journal (org_id, date DESC, id DESC);
+  `,
+  },
 ];

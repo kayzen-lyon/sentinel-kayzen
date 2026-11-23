@@ -1370,3 +1370,9 @@ html[data-espace='dashboard'] p a:not([data-slot='button']):not(.btn) {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+/* Pastilles et textes teintés « brand » : le texte prend la nuance lisible du thème (#BE123C / #FB7185),
+   le fond garde la teinte carmin. [WCAG 1.4.3] */
+html[data-espace='dashboard'] :is([data-tint="soft"], [data-tint="outline"], [data-tint="fg"])[data-tone="brand"] {
+  color: rgb(var(--brand-light));
+}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { formatDate } from "@/lib/format";
+import SurfacePanel from "@/components/dashboard/SurfacePanel";
 
 type Schedule = {
   id: string;
@@ -148,6 +149,7 @@ export default function MonitoringPanel() {
             </li>
           ))}
         </ul>
+        <SurfacePanel />
       </main>
     </div>
   );

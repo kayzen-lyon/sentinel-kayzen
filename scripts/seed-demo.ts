@@ -120,6 +120,23 @@ async function main() {
      VALUES ($1,$2,$3,'daily', now() - interval '1 day', 83)`,
     [user.id, orgId, TARGET]
   );
+  // Surveillance de la surface d'attaque : une cible et trois changements fictifs.
+  const cible = await query<{ id: string }>(
+    `INSERT INTO surface_cibles (org_id, user_id, hote, dernier_controle, dernier_statut)
+     VALUES ($1,$2,'demo.sentinel.test', now() - interval '1 day', '3 changement(s)') RETURNING id`,
+    [orgId, user.id]
+  );
+  const journal: [string, string, string][] = [
+    ["critique", "port-ouvert", "[Démo] Le port 6379 (Redis) de demo.sentinel.test est accessible depuis Internet."],
+    ["important", "entete-retire", "[Démo] L'en-tête Content-Security-Policy a été retiré de demo.sentinel.test."],
+    ["info", "route", "[Démo] Nouvelle route exposée sur demo.sentinel.test : /api/v2/items."],
+  ];
+  for (const [gravite, type, phrase] of journal)
+    await query(
+      `INSERT INTO surface_journal (org_id, cible_id, hote, date, gravite, type, phrase) VALUES ($1,$2,'demo.sentinel.test', now() - interval '1 day',$3,$4,$5)`,
+      [orgId, cible[0].id, gravite, type, phrase]
+    );
+
   console.log(`Jeu de démo installé : ${DEMO_EMAIL}`);
 }
 
